@@ -7,17 +7,20 @@ import api from './api/api';
 function App() {
   const [count, setCount] = useState(0)
     const [weather, setWeather] = useState<string | null>(null)
-    useEffect(() => {
-        console.log('useEffect');
+
+    const getWeather = (callback: () => void) => {
+        console.log('getWeather');
         api.get('/weatherforecast'
         ).then(response => {
             console.log('response');
-            setWeather(JSON.stringify(response.data, null, 2));
+            setWeather(JSON.stringify(response.data));
+            callback();
         }
         ).catch(error => {
-            console.log('error');
+            console.log(error);
         });
-    }, []);
+        
+    };
 
   return (
     <>
@@ -41,9 +44,9 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-        <p>
-            If there's text below... it's working! - Nick
-        </p>
+        <button onClick={() => getWeather(() => console.log('weather updated'))}>
+            Get Weather
+        </button>
         <p>{weather}</p>
     </>
   )
