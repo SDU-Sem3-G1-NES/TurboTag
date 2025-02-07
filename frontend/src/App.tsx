@@ -1,26 +1,26 @@
-import {useEffect, useState} from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
 import api from './api/api';
 
 function App() {
-  const [count, setCount] = useState(0)
-    const [weather, setWeather] = useState<string | null>(null)
+  const [count, setCount] = useState(0);
+  const [weather, setWeather] = useState<string | null>(null);
 
-    const getWeather = (callback: () => void) => {
-        console.log('getWeather');
-        api.get('/weatherforecast'
-        ).then(response => {
-            console.log('response');
-            setWeather(JSON.stringify(response.data));
-            callback();
-        }
-        ).catch(error => {
-            console.log(error);
-        });
-        
-    };
+  const getWeather = (callback: () => void) => {
+    console.log('getWeather');
+    api
+      .get('/weatherforecast')
+      .then((response) => {
+        console.log('response');
+        setWeather(JSON.stringify(response.data));
+        callback();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
@@ -34,22 +34,16 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-        <button onClick={() => getWeather(() => console.log('weather updated'))}>
-            Get Weather
-        </button>
-        <p>{weather}</p>
+      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      <button onClick={() => getWeather(() => console.log('weather updated'))}>Get Weather</button>
+      <p>{weather}</p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
