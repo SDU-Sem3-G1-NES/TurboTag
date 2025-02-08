@@ -1,0 +1,40 @@
+name: Generate API Client
+
+on:
+  pull_request:
+    branches:
+      - main
+        
+permissions:
+  contents: write
+
+jobs:
+  generate-api-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+
+      - name: Install NSwag and Swagger CLI
+        run: |
+          dotnet tool install -g NSwag.ConsoleCore
+          dotnet tool install -g Swashbuckle.AspNetCore.Cli
+      - name: Build API and Generate API Client
+        run: |
+          dotnet build API/API.csproj
+          cd frontend 
+          npm run genapi
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"     
+          git add frontend/src/api/apiClient.ts
+          git commit -m "Updated API Client" || echo "No changes to commit"
+          git pull --rebase origin ${{ github.head_ref }}
+          git push origin HEAD:${{ github.head_ref }} || echo "No changes to push"

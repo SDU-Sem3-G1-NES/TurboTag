@@ -1,0 +1,22 @@
+name: Build and Unit Test the API
+
+on:
+  pull_request:
+    branches:
+      - main
+        
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+      - name: Build API and Run Unit Tests
+        run: |
+          dotnet build API/API.csproj --warnaserror
+          dotnet test API.Tests/API.Tests.csproj
