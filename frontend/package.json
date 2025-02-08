@@ -9,6 +9,8 @@
     "devapi": "npm run genapi && vite",
     "build": "npm run genapi && tsc -b && vite build",
     "lint": "eslint .",
+    "lint-fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'",
+    "prettier-fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "preview": "vite preview"
   },
   "dependencies": {
