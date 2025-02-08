@@ -17,15 +17,15 @@ jobs:
         run: npm i
         working-directory: frontend
       - name: ESLint
-        run: yarn run lint-fix
+        run: npm run lint-fix
         working-directory: frontend
       - name: Prettier
-        run: yarn prettier-fix
+        run: npm prettier-fix
         working-directory: frontend
       - name: Commit changes
         run: |
           git config --global user.name "GitHub Actions"
-          git config --global user.email "
+          git config --global user.email "actions@github.com"
           git add -A
           git commit -m "Linted and Formatted code" || echo "No changes to commit"
           git pull --rebase origin ${{ github.head_ref }}
