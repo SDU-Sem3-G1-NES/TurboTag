@@ -21,8 +21,12 @@ jobs:
         run: |
           dotnet tool install -g NSwag.ConsoleCore
           dotnet tool install -g Swashbuckle.AspNetCore.Cli
+      - name: Build API
+        run: dotnet build API/Api.csproj
       - name: Build API and Generate API Client
-        run: cd frontend && npm run genapi
+        run: |
+          cd frontend 
+          npm run genapi
 
       - name: Commit changes
         run: |
