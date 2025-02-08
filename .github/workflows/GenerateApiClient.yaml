@@ -1,7 +1,6 @@
 name: Generate API Client
 
 on:
-  push:
   pull_request:
     branches:
       - main
