@@ -20,7 +20,7 @@ jobs:
         run: npm run lint-fix
         working-directory: frontend
       - name: Prettier
-        run: npm prettier-fix
+        run: npm run prettier-fix
         working-directory: frontend
       - name: Commit changes
         run: |
