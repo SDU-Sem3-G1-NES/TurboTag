@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
-import { TestClient } from './api/apiClient.ts';
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import { TestClient } from './api/apiClient.ts'
 
 function App() {
-  const [count, setCount] = useState(0);
-  const testClient = new TestClient();
-  const [testString, setTestString] = useState<string | null>(null);
+  const [count, setCount] = useState(0)
+  const testClient = new TestClient()
+  const [testString, setTestString] = useState<string | null>(null)
 
   const getTestString = (callback: () => void) => {
-    console.log('getWeather');
+    console.log('getWeather')
     testClient.get().then((response) => {
-      console.log('response', response);
-      setTestString(response);
-      callback();
-    });
-  };
+      console.log('response', response)
+      setTestString(response)
+      callback()
+    })
+  }
 
   return (
     <>
@@ -39,7 +39,7 @@ function App() {
       <button onClick={() => getTestString(() => console.log('weather updated'))}>Test</button>
       <p>{testString}</p>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
