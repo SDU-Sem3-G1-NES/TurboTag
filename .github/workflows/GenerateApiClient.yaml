@@ -22,12 +22,12 @@ jobs:
           dotnet tool install -g NSwag.ConsoleCore
           dotnet tool install -g Swashbuckle.AspNetCore.Cli
       - name: Build API and Generate API Client
-        run: npm run genapi
+        run: cd frontend && npm run genapi
 
       - name: Commit changes
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add src/api/apiClient.ts
+          git add frontend/src/api/apiClient.ts
           git commit -m "Updated API Client" || echo "No changes to commit"
           git push
