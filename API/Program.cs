@@ -1,3 +1,5 @@
+using API;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
             .AllowAnyMethod()
@@ -13,39 +15,26 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options => { options.OperationFilter<SwaggerOperationIdFilter>(); });
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 API");
+        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+    });
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 app.UseCors("AllowAll");
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

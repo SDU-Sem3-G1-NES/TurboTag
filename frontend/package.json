@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "genapi": "swagger tofile --output swagger.json ../API/bin/Debug/net9.0/API.dll v1 && nswag run nswag.json",
+    "devapi": "npm run genapi && vite",
+    "build": "npm run genapi && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.1",
+    "api": "^6.1.2",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "react": "^19.0.0",

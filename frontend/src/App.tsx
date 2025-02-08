@@ -2,24 +2,20 @@ import { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
-import api from './api/api';
+import { TestClient } from './api/apiClient.ts';
 
 function App() {
   const [count, setCount] = useState(0);
-  const [weather, setWeather] = useState<string | null>(null);
+  const testClient = new TestClient();
+  const [testString, setTestString] = useState<string | null>(null);
 
-  const getWeather = (callback: () => void) => {
+  const getTestString = (callback: () => void) => {
     console.log('getWeather');
-    api
-      .get('/weatherforecast')
-      .then((response) => {
-        console.log('response');
-        setWeather(JSON.stringify(response.data));
-        callback();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    testClient.get().then((response) => {
+      console.log('response', response);
+      setTestString(response);
+      callback();
+    });
   };
 
   return (
@@ -40,8 +36,8 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-      <button onClick={() => getWeather(() => console.log('weather updated'))}>Get Weather</button>
-      <p>{weather}</p>
+      <button onClick={() => getTestString(() => console.log('weather updated'))}>Test</button>
+      <p>{testString}</p>
     </>
   );
 }
