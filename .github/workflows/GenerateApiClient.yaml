@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  generate-client:
+  generate-api-client:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -32,6 +32,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+          git checkout -b update-api-client          
           git add frontend/src/api/apiClient.ts
           git commit -m "Updated API Client" || echo "No changes to commit"
-          git push
+          git push origin update-api-client || echo "No changes to push"
