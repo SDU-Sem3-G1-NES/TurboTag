@@ -1,15 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Frontend" type="JavascriptDebugType" uri="http://localhost:5173/" useFirstLineBreakpoints="true">
-    <method v="2">
-      <option name="NpmBeforeRunTask" enabled="true">
-        <package-json value="$PROJECT_DIR$/frontend/package.json" />
-        <command value="run" />
-        <scripts>
-          <script value="genapi" />
-        </scripts>
-        <node-interpreter value="project" />
-        <envs />
-      </option>
-    </method>
+    <method v="2" />
   </configuration>
 </component>
