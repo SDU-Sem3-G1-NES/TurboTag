@@ -1,16 +1,17 @@
 name: Generate API Client
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Build and Unit Test the API"]
+    types:
+      - completed
+    workflow_dispatch:
         
 permissions:
   contents: write
 
 jobs:
   generate-api-client:
-    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
