@@ -60,6 +60,7 @@ jobs:
           
   lint-and-prettier-frontend:
     name: Lint and Prettier Frontend
+    needs: generate-api-client
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
