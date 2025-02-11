@@ -7,6 +7,7 @@ permissions:
   contents: write
 jobs:
   lint-and-prettier-frontend:
+    needs: generate-api-client
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
