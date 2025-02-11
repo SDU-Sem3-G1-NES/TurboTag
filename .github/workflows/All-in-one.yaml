@@ -1,0 +1,89 @@
+name: All-in-one Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+    workflow_dispatch:
+
+permissions:
+  contents: write
+        
+jobs:
+  build-and-test:
+    name: Build and Unit Test the API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+      - name: Build API and Run Unit Tests
+        run: |
+          dotnet build API/API.csproj --warnaserror
+          dotnet test API.Tests/API.Tests.csproj
+
+  generate-api-client:
+    name: Generate API Client
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+
+      - name: Install NSwag and Swagger CLI
+        run: |
+          dotnet tool install -g NSwag.ConsoleCore
+          dotnet tool install -g Swashbuckle.AspNetCore.Cli
+      - name: Build API and Generate API Client
+        run: |
+          dotnet build API/API.csproj
+          cd frontend 
+          npm run genapi
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"     
+          git add frontend/src/api/apiClient.ts
+          git commit -m "Updated API Client" || echo "No changes to commit"
+          git fetch origin
+          git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
+          git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
+          
+  lint-and-prettier-frontend:
+    name: Lint and Prettier Frontend
+    needs: generate-api-client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+      - name: Install Dependencies
+        run: npm i
+        working-directory: frontend
+      - name: ESLint
+        run: npm run lint-fix
+        working-directory: frontend
+      - name: Prettier
+        run: npm run prettier-fix
+        working-directory: frontend
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add -A
+          git commit -m "Linted and Formatted code" || echo "No changes to commit"
+          git fetch origin
+          git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
+          git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
+        working-directory: frontend

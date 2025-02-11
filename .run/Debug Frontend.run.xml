@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Debug Frontend" type="CompoundRunConfigurationType">
+    <toRun name="fe (don't use)" type="JavascriptDebugType" />
+    <toRun name="rdapi (don't use)" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>
