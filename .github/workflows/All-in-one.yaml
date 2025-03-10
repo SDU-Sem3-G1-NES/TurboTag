@@ -38,6 +38,11 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0'
+          
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
 
       - name: Install NSwag and Swagger CLI
         run: |
