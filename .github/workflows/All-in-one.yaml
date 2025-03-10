@@ -43,6 +43,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '20'
+          
+      - name: Install sh
+        run: sudo apt-get install -y sh
+
+      - name: Verify npm installation
+        run: npm --version
 
       - name: Install NSwag and Swagger CLI
         run: |
