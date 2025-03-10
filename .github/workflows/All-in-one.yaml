@@ -42,7 +42,6 @@ jobs:
       - name: Install NSwag and Swagger CLI
         run: |
           dotnet tool install -g NSwag.ConsoleCore
-          dotnet tool install -g Swashbuckle.AspNetCore.Cli
       - name: Build API and Generate API Client
         run: |
           dotnet build API/API.csproj
