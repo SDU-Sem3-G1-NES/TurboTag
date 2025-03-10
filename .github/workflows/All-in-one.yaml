@@ -45,7 +45,7 @@ jobs:
           node-version: '20'
           
       - name: Install sh
-        run: sudo apt-get install -y sh
+        run: sudo apt-get install -y bash
 
       - name: Verify npm installation
         run: npm --version
