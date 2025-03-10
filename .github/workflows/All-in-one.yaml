@@ -45,7 +45,7 @@ jobs:
           dotnet tool install -g Swashbuckle.AspNetCore.Cli
       - name: Build API and Generate API Client
         run: |
-          dotnet restore
+          dotnet restore API/API.csproj
           dotnet build API/API.csproj
           cd frontend 
           npm run genapi
