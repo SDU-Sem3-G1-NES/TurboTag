@@ -49,6 +49,8 @@ jobs:
           dotnet build API/API.csproj
           cd frontend 
           npm run genapi
+        env:
+          PATH: /home/runner/.dotnet/tools:$PATH
 
       - name: Commit changes
         run: |
@@ -59,6 +61,8 @@ jobs:
           git fetch origin
           git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
           git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
+        env:
+          PATH: /home/runner/.dotnet/tools:$PATH
           
   lint-and-prettier-frontend:
     name: Lint and Prettier Frontend
