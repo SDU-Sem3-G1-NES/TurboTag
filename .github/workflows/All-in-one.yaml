@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: write
-        
+
 jobs:
   build-and-test:
     name: Build and Unit Test the API
@@ -42,7 +42,7 @@ jobs:
       - name: Install NSwag and Swagger CLI
         run: |
           dotnet tool install -g NSwag.ConsoleCore
-          dotnet tool install -g Swashbuckle.AspNetCore.Cli
+          dotnet tool install -g Swashbuckle.AspNetCore.Cli --version 7.3.1
       - name: Build API and Generate API Client
         run: |
           dotnet build API/API.csproj
@@ -58,7 +58,7 @@ jobs:
           git fetch origin
           git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
           git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
-          
+  
   lint-and-prettier-frontend:
     name: Lint and Prettier Frontend
     needs: generate-api-client
