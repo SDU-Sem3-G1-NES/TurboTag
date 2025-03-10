@@ -2,10 +2,10 @@ namespace API.DTOs
 {
     public class UploadDTO
     {
-        public required int uploadId { get; set; }
-        public required int ownerId { get; set; }
-        public required UploadDetailsDTO uploadDetails { get; set; }
-        public required FileMetadataDTO fileMetadata { get; set; }
+        public int uploadId { get; set; }
+        public int ownerId { get; set; }
+        public UploadDetailsDTO uploadDetails { get; set; }
+        public FileMetadataDTO fileMetadata { get; set; }
 
         public UploadDTO(int uploadId, int ownerId, UploadDetailsDTO uploadDetails, FileMetadataDTO fileMetadata)
         {
