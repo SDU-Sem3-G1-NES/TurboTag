@@ -1,7 +1,7 @@
 using API.DTOs;
 
 namespace API.Services;
-public class UserCredentialsService : IService
+public class UserCredentialsService : IUserCredentialsService
 {
     /// <summary>
     /// Method that checks if the user exists in the database by input email.

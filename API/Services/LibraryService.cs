@@ -1,7 +1,7 @@
 using API.DTOs;
 
 namespace API.Services;
-public class LibraryService : IService
+public class LibraryService : ILibraryService
 {
     /// <summary>
     /// Method that returns a list of LibraryDTO objects that belong to a User by Id.

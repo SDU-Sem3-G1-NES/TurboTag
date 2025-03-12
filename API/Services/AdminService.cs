@@ -1,7 +1,7 @@
 using API.DTOs;
 
 namespace API.Services;
-public class AdminService : IService
+public class AdminService : IAdminService
 {
     /// <summary>
     /// Method that returns a list of all Users from the database.    
