@@ -1,17 +1,9 @@
-namespace API.DTOs
+namespace API.DTOs;
+
+public class UploadDetailsDTO(int uploadId, string uploadDescription, string uploadTitle, List<string> uploadTags)
 {
-    public class UploadDetailsDTO
-    {
-        public int uploadId { get; set; }
-        public string uploadDescription { get; set; }
-        public string uploadTitle { get; set; }
-        public List<string> uploadTags { get; set; }
-        public UploadDetailsDTO(int uploadId, string uploadDescription, string uploadTitle, List<string> uploadTags)
-        {
-            this.uploadId = uploadId;
-            this.uploadDescription = uploadDescription;
-            this.uploadTitle = uploadTitle;
-            this.uploadTags = uploadTags;
-        }
-    }
+    public int Id { get; } = uploadId;
+    public string Description { get; } = uploadDescription;
+    public string Title { get; } = uploadTitle;
+    public List<string> Tags { get; } = uploadTags;
 }

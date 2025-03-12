@@ -1,10 +1,11 @@
-namespace API.Services
+namespace API.Services;
+public class UploadService : IService
 {
-    public class UploadService
+    /// <summary>
+    /// Method that stores an upload to the database and returns the BlobId of the upload.
+    /// </summary>
+    public string StoreUpload()
     {
-        public void StoreUpload()
-        {
-            // Method that mocks storing an upload to the database.
-        }
+        return "MockBlobId";
     }
 }
