@@ -5,20 +5,45 @@
     <title>Upload</title>
 </head>
 <body>
-<form>
-    <h1>Upload Lecture</h1>
-    <label for="title">Title</label>
-    <input type="text" id="title" name="title" required>
-    <label for="description">Description</label>
-    <input type="text" id="description" name="description">
-    <label for="file">File</label>
-    <input type="file" id="file" name="file" required>
-    <!-- <label for="tags"> I will add styling there will be js script that can add more tags</label> -->
-    <ul id="tags">
-        <li>Tag</li>
-    </ul>
-    <button type="submit">Upload</button>
+    <form>
+        <h1>Upload Lecture</h1>
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" required>
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description">
+        <label for="file">File</label>
+        <input type="file" id="file" name="file" required>
+        <ul id="tags">
+            <li id="tag1"><input type="text"></li>
+        </ul>
+        
+        <button type="submit">Upload</button>
 
-</form>
+    </form>
+
+    
 </body>
+
 </html>
+<script>
+    var tagId = 2;
+    
+    var title = document.getElementById("title").value;
+    var description = document.getElementById("description").value;
+    var file = document.getElementById("file").value;
+    var tags = document.getElementById("tags");
+
+    function addTag() {
+        var ul = document.getElementById("tags");
+        var li = document.createElement("li");
+        var input = document.createElement("input");
+        input.type = "text";
+        input.id = "tag" + tagId;
+        li.appendChild(input);
+        ul.appendChild(li);
+        tagId++;
+    }
+
+    
+
+</script>
