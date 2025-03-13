@@ -27,7 +27,6 @@ const Upload: React.FC = () => {
       tags
     }
     console.log(data)
-    
   }
 
   return (
