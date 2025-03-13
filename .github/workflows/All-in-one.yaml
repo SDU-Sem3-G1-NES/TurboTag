@@ -87,3 +87,22 @@ jobs:
           git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
           git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
         working-directory: frontend
+        
+  dependabot:
+    needs: [ build-and-test, generate-api-client, lint-and-prettier-frontend ] 
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'}}
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - run: |
+          gh pr review --approve "$PR_URL"
+          gh pr merge --squash --auto "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
