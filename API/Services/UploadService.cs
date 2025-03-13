@@ -1,4 +1,8 @@
 namespace API.Services;
+public interface IUploadService : IServiceBase
+{
+    string StoreUpload();
+}
 public class UploadService : IUploadService
 {
     /// <summary>
