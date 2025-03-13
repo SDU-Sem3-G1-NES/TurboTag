@@ -1,17 +1,7 @@
-using YamlDotNet.Serialization;
-
-namespace API.DTOs
+namespace API.DTOs;
+public class SettingsDTO(int settingId, string settingName, string settingValue)
 {
-    public class SettingsDTO
-    {
-        public int settingId { get; set; }
-        public string settingName { get; set; }
-        public string settingValue { get; set; }
-        public SettingsDTO(int settingId, string settingName, string settingValue)
-        {
-            this.settingId = settingId;
-            this.settingName = settingName;
-            this.settingValue = settingValue;
-        }
-    }
+    public int Id { get; } = settingId;
+    public string Name { get; } = settingName;
+    public string Value { get; } = settingValue;
 }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "genapi": "swagger tofile --output swagger.json ../API/bin/Debug/net9.0/API.dll v1 && nswag run nswag.json",
+    "genapi": "dotnet restore ../TurboTag.sln && dotnet build ../TurboTag.sln && swagger tofile --output swagger.json ../API/bin/Debug/net9.0/API.dll v1 && nswag run nswag.json",
     "devapi": "npm run genapi && vite",
     "build": "npm run genapi && tsc -b && vite build",
     "lint": "eslint .",
@@ -17,7 +17,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.1",
     "api": "^6.1.2",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "bootstrap": "^5.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -38,6 +38,6 @@
     "prettier": "^3.4.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
-    "vite": "^6.1.0"
+    "vite": "^6.2.1"
   }
 }

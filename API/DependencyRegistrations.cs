@@ -1,4 +1,5 @@
 using API.Controllers;
+using API.Services;
 using Autofac;
 
 namespace API;
@@ -11,5 +12,9 @@ public class DependencyRegistrations : Module
         builder.RegisterAssemblyTypes(typeof(Program).Assembly)
             .AsImplementedInterfaces()
             .Where(t => typeof(ITestBase).IsAssignableFrom(t));
+        // Automatically register all types that implement IServiceBase
+        builder.RegisterAssemblyTypes(typeof(Program).Assembly)
+            .AsImplementedInterfaces()
+            .Where(t => typeof(IServiceBase).IsAssignableFrom(t));
     }
 }

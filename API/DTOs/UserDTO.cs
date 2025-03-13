@@ -1,20 +1,9 @@
-namespace API.DTOs
+namespace API.DTOs;
+public class UserDTO(int userId, int userType, string email, List<string> userPermissions, List<SettingsDTO> userSettings)
 {
-    public class UserDTO
-    {
-        public int userId { get; set; }
-        public int userType { get; set; }
-        public string email { get; set; }
-        public List<string> userPermissions { get; set; }
-        public List<SettingsDTO> userSettings { get; set; }
-
-        public UserDTO(int userId, int userType, string email, List<string> userPermissions, List<SettingsDTO> userSettings)
-        {
-            this.userId = userId;
-            this.userType = userType;
-            this.email = email;
-            this.userPermissions = userPermissions;
-            this.userSettings = userSettings;
-        }
-    }
+    public int Id { get; } = userId;
+    public int Type { get; } = userType;
+    public string Email { get; } = email;
+    public List<string> Permissions { get; } = userPermissions;
+    public List<SettingsDTO> Settings { get; } = userSettings;
 }
