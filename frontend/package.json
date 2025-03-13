@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "genapi": "swagger tofile --output swagger.json ../API/bin/Debug/net9.0/API.dll v1 && nswag run nswag.json",
+    "genapi": "dotnet restore ../TurboTag.sln && dotnet build ../TurboTag.sln && swagger tofile --output swagger.json ../API/bin/Debug/net9.0/API.dll v1 && nswag run nswag.json",
     "devapi": "npm run genapi && vite",
     "build": "npm run genapi && tsc -b && vite build",
     "lint": "eslint .",
