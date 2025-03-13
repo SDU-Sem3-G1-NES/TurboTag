@@ -11,45 +11,43 @@ public class AdminController : ControllerBase
     [HttpGet("GetAllUsers")]
     public ActionResult<UserDTO[]> GetAllUsers()
     {
-        return Ok(users);
+        return Ok(mockUsers);
     }
 
     [HttpGet("GetAllContentLibraries")]
     public ActionResult<LibraryDTO[]> GetAllContentLibraries()
     {
-        return Ok(libraries);
+        return Ok(mockLibraries);
     }
 
     [HttpDelete("DeleteUserById")]
     public ActionResult DeleteUserById(int userId)
     {
-        var existingUser = users.FirstOrDefault(u => u.userId == userId);
+        var existingUser = mockUsers.FirstOrDefault(u => u.Id == userId);
         if (existingUser == null)
         {
             return NotFound();
         }
-        users.Remove(existingUser);
+        mockUsers.Remove(existingUser);
         return Ok();
     }
 
     [HttpDelete("DeleteUsersById")]
     public ActionResult DeleteUsersById([FromBody] int[] userIds)
     {
-        users.RemoveAll(u => userIds.Contains(u.userId));
+        mockUsers.RemoveAll(u => userIds.Contains(u.Id));
         return Ok();
     }
 
     [HttpPut("UpdateUserById")]
     public ActionResult UpdateUserById(int userId, [FromBody] UserDTO updatedUser)
     {
-        foreach (var user in users)
+        foreach (var user in mockUsers)
         {
-            if (user.userId == userId)
+            if (user.Id == userId)
             {
-                user.email = updatedUser.email;
-                user.userType = updatedUser.userType;
-                user.userPermissions = updatedUser.userPermissions;
-                user.userSettings = updatedUser.userSettings;
+                mockUsers.Remove(user);
+                mockUsers.Add(updatedUser);
             }
         }
         return Ok();
@@ -64,23 +62,23 @@ public class AdminController : ControllerBase
     [HttpPost("CreateNewUser")]
     public ActionResult CreateNewUser([FromBody] UserDTO user)
     {
-        users.Add(user);
-        return Ok(users);
+        mockUsers.Add(user);
+        return Ok(mockUsers);
     }
 
     [HttpPost("CreateNewUsers")]
     public ActionResult CreateNewUsers([FromBody] UserDTO[] user)
     {
-        users.AddRange(user);
+        mockUsers.AddRange(user);
         return Ok();
     }
 
-    private List<LibraryDTO> libraries = new List<LibraryDTO>
+    private List<LibraryDTO> mockLibraries = new List<LibraryDTO>
     {
         new LibraryDTO(libraryId: 1, libraryName: "Library 1")
     };
 
-    private List<UserDTO> users = new List<UserDTO>
+    private List<UserDTO> mockUsers = new List<UserDTO>
     {
         new UserDTO(
             userId: 1,

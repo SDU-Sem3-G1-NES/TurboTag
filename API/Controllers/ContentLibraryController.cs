@@ -11,29 +11,29 @@ public class ContentLibraryController : ControllerBase
     [HttpGet("GetUserLibrariesById")]
     public ActionResult<LibraryDTO[]> GetUserLibrariesById(string userId)
     {
-        return Ok(libraries);
+        return Ok(mockLibraries);
     }
     [HttpGet("GetUserLibraryId")]
     public ActionResult<LibraryDTO> GetUserLibraryId(string libraryId)
     {
-        return Ok(libraries.First());
+        return Ok(mockLibraries.First());
     }
     [HttpGet("GetLibraryUploadsById")]
     public ActionResult<UploadDTO[]> GetLibraryUploadsById(string libraryId)
     {
-        return Ok(uploads);
+        return Ok(mockUploads);
     }
     [HttpGet("GetLibraryUploadById")]
     public ActionResult<UploadDTO> GetLibraryUploadById(string uploadId)
     {
-        return Ok(uploads.First());
+        return Ok(mockUploads.First());
     }
     
-    private List<LibraryDTO> libraries = new List<LibraryDTO>
+    private List<LibraryDTO> mockLibraries = new List<LibraryDTO>
     {
         new LibraryDTO(libraryId: 1, libraryName: "Library 1")
     };
-    private List<UploadDTO> uploads = new List<UploadDTO>
+    private List<UploadDTO> mockUploads = new List<UploadDTO>
     {
         new UploadDTO(
             uploadId: 1,

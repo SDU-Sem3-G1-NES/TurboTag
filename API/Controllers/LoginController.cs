@@ -21,7 +21,7 @@ public class LoginController : ControllerBase
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDTO> GetUserDataByEmail(string email)
     {
-        var existingUser = users.FirstOrDefault(u => u.email == email);
+        var existingUser = mockUsers.FirstOrDefault(u => u.Email == email);
         if (existingUser == null)
         {
             return NotFound();
@@ -39,7 +39,7 @@ public class LoginController : ControllerBase
         return Ok();
     }
 
-    private List<UserDTO> users = new List<UserDTO>
+    private List<UserDTO> mockUsers = new List<UserDTO>
     {
         new UserDTO(
             userId: 1,

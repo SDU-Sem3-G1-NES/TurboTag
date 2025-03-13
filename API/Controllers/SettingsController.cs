@@ -11,7 +11,7 @@ public class SettingsController : ControllerBase
     [HttpGet("GetUserSettingsById")]
     public ActionResult<SettingsDTO> GetUserSettingsById(int id)
     {
-        return Ok(settings.FirstOrDefault(s => s.settingId == id));
+        return Ok(mockSettings.FirstOrDefault(s => s.Id == id));
     }
         
     [HttpPut("UpdateUserSettingsById")]
@@ -19,10 +19,11 @@ public class SettingsController : ControllerBase
     {
         foreach (var updatedSetting in updatedSettings)
         {
-            var existingSetting = settings.FirstOrDefault(s => s.settingId == updatedSetting.settingId);
+            var existingSetting = mockSettings.FirstOrDefault(s => s.Id == updatedSetting.Id);
             if (existingSetting != null)
             {
-                existingSetting.settingValue = updatedSetting.settingValue;
+                mockSettings.Remove(existingSetting);
+                mockSettings.Add(updatedSetting);
             }
         }
         return Ok();
@@ -31,16 +32,17 @@ public class SettingsController : ControllerBase
     [HttpPut("UpdateUserSettingById")]
     public ActionResult UpdateUserSettingById([FromBody] SettingsDTO setting)
     {
-        var existingSetting = settings.FirstOrDefault(s => s.settingId == setting.settingId);
+        var existingSetting = mockSettings.FirstOrDefault(s => s.Id == setting.Id);
         if (existingSetting == null)
         {
             return NotFound();
         }
-        existingSetting.settingValue = setting.settingValue;
+        mockSettings.Remove(existingSetting);
+        mockSettings.Add(setting);
         return Ok();
     }
     
-    private List<SettingsDTO> settings = new List<SettingsDTO>
+    private List<SettingsDTO> mockSettings = new List<SettingsDTO>
     {
         new SettingsDTO(1, "Theme", "Dark")
     };
