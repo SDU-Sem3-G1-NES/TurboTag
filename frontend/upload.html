@@ -14,9 +14,8 @@
         <label for="file">File</label>
         <input type="file" id="file" name="file" required>
         <ul id="tags">
-            <li id="tag1"><input type="text"></li>
         </ul>
-        
+        <button type="button" onclick="addTag()">Add Tag</button>
         <button type="submit">Upload</button>
 
     </form>
@@ -26,22 +25,44 @@
 
 </html>
 <script>
-    var tagId = 2;
+    var tagId = 1;
     
-    var title = document.getElementById("title").value;
-    var description = document.getElementById("description").value;
-    var file = document.getElementById("file").value;
-    var tags = document.getElementById("tags");
-
     function addTag() {
         var ul = document.getElementById("tags");
         var li = document.createElement("li");
         var input = document.createElement("input");
         input.type = "text";
         input.id = "tag" + tagId;
+
+        var removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.innerText = "Remove";
+        removeButton.onclick = function () {
+            ul.removeChild(li);
+        };
+
         li.appendChild(input);
+        li.appendChild(removeButton);
         ul.appendChild(li);
         tagId++;
+    }
+
+    function Upload() {
+        var title = document.getElementById("title").value;
+        var description = document.getElementById("description").value;
+        var file = document.getElementById("file").value;
+        var tags = document.getElementById("tags");
+        var tagList = [];
+        for (var i = 0; i < tags.children.length; i++) {
+            tagList.push(tags.children[i].children[0].value);
+        }
+        var data = {
+            title: title,
+            description: description,
+            file: file,
+            tags: tagList
+        };
+        //Here i will send request to backend
     }
 
     
