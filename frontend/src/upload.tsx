@@ -27,7 +27,7 @@ const Upload: React.FC = () => {
       tags
     }
     console.log(data)
-    // Tutaj wyślij dane do backendu
+    
   }
 
   return (
