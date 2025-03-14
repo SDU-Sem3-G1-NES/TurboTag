@@ -11,34 +11,18 @@ public class SettingsController : ControllerBase
     [HttpGet("GetUserSettingsById")]
     public ActionResult<SettingsDTO> GetUserSettingsById(int id)
     {
-        return Ok(mockSettings.FirstOrDefault(s => s.Id == id));
+        return Ok(mockSettings.First());
     }
         
     [HttpPut("UpdateUserSettingsById")]
     public ActionResult UpdateUserSettingsById([FromBody] SettingsDTO[] updatedSettings)
     {
-        foreach (var updatedSetting in updatedSettings)
-        {
-            var existingSetting = mockSettings.FirstOrDefault(s => s.Id == updatedSetting.Id);
-            if (existingSetting != null)
-            {
-                mockSettings.Remove(existingSetting);
-                mockSettings.Add(updatedSetting);
-            }
-        }
         return Ok();
     }
         
     [HttpPut("UpdateUserSettingById")]
     public ActionResult UpdateUserSettingById([FromBody] SettingsDTO setting)
     {
-        var existingSetting = mockSettings.FirstOrDefault(s => s.Id == setting.Id);
-        if (existingSetting == null)
-        {
-            return NotFound();
-        }
-        mockSettings.Remove(existingSetting);
-        mockSettings.Add(setting);
         return Ok();
     }
     

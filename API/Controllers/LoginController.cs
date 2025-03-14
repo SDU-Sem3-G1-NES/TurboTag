@@ -21,12 +21,7 @@ public class LoginController : ControllerBase
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDTO> GetUserDataByEmail(string email)
     {
-        var existingUser = mockUsers.FirstOrDefault(u => u.Email == email);
-        if (existingUser == null)
-        {
-            return NotFound();
-        }
-        return Ok(existingUser);
+        return Ok(mockUsers.First());
     }
     [HttpPost("StoreUserSession")]
     public ActionResult StoreUserSession()

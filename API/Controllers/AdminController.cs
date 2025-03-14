@@ -23,33 +23,18 @@ public class AdminController : ControllerBase
     [HttpDelete("DeleteUserById")]
     public ActionResult DeleteUserById(int userId)
     {
-        var existingUser = mockUsers.FirstOrDefault(u => u.Id == userId);
-        if (existingUser == null)
-        {
-            return NotFound();
-        }
-        mockUsers.Remove(existingUser);
         return Ok();
     }
 
     [HttpDelete("DeleteUsersById")]
     public ActionResult DeleteUsersById([FromBody] int[] userIds)
     {
-        mockUsers.RemoveAll(u => userIds.Contains(u.Id));
         return Ok();
     }
 
     [HttpPut("UpdateUserById")]
     public ActionResult UpdateUserById(int userId, [FromBody] UserDTO updatedUser)
     {
-        foreach (var user in mockUsers)
-        {
-            if (user.Id == userId)
-            {
-                mockUsers.Remove(user);
-                mockUsers.Add(updatedUser);
-            }
-        }
         return Ok();
     }
 
@@ -62,14 +47,12 @@ public class AdminController : ControllerBase
     [HttpPost("CreateNewUser")]
     public ActionResult CreateNewUser([FromBody] UserDTO user)
     {
-        mockUsers.Add(user);
-        return Ok(mockUsers);
+        return Ok();
     }
 
     [HttpPost("CreateNewUsers")]
     public ActionResult CreateNewUsers([FromBody] UserDTO[] user)
     {
-        mockUsers.AddRange(user);
         return Ok();
     }
 
