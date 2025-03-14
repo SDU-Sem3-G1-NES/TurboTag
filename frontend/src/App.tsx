@@ -2,18 +2,18 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { TestClient } from './api/apiClient.ts'
+import { AdminClient } from './api/apiClient.ts'
 
 function App() {
   const [count, setCount] = useState(0)
-  const testClient = new TestClient()
+  const adminClient = new AdminClient()
   const [testString, setTestString] = useState<string | null>(null)
 
   const getTestString = (callback: () => void) => {
-    console.log('getWeather')
-    testClient.get().then((response) => {
+    console.log('getTestString')
+    adminClient.getAllUsers().then((response) => {
       console.log('response', response)
-      setTestString(response)
+      setTestString(response[0].email ?? null)
       callback()
     })
   }
@@ -36,7 +36,9 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-      <button onClick={() => getTestString(() => console.log('weather updated'))}>Test</button>
+      <button onClick={() => getTestString(() => console.log('test string displayed'))}>
+        Test
+      </button>
       <p>{testString}</p>
     </>
   )
