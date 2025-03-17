@@ -3,18 +3,19 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { useState } from 'react'
 import { TestClient } from './api/apiClient.ts'
+import { AdminClient } from './api/apiClient.ts'
 
 
 function App() {
   const [count, setCount] = useState(0)
-  const testClient = new TestClient()
+  const adminClient = new AdminClient()
   const [testString, setTestString] = useState<string | null>(null)
 
   const getTestString = (callback: () => void) => {
-    console.log('getWeather')
-    testClient.get().then((response) => {
+    console.log('getTestString')
+    adminClient.getAllUsers().then((response) => {
       console.log('response', response)
-      setTestString(response)
+      setTestString(response[0].email ?? null)
       callback()
     })
   }
