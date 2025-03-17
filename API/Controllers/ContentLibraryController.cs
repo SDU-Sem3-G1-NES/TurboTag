@@ -38,6 +38,7 @@ public class ContentLibraryController : ControllerBase
         new UploadDTO(
             uploadId: 1,
             ownerId: 1,
+            libraryId: 1,
             uploadDetails: new UploadDetailsDTO(uploadId: 1,
                 uploadDescription: "Description 1",
                 uploadTitle: "Title 1", uploadTags:
