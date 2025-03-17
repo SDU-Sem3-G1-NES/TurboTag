@@ -1637,6 +1637,7 @@ export class SettingsDTO {
 export class UploadDTO {
     readonly id?: number;
     ownerId?: number;
+    libraryId?: number;
     details?: UploadDetailsDTO;
     fileMetadata?: FileMetadataDTO;
 
@@ -1644,6 +1645,7 @@ export class UploadDTO {
         if (_data) {
             (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+            this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
             this.details = _data["details"] ? UploadDetailsDTO.fromJS(_data["details"]) : <any>null;
             this.fileMetadata = _data["fileMetadata"] ? FileMetadataDTO.fromJS(_data["fileMetadata"]) : <any>null;
         }
@@ -1660,6 +1662,7 @@ export class UploadDTO {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        data["libraryId"] = this.libraryId !== undefined ? this.libraryId : <any>null;
         data["details"] = this.details ? this.details.toJSON() : <any>null;
         data["fileMetadata"] = this.fileMetadata ? this.fileMetadata.toJSON() : <any>null;
         return data;
