@@ -919,6 +919,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "libraryId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "details": {
             "$ref": "#/components/schemas/UploadDetailsDTO"
           },
