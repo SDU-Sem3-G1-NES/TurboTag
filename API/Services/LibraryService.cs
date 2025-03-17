@@ -16,7 +16,6 @@ public class LibraryService(ILibraryRepository _libraryRepository, IUploadReposi
     /// </summary>
     public List<LibraryDTO> GetUserLibrariesById()
     {
-        // bad method in the repository? should return a list of libraries by user id. returns all existing libraries instead.
         return _libraryRepository.GetAllLibraries();
     }
     /// <summary>

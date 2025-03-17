@@ -39,22 +39,20 @@ public class UserCredentialsService(IUserRepository _userRepository) : IUserCred
     /// </summary>
     public UserDTO GetUserDataByEmail()
     {
-        // missing method in user repository. Get user by email.
-        return _userRepository.GetUserById(1);
+        return _userRepository.GetUserByEmail("mock@mock.com");
     }
     /// <summary>
     /// Method that stores a user session in the database.
     /// </summary>
     public void StoreUserSession()
     {
-        // missing repository method. Store user session.
+        _userRepository.StoreUserSession();
     }
     /// <summary>
     /// Metho that gets user data from the database by session id and returns it as a UserDTO object.
     /// </summary>
     public UserDTO GetUserDataBySession()
     {
-        // missing repository method. Get user by session.
-        return _userRepository.GetUserById(1);
+        return _userRepository.GetUserBySession();
     }
 }
