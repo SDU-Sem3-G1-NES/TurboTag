@@ -13,26 +13,11 @@ const Upload: React.FC = () => {
     event.preventDefault()
     if (!file) return
 
-    const fileMetadata = new FileMetadataDTO()
-    fileMetadata.fileName = file.name
-    fileMetadata.fileSize = file.size
-    fileMetadata.duration = null
-    fileMetadata.date = new Date().toISOString()
-    fileMetadata.checkSum = ''
+    const fileMetadata = new FileMetadataDTO({fileType: file.type, fileName: file.name, fileSize: file.size, duration: file.size}) 
 
-    const uploadDetails = new UploadDetailsDTO()
-    uploadDetails.init({id})
-    uploadDetails.id = 0
-    uploadDetails.description = description
-    uploadDetails.title = title
-    uploadDetails.tags = tags
+    const uploadDetails = new UploadDetailsDTO({ title, description, tags })
 
-    const uploadDTO = new UploadDTO()
-    uploadDTO.id = 0
-    uploadDTO.ownerId = 1
-    uploadDTO.libraryId = 1
-    uploadDTO.details = uploadDetails
-    uploadDTO.fileMetadata = fileMetadata
+    const uploadDTO = new UploadDTO({ ownerId: 1, libraryId: 1,details: uploadDetails,fileMetadata })
 
     try {
       await uploadClient.storeUpload(uploadDTO)

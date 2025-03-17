@@ -1,13 +1,15 @@
-import { useState } from 'react'
 import { TagsInput } from 'react-tag-input-component'
 
-const Tags = () => {
-  const [selected, setSelected] = useState(['tag'])
+interface TagsProps {
+  tags: string[]
+  setTags: React.Dispatch<React.SetStateAction<string[]>>
+}
 
+const Tags: React.FC<TagsProps> = ({ tags, setTags }) => {
   return (
     <div>
       <h1>Add Tags</h1>
-      <TagsInput value={selected} onChange={setSelected} name="tags" placeHolder="Enter Tags" />
+      <TagsInput value={tags} onChange={setTags} name="tags" placeHolder="Enter Tags" />
       <em>Press enter or comma to add new tag</em>
     </div>
   )
