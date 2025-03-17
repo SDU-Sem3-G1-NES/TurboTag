@@ -55,6 +55,7 @@ jobs:
           git add frontend/src/api/apiClient.ts
           git commit -m "Updated API Client" || echo "No changes to commit"
           git fetch origin
+          git stash --include-untracked
           git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
           git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
   
@@ -84,6 +85,7 @@ jobs:
           git reset src/api/apiClient.ts
           git commit -m "Linted and Formatted code" || echo "No changes to commit"
           git fetch origin
+          git stash --include-untracked
           git rebase origin/${{ github.head_ref }} --reapply-cherry-picks
           git push origin HEAD:${{ github.head_ref }} --force-with-lease || echo "No changes to push"
         working-directory: frontend
