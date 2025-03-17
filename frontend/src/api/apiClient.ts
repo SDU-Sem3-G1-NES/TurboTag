@@ -1475,7 +1475,7 @@ export interface IAdminClient {
                     /**
              * @return OK
              */
-            storeUpload(): Promise<void>;
+            storeUpload(): Promise<string>;
         }
 
     export class UploadClient extends BaseApiClient implements IUploadClient {
@@ -1493,7 +1493,7 @@ export interface IAdminClient {
         /**
          * @return OK
          */
-        storeUpload( cancelToken?: CancelToken): Promise<void> {
+        storeUpload( cancelToken?: CancelToken): Promise<string> {
         let url_ = this.baseUrl + "/Upload/StoreUpload";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1501,7 +1501,8 @@ export interface IAdminClient {
                         method: "POST",
         url: url_,
         headers: {
-                                },
+                                    "Accept": "text/plain"
+                },
             cancelToken
         };
 
@@ -1516,7 +1517,7 @@ export interface IAdminClient {
                 });
         }
 
-        protected processStoreUpload(response: AxiosResponse): Promise<void> {
+        protected processStoreUpload(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1528,13 +1529,17 @@ export interface IAdminClient {
         }
         if (status === 200) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<string>(null as any);
         }
         }
 
