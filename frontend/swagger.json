@@ -823,6 +823,25 @@
           "Upload"
         ],
         "operationId": "Upload_StoreUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDTO"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -916,6 +935,10 @@
             "readOnly": true
           },
           "ownerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "libraryId": {
             "type": "integer",
             "format": "int32"
           },
