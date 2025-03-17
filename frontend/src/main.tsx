@@ -6,7 +6,6 @@ import App from './App.tsx'
 import Upload from './upload'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Router>
@@ -21,8 +20,7 @@ createRoot(document.getElementById('root')!).render(
         </ul>
       </nav>
       <Routes>
-        <Route path="/" element={<App/>}
-        />
+        <Route path="/" element={<App />} />
         <Route path="/upload" element={<Upload />} />
       </Routes>
     </Router>

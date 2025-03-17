@@ -5,7 +5,7 @@ const Upload: React.FC = () => {
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
-  
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
     const data = {
@@ -53,7 +53,7 @@ const Upload: React.FC = () => {
         required
       />
       <br />
-      <Tags/>
+      <Tags />
 
       <br />
       <button type="submit">Upload</button>
