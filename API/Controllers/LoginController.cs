@@ -1,55 +1,33 @@
-using System.Diagnostics;
 using API.DTOs;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LoginController : ControllerBase
+public class LoginController(IUserCredentialsService _userCredentialsService) : ControllerBase
 {
     [HttpGet("ValidateUserCredentials")]
     public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDTO userCredentials)
     {
-        if (mockuserCredentials.Any(c => c.Email == userCredentials.Email && c.Password == userCredentials.Password))
-        {
-            return Ok(true);
-        }
-        return NotFound(true);
+        return Ok(_userCredentialsService.ValidateUserCredentials());
     }
 
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDTO> GetUserDataByEmail(string email)
     {
-        return Ok(mockUsers.First());
+        return Ok(_userCredentialsService.GetUserDataByEmail());
     }
     [HttpPost("StoreUserSession")]
     public ActionResult StoreUserSession()
     {
+        _userCredentialsService.StoreUserSession();
         return Ok();
     }
     [HttpGet("GetUserDataBySessionId")]
     public ActionResult GetUserDataBySessionId(string sessionId)
     {
-        return Ok();
+        return Ok(_userCredentialsService.GetUserDataBySession());
     }
-
-    private List<UserDTO> mockUsers = new List<UserDTO>
-    {
-        new UserDTO(
-            userId: 1,
-            userType: 1,
-            email: "example@example.com",
-            userPermissions: new List<string> { "read", "write" },
-            userSettings: new List<SettingsDTO>
-            {
-                new SettingsDTO(1, "Theme", "Dark")
-            }
-        )
-    };
-
-    private List<UserCredentialsDTO> mockuserCredentials = new List<UserCredentialsDTO>
-    {
-        new UserCredentialsDTO("example@example.com", "example")
-    };
 }
