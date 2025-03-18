@@ -4,7 +4,7 @@ namespace API.Repositories
 {
     public interface IUploadRepository : IRepositoryBase
     {
-        int AddUpload(UploadDTO upload);
+        string AddUpload(UploadDTO upload);
         UploadDTO GetUploadById(int uploadId);
         List<UploadDTO> GetUploadsByOwnerId(int ownerId);
         List<UploadDTO> GetUploadsByLibraryId(int libraryId);
@@ -16,9 +16,9 @@ namespace API.Repositories
     }
     public class UploadRepository : IUploadRepository
     {
-        public int AddUpload(UploadDTO upload)
+        public string AddUpload(UploadDTO upload)
         {
-            return 1;
+            return "MockBlobId";
         }
         public UploadDTO GetUploadById(int uploadId)
         {

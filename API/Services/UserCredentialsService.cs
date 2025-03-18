@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Repositories;
 
 namespace API.Services;
 public interface IUserCredentialsService : IServiceBase
@@ -10,46 +11,48 @@ public interface IUserCredentialsService : IServiceBase
     void StoreUserSession();
     UserDTO GetUserDataBySession();
 }
-public class UserCredentialsService : IUserCredentialsService
+public class UserCredentialsService(IUserRepository _userRepository) : IUserCredentialsService
 {
     /// <summary>
     /// Method that checks if the user exists in the database by input email.
     /// </summary>
     public bool CheckIfUserExistsByEmail()
     {
-        return false;
+        return _userRepository.UserEmailExists("mock@mock.com");
     }
     /// <summary>
     /// Method that stores hashed password and email in the database.
     /// </summary>
     public void StoreNewUserCredentials()
     {
+        _userRepository.AddUserCredentials(new byte[] { 0x00, 0x01, 0x02, 0x03 }, new byte[] { 0x00, 0x01, 0x02, 0x03 });
     }
     /// <summary>
     /// Method that validates user credentials by hashed input email and password.
     /// </summary>
     public bool ValidateUserCredentials()
     {
-        return false;
+        return true;
     }
     /// <summary>
     /// Method that gets user data from the database and returns it as a UserDTO object.
     /// </summary>
     public UserDTO GetUserDataByEmail()
     {
-        return new UserDTO(1, 1, "mock@mock.com", new List<string> { "mockPermission" }, new List<SettingsDTO> { new SettingsDTO(1, "mockSetting", "mockValue") });
+        return _userRepository.GetUserByEmail("mock@mock.com");
     }
     /// <summary>
     /// Method that stores a user session in the database.
     /// </summary>
     public void StoreUserSession()
     {
+        _userRepository.StoreUserSession();
     }
     /// <summary>
     /// Metho that gets user data from the database by session id and returns it as a UserDTO object.
     /// </summary>
     public UserDTO GetUserDataBySession()
     {
-        return new UserDTO(1, 1, "mock@mock.com", new List<string> { "mockPermission" }, new List<SettingsDTO> { new SettingsDTO(1, "mockSetting", "mockValue") });
+        return _userRepository.GetUserBySession();
     }
 }
