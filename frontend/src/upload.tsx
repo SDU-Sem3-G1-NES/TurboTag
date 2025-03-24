@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Tags from './tags'
 import { UploadClient, UploadDTO, UploadDetailsDTO, FileMetadataDTO } from './api/apiClient.ts'
+import { Store } from 'react-notifications-component';
 
 const Upload: React.FC = () => {
   const [title, setTitle] = useState<string>('')
@@ -13,16 +14,50 @@ const Upload: React.FC = () => {
     event.preventDefault()
     if (!file) return
 
-    const fileMetadata = new FileMetadataDTO({fileType: file.type, fileName: file.name, fileSize: file.size, duration: file.size}) 
+    const fileMetadata = new FileMetadataDTO({id: 1,fileType: file.type, fileName: file.name, fileSize: file.size, duration: file.size}) 
 
-    const uploadDetails = new UploadDetailsDTO({ title, description, tags })
+    const uploadDetails = new UploadDetailsDTO({ id:1 ,title: title, description: description,tags: tags })
 
-    const uploadDTO = new UploadDTO({ ownerId: 1, libraryId: 1,details: uploadDetails,fileMetadata })
+    const uploadDTO = new UploadDTO();
+    uploadDTO.init({
+      ownerId: 1,
+      libraryId: 1,
+      details: uploadDetails,
+      fileMetadata: fileMetadata
+    });
 
     try {
       await uploadClient.storeUpload(uploadDTO)
+      
+      Store.addNotification({
+        title: 'Upload successful',
+        message: 'Your lecture has been uploaded',
+        type: 'success',
+        insert: 'top',
+        container: 'top-right',
+        animationIn: ['animate__animated', 'animate__fadeIn'],
+        animationOut: ['animate__animated', 'animate__fadeOut'],
+        dismiss: {
+          duration: 2000,
+          onScreen: true
+        }
+      })
       console.log('Upload successful')
     } catch (error) {
+      
+      Store.addNotification({
+        title: 'Upload failed',
+        message: 'Your lecture could not be uploaded',
+        type: 'danger',
+        insert: 'top',
+        container: 'top-right',
+        animationIn: ['animate__animated', 'animate__fadeIn'],
+        animationOut: ['animate__animated', 'animate__fadeOut'],
+        dismiss: {
+          duration: 2000,
+          onScreen: true
+        }
+      })
       console.error('Upload failed', error)
     }
   }
