@@ -13,22 +13,22 @@ const Upload: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!file) return
-    
+
     const fileMetadata = new FileMetadataDto({
-      checkSum: '1234', 
+      checkSum: '1234',
       id: 1,
       fileSize: 1000,
       fileName: file.name,
       fileType: file.type,
       duration: 100,
-      date: new Date()})
-    
+      date: new Date()
+    })
 
     const uploadDetails = new UploadDetailsDto({
       id: 1,
       title: title,
       description: description,
-      tags: tags 
+      tags: tags
     })
 
     const uploadDTO = new UploadDto()
