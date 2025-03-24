@@ -38,10 +38,14 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 API");
         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
     });
+    
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseRouting();
 app.UseCors("AllowAll");
+app.UseAuthorization();
 
 app.Run();
