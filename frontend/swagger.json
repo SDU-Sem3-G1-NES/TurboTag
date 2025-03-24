@@ -877,7 +877,7 @@
           },
           "date": {
             "type": "string",
-            "nullable": true,
+            "format": "date-time",
             "readOnly": true
           },
           "checkSum": {
