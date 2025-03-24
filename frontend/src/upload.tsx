@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Tags from './tags'
-import { UploadClient, UploadDTO, UploadDetailsDTO, FileMetadataDTO } from './api/apiClient.ts'
+import { UploadClient, UploadDto, UploadDetailsDto, FileMetadataDto } from './api/apiClient.ts'
 import { Store } from 'react-notifications-component'
 
 const Upload: React.FC = () => {
@@ -13,25 +13,25 @@ const Upload: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!file) return
-
-    const fileMetadata = new FileMetadataDTO({
+    
+    const fileMetadata = new FileMetadataDto({
+      checkSum: '1234', 
       id: 1,
-      fileType: file.type,
+      fileSize: 1000,
       fileName: file.name,
-      fileSize: file.size,
-      duration: file.size,
-      date: '2021-01-01T00:00:00Z',
-      checkSum: '1234'
-    })
+      fileType: file.type,
+      duration: 100,
+      date: new Date()})
+    
 
-    const uploadDetails = new UploadDetailsDTO({
+    const uploadDetails = new UploadDetailsDto({
       id: 1,
       title: title,
       description: description,
-      tags: tags
+      tags: tags 
     })
 
-    const uploadDTO = new UploadDTO()
+    const uploadDTO = new UploadDto()
     uploadDTO.init({
       id: 1,
       ownerId: 1,

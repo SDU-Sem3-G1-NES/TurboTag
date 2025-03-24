@@ -9,7 +9,7 @@ namespace API.Controllers;
 public class UploadController : ControllerBase
 {
     [HttpPost("StoreUpload")]
-    public ActionResult StoreUpload(UploadDTO upload)
+    public ActionResult StoreUpload(UploadDto upload)
     {
         return Ok();
     }

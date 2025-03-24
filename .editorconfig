@@ -1,0 +1,10 @@
+[*.cs]
+dotnet_naming_rule.parameter_naming.symbols = parameter
+dotnet_naming_rule.parameter_naming.style = parameter_style
+dotnet_naming_rule.parameter_naming.severity = error
+
+dotnet_naming_symbols.parameter.applicable_kinds = parameter
+dotnet_naming_symbols.parameter.applicable_accessibilities = *
+dotnet_naming_symbols.parameter.required_modifiers =
+
+dotnet_naming_style.parameter_style.capitalization = camel_case

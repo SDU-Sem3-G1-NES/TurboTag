@@ -11,44 +11,45 @@ public class ContentLibraryController : ControllerBase
     [HttpGet("GetUserLibrariesById")]
     public ActionResult<LibraryDTO[]> GetUserLibrariesById(string userId)
     {
-        return Ok(mockLibraries);
+        return Ok(_mockLibraries);
     }
     [HttpGet("GetUserLibraryId")]
     public ActionResult<LibraryDTO> GetUserLibraryId(string libraryId)
     {
-        return Ok(mockLibraries.First());
+        return Ok(_mockLibraries.First());
     }
     [HttpGet("GetLibraryUploadsById")]
-    public ActionResult<UploadDTO[]> GetLibraryUploadsById(string libraryId)
+    public ActionResult<UploadDto[]> GetLibraryUploadsById(string libraryId)
     {
-        return Ok(mockUploads);
+        return Ok(_mockUploads);
     }
     [HttpGet("GetLibraryUploadById")]
-    public ActionResult<UploadDTO> GetLibraryUploadById(string uploadId)
+    public ActionResult<UploadDto> GetLibraryUploadById(string uploadId)
     {
-        return Ok(mockUploads.First());
+        return Ok(_mockUploads.First());
     }
     
-    private List<LibraryDTO> mockLibraries = new List<LibraryDTO>
+    private readonly List<LibraryDTO> _mockLibraries = new List<LibraryDTO>
     {
         new LibraryDTO(libraryId: 1, libraryName: "Library 1")
     };
-    private List<UploadDTO> mockUploads = new List<UploadDTO>
+    private readonly List<UploadDto> _mockUploads = new List<UploadDto>
     {
-        new UploadDTO(
+        new UploadDto(
             id: 1,
             ownerId: 1,
             libraryId: 1,
-            details: new UploadDetailsDTO(id: 1,
+            details: new UploadDetailsDto(id: 1,
                 description: "Description 1",
-                title: "Title 1", tags:
-                new List<string> { "Tag 1", "Tag 2" }),
-            fileMetadata: new FileMetadataDTO(id: 1,
+                title: "Title 1", 
+                tags:
+                    new List<string> { "Tag 1", "Tag 2" }),
+            fileMetadata: new FileMetadataDto(id: 1,
                 fileType: "txt",
                 fileName: "example.txt",
                 fileSize: 123.45f,
                 duration: 60,
-                date: "2023-10-01",
+                date: DateTime.Now, 
                 checkSum: "abc123")
         )
     };
