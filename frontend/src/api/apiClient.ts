@@ -1544,22 +1544,22 @@ export interface IAdminClient {
         }
 
 export class FileMetadataDTO {
-    readonly id?: number;
+    id?: number;
     fileType?: string | null;
     fileName?: string | null;
     fileSize?: number;
     duration?: number | null;
-    readonly date?: string | null;
+    date?: string | null;
     checkSum?: string | null;
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.fileType = _data["fileType"] !== undefined ? _data["fileType"] : <any>null;
             this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
             this.fileSize = _data["fileSize"] !== undefined ? _data["fileSize"] : <any>null;
             this.duration = _data["duration"] !== undefined ? _data["duration"] : <any>null;
-            (<any>this).date = _data["date"] !== undefined ? _data["date"] : <any>null;
+            this.date = _data["date"] !== undefined ? _data["date"] : <any>null;
             this.checkSum = _data["checkSum"] !== undefined ? _data["checkSum"] : <any>null;
         }
     }
@@ -1585,13 +1585,13 @@ export class FileMetadataDTO {
 }
 
 export class LibraryDTO {
-    readonly id?: number;
-    readonly name?: string | null;
+    id?: number;
+    name?: string | null;
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            (<any>this).name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
         }
     }
 
@@ -1611,15 +1611,15 @@ export class LibraryDTO {
 }
 
 export class SettingsDTO {
-    readonly id?: number;
-    readonly name?: string | null;
-    readonly value?: string | null;
+    id?: number;
+    name?: string | null;
+    value?: string | null;
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            (<any>this).name = _data["name"] !== undefined ? _data["name"] : <any>null;
-            (<any>this).value = _data["value"] !== undefined ? _data["value"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.value = _data["value"] !== undefined ? _data["value"] : <any>null;
         }
     }
 
@@ -1640,7 +1640,7 @@ export class SettingsDTO {
 }
 
 export class UploadDTO {
-    readonly id?: number;
+    id?: number;
     ownerId?: number;
     libraryId?: number;
     details?: UploadDetailsDTO;
@@ -1648,7 +1648,7 @@ export class UploadDTO {
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
             this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
             this.details = _data["details"] ? UploadDetailsDTO.fromJS(_data["details"]) : <any>null;
@@ -1675,23 +1675,23 @@ export class UploadDTO {
 }
 
 export class UploadDetailsDTO {
-    readonly id?: number;
-    readonly description?: string | null;
-    readonly title?: string | null;
-    readonly tags?: string[] | null;
+    id?: number;
+    description?: string | null;
+    title?: string | null;
+    tags?: string[] | null;
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            (<any>this).description = _data["description"] !== undefined ? _data["description"] : <any>null;
-            (<any>this).title = _data["title"] !== undefined ? _data["title"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            this.title = _data["title"] !== undefined ? _data["title"] : <any>null;
             if (Array.isArray(_data["tags"])) {
-                (<any>this).tags = [] as any;
+                this.tags = [] as any;
                 for (let item of _data["tags"])
-                    (<any>this).tags!.push(item);
+                    this.tags!.push(item);
             }
             else {
-                (<any>this).tags = <any>null;
+                this.tags = <any>null;
             }
         }
     }
@@ -1744,32 +1744,32 @@ export class UserCredentialsDTO {
 }
 
 export class UserDTO {
-    readonly id?: number;
-    readonly type?: number;
+    id?: number;
+    type?: number;
     email?: string | null;
-    readonly permissions?: string[] | null;
-    readonly settings?: SettingsDTO[] | null;
+    permissions?: string[] | null;
+    settings?: SettingsDTO[] | null;
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            (<any>this).type = _data["type"] !== undefined ? _data["type"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.type = _data["type"] !== undefined ? _data["type"] : <any>null;
             this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
             if (Array.isArray(_data["permissions"])) {
-                (<any>this).permissions = [] as any;
+                this.permissions = [] as any;
                 for (let item of _data["permissions"])
-                    (<any>this).permissions!.push(item);
+                    this.permissions!.push(item);
             }
             else {
-                (<any>this).permissions = <any>null;
+                this.permissions = <any>null;
             }
             if (Array.isArray(_data["settings"])) {
-                (<any>this).settings = [] as any;
+                this.settings = [] as any;
                 for (let item of _data["settings"])
-                    (<any>this).settings!.push(SettingsDTO.fromJS(item));
+                    this.settings!.push(SettingsDTO.fromJS(item));
             }
             else {
-                (<any>this).settings = <any>null;
+                this.settings = <any>null;
             }
         }
     }
