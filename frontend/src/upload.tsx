@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import Tags from './tags'
 import { UploadClient, UploadDTO, UploadDetailsDTO, FileMetadataDTO } from './api/apiClient.ts'
-import { Store } from 'react-notifications-component';
-
+import { Store } from 'react-notifications-component'
 
 const Upload: React.FC = () => {
   const [title, setTitle] = useState<string>('')
@@ -15,22 +14,35 @@ const Upload: React.FC = () => {
     event.preventDefault()
     if (!file) return
 
-    const fileMetadata = new FileMetadataDTO({id: 1,fileType: file.type, fileName: file.name, fileSize: file.size, duration: file.size, date: '2021-01-01T00:00:00Z', checkSum: '1234'})
+    const fileMetadata = new FileMetadataDTO({
+      id: 1,
+      fileType: file.type,
+      fileName: file.name,
+      fileSize: file.size,
+      duration: file.size,
+      date: '2021-01-01T00:00:00Z',
+      checkSum: '1234'
+    })
 
-    const uploadDetails = new UploadDetailsDTO({ id:1 ,title: title, description: description,tags: tags })
+    const uploadDetails = new UploadDetailsDTO({
+      id: 1,
+      title: title,
+      description: description,
+      tags: tags
+    })
 
-    const uploadDTO = new UploadDTO();
+    const uploadDTO = new UploadDTO()
     uploadDTO.init({
       id: 1,
       ownerId: 1,
       libraryId: 1,
       details: uploadDetails,
       fileMetadata: fileMetadata
-    });
+    })
 
     try {
       await uploadClient.storeUpload(uploadDTO)
-      
+
       Store.addNotification({
         title: 'Upload successful',
         message: 'Your lecture has been uploaded',
@@ -46,7 +58,6 @@ const Upload: React.FC = () => {
       })
       console.log('Upload successful')
     } catch (error) {
-      
       Store.addNotification({
         title: 'Upload failed',
         message: 'Your lecture could not be uploaded',
@@ -69,12 +80,7 @@ const Upload: React.FC = () => {
       <h1>Upload Lecture</h1>
 
       <label htmlFor="title">Title</label>
-      <input
-        id="title"
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+      <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
       <br />
 
       <label htmlFor="description">Description</label>
