@@ -844,24 +844,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -957,10 +940,6 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
-          },
-          "libraryId": {
-            "type": "integer",
-            "format": "int32"
           },
           "details": {
             "$ref": "#/components/schemas/UploadDetailsDTO"
