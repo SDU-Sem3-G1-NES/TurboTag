@@ -15,7 +15,7 @@ export class ApiConfiguration {
   public baseUrl: string;
   public instance: AxiosInstance;
 
-  constructor(baseUrl: string = 'https://localhost:7275', instance?: AxiosInstance) {
+  constructor(baseUrl: string = 'http://localhost:5088', instance?: AxiosInstance) {
     this.baseUrl = baseUrl;
     this.instance =
       instance ||
@@ -1473,10 +1473,9 @@ export interface IAdminClient {
 
             export interface IUploadClient {
                     /**
-             * @param body (optional) 
              * @return OK
              */
-            storeUpload(body?: UploadDTO | undefined): Promise<void>;
+            storeUpload(): Promise<string>;
         }
 
     export class UploadClient extends BaseApiClient implements IUploadClient {
@@ -1492,22 +1491,18 @@ export interface IAdminClient {
     
 
         /**
-         * @param body (optional) 
          * @return OK
          */
-        storeUpload(body?: UploadDTO | undefined, cancelToken?: CancelToken): Promise<void> {
+        storeUpload( cancelToken?: CancelToken): Promise<string> {
         let url_ = this.baseUrl + "/Upload/StoreUpload";
         url_ = url_.replace(/[?&]$/, "");
 
-                    const content_ = JSON.stringify(body);
-
                 let options_: AxiosRequestConfig = {
-                    data: content_,
                         method: "POST",
         url: url_,
         headers: {
-                            "Content-Type": "application/json",
-                        },
+                                    "Accept": "text/plain"
+                },
             cancelToken
         };
 
@@ -1522,7 +1517,7 @@ export interface IAdminClient {
                 });
         }
 
-        protected processStoreUpload(response: AxiosResponse): Promise<void> {
+        protected processStoreUpload(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1534,42 +1529,37 @@ export interface IAdminClient {
         }
         if (status === 200) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<string>(null as any);
         }
         }
 
-export class FileMetadataDTO implements IFileMetadataDTO {
-    id?: number;
+export class FileMetadataDTO {
+    readonly id?: number;
     fileType?: string | null;
     fileName?: string | null;
     fileSize?: number;
-    duration?: number;
-    date?: string | null;
+    duration?: number | null;
+    readonly date?: Date;
     checkSum?: string | null;
-
-    constructor(data?: IFileMetadataDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.fileType = _data["fileType"] !== undefined ? _data["fileType"] : <any>null;
             this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
             this.fileSize = _data["fileSize"] !== undefined ? _data["fileSize"] : <any>null;
             this.duration = _data["duration"] !== undefined ? _data["duration"] : <any>null;
-            this.date = _data["date"] !== undefined ? _data["date"] : <any>null;
+            (<any>this).date = _data["date"] ? new Date(_data["date"].toString()) : <any>null;
             this.checkSum = _data["checkSum"] !== undefined ? _data["checkSum"] : <any>null;
         }
     }
@@ -1588,34 +1578,15 @@ export class FileMetadataDTO implements IFileMetadataDTO {
         data["fileName"] = this.fileName !== undefined ? this.fileName : <any>null;
         data["fileSize"] = this.fileSize !== undefined ? this.fileSize : <any>null;
         data["duration"] = this.duration !== undefined ? this.duration : <any>null;
-        data["date"] = this.date !== undefined ? this.date : <any>null;
+        data["date"] = this.date ? this.date.toISOString() : <any>null;
         data["checkSum"] = this.checkSum !== undefined ? this.checkSum : <any>null;
         return data;
     }
 }
 
-export interface IFileMetadataDTO {
-    id?: number;
-    fileType?: string | null;
-    fileName?: string | null;
-    fileSize?: number;
-    duration?: number;
-    date?: string | null;
-    checkSum?: string | null;
-}
-
-export class LibraryDTO implements ILibraryDTO {
+export class LibraryDTO {
     readonly id?: number;
     readonly name?: string | null;
-
-    constructor(data?: ILibraryDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
 
     init(_data?: any) {
         if (_data) {
@@ -1639,24 +1610,10 @@ export class LibraryDTO implements ILibraryDTO {
     }
 }
 
-export interface ILibraryDTO {
-    id?: number;
-    name?: string | null;
-}
-
-export class SettingsDTO implements ISettingsDTO {
+export class SettingsDTO {
     readonly id?: number;
     readonly name?: string | null;
     readonly value?: string | null;
-
-    constructor(data?: ISettingsDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
 
     init(_data?: any) {
         if (_data) {
@@ -1682,31 +1639,16 @@ export class SettingsDTO implements ISettingsDTO {
     }
 }
 
-export interface ISettingsDTO {
-    id?: number;
-    name?: string | null;
-    value?: string | null;
-}
-
-export class UploadDTO implements IUploadDTO {
-    id?: number | null;
-    ownerId?: number | null;
-    libraryId?: number | null;
+export class UploadDTO {
+    readonly id?: number;
+    ownerId?: number;
+    libraryId?: number;
     details?: UploadDetailsDTO;
     fileMetadata?: FileMetadataDTO;
 
-    constructor(data?: IUploadDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
             this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
             this.details = _data["details"] ? UploadDetailsDTO.fromJS(_data["details"]) : <any>null;
@@ -1732,41 +1674,24 @@ export class UploadDTO implements IUploadDTO {
     }
 }
 
-export interface IUploadDTO {
-    id?: number | null;
-    ownerId?: number | null;
-    libraryId?: number | null;
-    details?: UploadDetailsDTO;
-    fileMetadata?: FileMetadataDTO;
-}
-
-export class UploadDetailsDTO implements IUploadDetailsDTO {
-    id?: number;
-    description?: string | null;
-    title?: string | null;
-    tags?: string[] | null;
-
-    constructor(data?: IUploadDetailsDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
+export class UploadDetailsDTO {
+    readonly id?: number;
+    readonly description?: string | null;
+    readonly title?: string | null;
+    readonly tags?: string[] | null;
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
-            this.title = _data["title"] !== undefined ? _data["title"] : <any>null;
+            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            (<any>this).description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            (<any>this).title = _data["title"] !== undefined ? _data["title"] : <any>null;
             if (Array.isArray(_data["tags"])) {
-                this.tags = [] as any;
+                (<any>this).tags = [] as any;
                 for (let item of _data["tags"])
-                    this.tags!.push(item);
+                    (<any>this).tags!.push(item);
             }
             else {
-                this.tags = <any>null;
+                (<any>this).tags = <any>null;
             }
         }
     }
@@ -1792,25 +1717,9 @@ export class UploadDetailsDTO implements IUploadDetailsDTO {
     }
 }
 
-export interface IUploadDetailsDTO {
-    id?: number;
-    description?: string | null;
-    title?: string | null;
-    tags?: string[] | null;
-}
-
-export class UserCredentialsDTO implements IUserCredentialsDTO {
+export class UserCredentialsDTO {
     email?: string | null;
     password?: string | null;
-
-    constructor(data?: IUserCredentialsDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
 
     init(_data?: any) {
         if (_data) {
@@ -1834,26 +1743,12 @@ export class UserCredentialsDTO implements IUserCredentialsDTO {
     }
 }
 
-export interface IUserCredentialsDTO {
-    email?: string | null;
-    password?: string | null;
-}
-
-export class UserDTO implements IUserDTO {
+export class UserDTO {
     readonly id?: number;
     readonly type?: number;
     email?: string | null;
     readonly permissions?: string[] | null;
     readonly settings?: SettingsDTO[] | null;
-
-    constructor(data?: IUserDTO) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
 
     init(_data?: any) {
         if (_data) {
@@ -1903,14 +1798,6 @@ export class UserDTO implements IUserDTO {
         }
         return data;
     }
-}
-
-export interface IUserDTO {
-    id?: number;
-    type?: number;
-    email?: string | null;
-    permissions?: string[] | null;
-    settings?: SettingsDTO[] | null;
 }
 
 export class SwaggerException extends Error {
