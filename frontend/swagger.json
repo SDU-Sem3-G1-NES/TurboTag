@@ -855,7 +855,8 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "readOnly": true
           },
           "fileType": {
             "type": "string",
@@ -876,7 +877,8 @@
           },
           "date": {
             "type": "string",
-            "nullable": true
+            "format": "date-time",
+            "readOnly": true
           },
           "checkSum": {
             "type": "string",

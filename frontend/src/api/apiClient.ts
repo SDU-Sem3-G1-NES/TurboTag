@@ -1544,22 +1544,22 @@ export interface IAdminClient {
         }
 
 export class FileMetadataDTO {
-    id?: number;
+    readonly id?: number;
     fileType?: string | null;
     fileName?: string | null;
     fileSize?: number;
     duration?: number | null;
-    date?: string | null;
+    readonly date?: Date;
     checkSum?: string | null;
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.fileType = _data["fileType"] !== undefined ? _data["fileType"] : <any>null;
             this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
             this.fileSize = _data["fileSize"] !== undefined ? _data["fileSize"] : <any>null;
             this.duration = _data["duration"] !== undefined ? _data["duration"] : <any>null;
-            this.date = _data["date"] !== undefined ? _data["date"] : <any>null;
+            (<any>this).date = _data["date"] ? new Date(_data["date"].toString()) : <any>null;
             this.checkSum = _data["checkSum"] !== undefined ? _data["checkSum"] : <any>null;
         }
     }
@@ -1578,7 +1578,7 @@ export class FileMetadataDTO {
         data["fileName"] = this.fileName !== undefined ? this.fileName : <any>null;
         data["fileSize"] = this.fileSize !== undefined ? this.fileSize : <any>null;
         data["duration"] = this.duration !== undefined ? this.duration : <any>null;
-        data["date"] = this.date !== undefined ? this.date : <any>null;
+        data["date"] = this.date ? this.date.toISOString() : <any>null;
         data["checkSum"] = this.checkSum !== undefined ? this.checkSum : <any>null;
         return data;
     }
