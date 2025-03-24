@@ -1,23 +1,15 @@
-using System.Text.Json.Serialization;
+namespace API.DTOs;
 
-namespace API.DTOs
+public class UploadDTO(
+    int uploadId,
+    int ownerId,
+    int libraryId,
+    UploadDetailsDTO uploadDetails,
+    FileMetadataDTO fileMetadata)
 {
-    public class UploadDTO
-    {
-        public int? Id { get; set; }
-        public int? OwnerId { get; set; }
-        public int? LibraryId { get; set; }
-        public UploadDetailsDTO Details { get; set; }
-        public FileMetadataDTO FileMetadata { get; set; }
-
-        [JsonConstructor]
-        public UploadDTO(int? id, int? ownerId, int? libraryId, UploadDetailsDTO details, FileMetadataDTO fileMetadata)
-        {
-            Id = id;
-            OwnerId = ownerId;
-            LibraryId = libraryId;
-            Details = details;
-            FileMetadata = fileMetadata;
-        }
-    }
+    public int Id { get; set; } = uploadId;
+    public int OwnerId { get; set; } = ownerId;
+    public int LibraryId { get; set; } = libraryId;
+    public UploadDetailsDTO Details { get; set; } = uploadDetails;
+    public FileMetadataDTO FileMetadata { get; set; } = fileMetadata;
 }
