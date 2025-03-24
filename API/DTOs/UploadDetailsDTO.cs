@@ -1,9 +1,20 @@
-namespace API.DTOs;
+using System.Collections.Generic;
 
-public class UploadDetailsDTO(int uploadId, string uploadDescription, string uploadTitle, List<string> uploadTags)
+namespace API.DTOs
 {
-    public int Id { get; } = uploadId;
-    public string Description { get; } = uploadDescription;
-    public string Title { get; } = uploadTitle;
-    public List<string> Tags { get; } = uploadTags;
+    public class UploadDetailsDTO
+    {
+        public int Id { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+        public List<string> Tags { get; set; }
+
+        public UploadDetailsDTO(int id, string description, string title, List<string> tags)
+        {
+            Id = id;
+            Description = description;
+            Title = title;
+            Tags = tags;
+        }
+    }
 }

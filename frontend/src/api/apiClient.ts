@@ -1545,12 +1545,12 @@ export interface IAdminClient {
         }
 
 export class FileMetadataDTO implements IFileMetadataDTO {
-    readonly id?: number;
+    id?: number;
     fileType?: string | null;
     fileName?: string | null;
     fileSize?: number;
-    duration?: number | null;
-    readonly date?: string | null;
+    duration?: number;
+    date?: string | null;
     checkSum?: string | null;
 
     constructor(data?: IFileMetadataDTO) {
@@ -1564,12 +1564,12 @@ export class FileMetadataDTO implements IFileMetadataDTO {
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.fileType = _data["fileType"] !== undefined ? _data["fileType"] : <any>null;
             this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
             this.fileSize = _data["fileSize"] !== undefined ? _data["fileSize"] : <any>null;
             this.duration = _data["duration"] !== undefined ? _data["duration"] : <any>null;
-            (<any>this).date = _data["date"] !== undefined ? _data["date"] : <any>null;
+            this.date = _data["date"] !== undefined ? _data["date"] : <any>null;
             this.checkSum = _data["checkSum"] !== undefined ? _data["checkSum"] : <any>null;
         }
     }
@@ -1599,7 +1599,7 @@ export interface IFileMetadataDTO {
     fileType?: string | null;
     fileName?: string | null;
     fileSize?: number;
-    duration?: number | null;
+    duration?: number;
     date?: string | null;
     checkSum?: string | null;
 }
@@ -1689,9 +1689,9 @@ export interface ISettingsDTO {
 }
 
 export class UploadDTO implements IUploadDTO {
-    readonly id?: number;
-    ownerId?: number;
-    libraryId?: number;
+    id?: number | null;
+    ownerId?: number | null;
+    libraryId?: number | null;
     details?: UploadDetailsDTO;
     fileMetadata?: FileMetadataDTO;
 
@@ -1706,7 +1706,7 @@ export class UploadDTO implements IUploadDTO {
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
             this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
             this.details = _data["details"] ? UploadDetailsDTO.fromJS(_data["details"]) : <any>null;
@@ -1733,18 +1733,18 @@ export class UploadDTO implements IUploadDTO {
 }
 
 export interface IUploadDTO {
-    id?: number;
-    ownerId?: number;
-    libraryId?: number;
+    id?: number | null;
+    ownerId?: number | null;
+    libraryId?: number | null;
     details?: UploadDetailsDTO;
     fileMetadata?: FileMetadataDTO;
 }
 
 export class UploadDetailsDTO implements IUploadDetailsDTO {
-    readonly id?: number;
-    readonly description?: string | null;
-    readonly title?: string | null;
-    readonly tags?: string[] | null;
+    id?: number;
+    description?: string | null;
+    title?: string | null;
+    tags?: string[] | null;
 
     constructor(data?: IUploadDetailsDTO) {
         if (data) {
@@ -1757,16 +1757,16 @@ export class UploadDetailsDTO implements IUploadDetailsDTO {
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            (<any>this).description = _data["description"] !== undefined ? _data["description"] : <any>null;
-            (<any>this).title = _data["title"] !== undefined ? _data["title"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            this.title = _data["title"] !== undefined ? _data["title"] : <any>null;
             if (Array.isArray(_data["tags"])) {
-                (<any>this).tags = [] as any;
+                this.tags = [] as any;
                 for (let item of _data["tags"])
-                    (<any>this).tags!.push(item);
+                    this.tags!.push(item);
             }
             else {
-                (<any>this).tags = <any>null;
+                this.tags = <any>null;
             }
         }
     }

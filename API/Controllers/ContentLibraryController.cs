@@ -36,19 +36,19 @@ public class ContentLibraryController : ControllerBase
     private List<UploadDTO> mockUploads = new List<UploadDTO>
     {
         new UploadDTO(
-            uploadId: 1,
+            id: 1,
             ownerId: 1,
             libraryId: 1,
-            uploadDetails: new UploadDetailsDTO(uploadId: 1,
-                uploadDescription: "Description 1",
-                uploadTitle: "Title 1", uploadTags:
+            details: new UploadDetailsDTO(id: 1,
+                description: "Description 1",
+                title: "Title 1", tags:
                 new List<string> { "Tag 1", "Tag 2" }),
-            fileMetadata: new FileMetadataDTO(uploadId: 1,
+            fileMetadata: new FileMetadataDTO(id: 1,
                 fileType: "txt",
                 fileName: "example.txt",
                 fileSize: 123.45f,
                 duration: 60,
-                uploadDate: "2023-10-01",
+                date: "2023-10-01",
                 checkSum: "abc123")
         )
     };
