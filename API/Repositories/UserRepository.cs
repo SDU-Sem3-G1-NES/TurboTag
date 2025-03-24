@@ -15,6 +15,9 @@ namespace API.Repositories
         void UpdateUserCredentials(byte[] emailHash, byte[] passwordHash);
         void DeleteUser(int userId);
         void DeleteUserCredentials(byte[] passwordHash);
+        void StoreUserSession();
+        UserDTO GetUserBySession();
+        UserDTO GetUserByEmail(string email);
     }
     public class UserRepository : IUserRepository
     {
@@ -65,6 +68,18 @@ namespace API.Repositories
         public void DeleteUserCredentials(byte[] passwordHash)
         {
             throw new NotImplementedException();
+        }
+        public void StoreUserSession()
+        {
+            throw new NotImplementedException();
+        }
+        public UserDTO GetUserBySession()
+        {
+            throw new NotImplementedException();
+        }
+        public UserDTO GetUserByEmail(string email)
+        {
+            return new UserDTO(1, 1, email, new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>());
         }
     }
 }
