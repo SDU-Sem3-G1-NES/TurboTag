@@ -1,0 +1,26 @@
+﻿services:
+#  api:
+#    image: api
+#    build:
+#      context: .
+#      dockerfile: API/Dockerfile
+#      
+#    deploy:
+#      replicas: ${COMPOSE_ENVIRONMENT:-1}
+
+  postgres:
+    build:
+      context: ./setup/postgres
+      dockerfile: Dockerfile
+      
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      
+    ports:
+      - "5432:5432"
+    
+    env_file:
+      - ./setup/postgres/.env
+
+volumes:
+  db_data:
