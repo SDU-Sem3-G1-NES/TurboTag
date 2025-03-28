@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Tags from './tags'
-import { UploadClient, UploadDto, UploadDetailsDto, FileMetadataDto } from './api/apiClient.ts'
+import Tags from '../components/tags'
+import { UploadClient, UploadDto, UploadDetailsDto, FileMetadataDto } from '../api/apiClient.ts'
 import { Store } from 'react-notifications-component'
 
 const Upload: React.FC = () => {
