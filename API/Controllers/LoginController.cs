@@ -9,7 +9,7 @@ namespace API.Controllers;
 public class LoginController(IUserCredentialsService _userCredentialsService) : ControllerBase
 {
     [HttpGet("ValidateUserCredentials")]
-    public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDTO userCredentials)
+    public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDto userCredentials)
     {
         return Ok(_userCredentialsService.ValidateUserCredentials());
     }

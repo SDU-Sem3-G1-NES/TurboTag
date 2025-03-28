@@ -15,7 +15,7 @@ export class ApiConfiguration {
   public baseUrl: string;
   public instance: AxiosInstance;
 
-  constructor(baseUrl: string = 'http://localhost:5088', instance?: AxiosInstance) {
+  constructor(baseUrl: string = 'https://localhost:7275', instance?: AxiosInstance) {
     this.baseUrl = baseUrl;
     this.instance =
       instance ||
@@ -558,12 +558,12 @@ export interface IAdminClient {
              * @param libraryId (optional) 
              * @return OK
              */
-            getLibraryUploadsById(libraryId?: string | undefined): Promise<UploadDTO[]>;
+            getLibraryUploadsById(libraryId?: string | undefined): Promise<UploadDto[]>;
                     /**
              * @param uploadId (optional) 
              * @return OK
              */
-            getLibraryUploadById(uploadId?: string | undefined): Promise<UploadDTO>;
+            getLibraryUploadById(uploadId?: string | undefined): Promise<UploadDto>;
         }
 
     export class ContentLibraryClient extends BaseApiClient implements IContentLibraryClient {
@@ -703,7 +703,7 @@ export interface IAdminClient {
          * @param libraryId (optional) 
          * @return OK
          */
-        getLibraryUploadsById(libraryId?: string | undefined, cancelToken?: CancelToken): Promise<UploadDTO[]> {
+        getLibraryUploadsById(libraryId?: string | undefined, cancelToken?: CancelToken): Promise<UploadDto[]> {
         let url_ = this.baseUrl + "/ContentLibrary/GetLibraryUploadsById?";
         if (libraryId === null)
             throw new Error("The parameter 'libraryId' cannot be null.");
@@ -731,7 +731,7 @@ export interface IAdminClient {
                 });
         }
 
-        protected processGetLibraryUploadsById(response: AxiosResponse): Promise<UploadDTO[]> {
+        protected processGetLibraryUploadsById(response: AxiosResponse): Promise<UploadDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -748,18 +748,18 @@ export interface IAdminClient {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(UploadDTO.fromJS(item));
+                    result200!.push(UploadDto.fromJS(item));
             }
             else {
                 result200 = <any>null;
             }
-            return Promise.resolve<UploadDTO[]>(result200);
+            return Promise.resolve<UploadDto[]>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<UploadDTO[]>(null as any);
+        return Promise.resolve<UploadDto[]>(null as any);
         }
     
 
@@ -767,7 +767,7 @@ export interface IAdminClient {
          * @param uploadId (optional) 
          * @return OK
          */
-        getLibraryUploadById(uploadId?: string | undefined, cancelToken?: CancelToken): Promise<UploadDTO> {
+        getLibraryUploadById(uploadId?: string | undefined, cancelToken?: CancelToken): Promise<UploadDto> {
         let url_ = this.baseUrl + "/ContentLibrary/GetLibraryUploadById?";
         if (uploadId === null)
             throw new Error("The parameter 'uploadId' cannot be null.");
@@ -795,7 +795,7 @@ export interface IAdminClient {
                 });
         }
 
-        protected processGetLibraryUploadById(response: AxiosResponse): Promise<UploadDTO> {
+        protected processGetLibraryUploadById(response: AxiosResponse): Promise<UploadDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -809,14 +809,14 @@ export interface IAdminClient {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UploadDTO.fromJS(resultData200);
-            return Promise.resolve<UploadDTO>(result200);
+            result200 = UploadDto.fromJS(resultData200);
+            return Promise.resolve<UploadDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<UploadDTO>(null as any);
+        return Promise.resolve<UploadDto>(null as any);
         }
         }
 
@@ -825,7 +825,7 @@ export interface IAdminClient {
              * @param body (optional) 
              * @return OK
              */
-            validateUserCredentials(body?: UserCredentialsDTO | undefined): Promise<boolean>;
+            validateUserCredentials(body?: UserCredentialsDto | undefined): Promise<boolean>;
                     /**
              * @param email (optional) 
              * @return OK
@@ -858,7 +858,7 @@ export interface IAdminClient {
          * @param body (optional) 
          * @return OK
          */
-        validateUserCredentials(body?: UserCredentialsDTO | undefined, cancelToken?: CancelToken): Promise<boolean> {
+        validateUserCredentials(body?: UserCredentialsDto | undefined, cancelToken?: CancelToken): Promise<boolean> {
         let url_ = this.baseUrl + "/Login/ValidateUserCredentials";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1080,7 +1080,7 @@ export interface IAdminClient {
              * @param body (optional) 
              * @return OK
              */
-            registerUser(body?: UserCredentialsDTO | undefined): Promise<void>;
+            registerUser(body?: UserCredentialsDto | undefined): Promise<void>;
         }
 
     export class RegisterClient extends BaseApiClient implements IRegisterClient {
@@ -1157,7 +1157,7 @@ export interface IAdminClient {
          * @param body (optional) 
          * @return OK
          */
-        registerUser(body?: UserCredentialsDTO | undefined, cancelToken?: CancelToken): Promise<void> {
+        registerUser(body?: UserCredentialsDto | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/Register/RegisterUser";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1473,9 +1473,10 @@ export interface IAdminClient {
 
             export interface IUploadClient {
                     /**
+             * @param body (optional) 
              * @return OK
              */
-            storeUpload(): Promise<string>;
+            storeUpload(body?: UploadDto | undefined): Promise<void>;
         }
 
     export class UploadClient extends BaseApiClient implements IUploadClient {
@@ -1491,18 +1492,22 @@ export interface IAdminClient {
     
 
         /**
+         * @param body (optional) 
          * @return OK
          */
-        storeUpload( cancelToken?: CancelToken): Promise<string> {
+        storeUpload(body?: UploadDto | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/Upload/StoreUpload";
         url_ = url_.replace(/[?&]$/, "");
 
+                    const content_ = JSON.stringify(body);
+
                 let options_: AxiosRequestConfig = {
+                    data: content_,
                         method: "POST",
         url: url_,
         headers: {
-                                    "Accept": "text/plain"
-                },
+                            "Content-Type": "application/json",
+                        },
             cancelToken
         };
 
@@ -1517,7 +1522,7 @@ export interface IAdminClient {
                 });
         }
 
-        protected processStoreUpload(response: AxiosResponse): Promise<string> {
+        protected processStoreUpload(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1529,44 +1534,49 @@ export interface IAdminClient {
         }
         if (status === 200) {
             const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<string>(result200);
+            return Promise.resolve<void>(null as any);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<void>(null as any);
         }
         }
 
-export class FileMetadataDTO {
-    readonly id?: number;
+export class FileMetadataDto implements IFileMetadataDto {
+    id?: number;
     fileType?: string | null;
     fileName?: string | null;
     fileSize?: number;
     duration?: number | null;
-    readonly date?: Date;
+    date?: Date;
     checkSum?: string | null;
+
+    constructor(data?: IFileMetadataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.fileType = _data["fileType"] !== undefined ? _data["fileType"] : <any>null;
             this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
             this.fileSize = _data["fileSize"] !== undefined ? _data["fileSize"] : <any>null;
             this.duration = _data["duration"] !== undefined ? _data["duration"] : <any>null;
-            (<any>this).date = _data["date"] ? new Date(_data["date"].toString()) : <any>null;
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>null;
             this.checkSum = _data["checkSum"] !== undefined ? _data["checkSum"] : <any>null;
         }
     }
 
-    static fromJS(data: any): FileMetadataDTO {
+    static fromJS(data: any): FileMetadataDto {
         data = typeof data === 'object' ? data : {};
-        let result = new FileMetadataDTO();
+        let result = new FileMetadataDto();
         result.init(data);
         return result;
     }
@@ -1584,9 +1594,28 @@ export class FileMetadataDTO {
     }
 }
 
-export class LibraryDTO {
+export interface IFileMetadataDto {
+    id?: number;
+    fileType?: string | null;
+    fileName?: string | null;
+    fileSize?: number;
+    duration?: number | null;
+    date?: Date;
+    checkSum?: string | null;
+}
+
+export class LibraryDTO implements ILibraryDTO {
     id?: number;
     name?: string | null;
+
+    constructor(data?: ILibraryDTO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(_data?: any) {
         if (_data) {
@@ -1610,10 +1639,24 @@ export class LibraryDTO {
     }
 }
 
-export class SettingsDTO {
+export interface ILibraryDTO {
+    id?: number;
+    name?: string | null;
+}
+
+export class SettingsDTO implements ISettingsDTO {
     id?: number;
     name?: string | null;
     value?: string | null;
+
+    constructor(data?: ISettingsDTO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(_data?: any) {
         if (_data) {
@@ -1639,46 +1682,26 @@ export class SettingsDTO {
     }
 }
 
-export class UploadDTO {
+export interface ISettingsDTO {
     id?: number;
-    ownerId?: number;
-    libraryId?: number;
-    details?: UploadDetailsDTO;
-    fileMetadata?: FileMetadataDTO;
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
-            this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
-            this.details = _data["details"] ? UploadDetailsDTO.fromJS(_data["details"]) : <any>null;
-            this.fileMetadata = _data["fileMetadata"] ? FileMetadataDTO.fromJS(_data["fileMetadata"]) : <any>null;
-        }
-    }
-
-    static fromJS(data: any): UploadDTO {
-        data = typeof data === 'object' ? data : {};
-        let result = new UploadDTO();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id !== undefined ? this.id : <any>null;
-        data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
-        data["libraryId"] = this.libraryId !== undefined ? this.libraryId : <any>null;
-        data["details"] = this.details ? this.details.toJSON() : <any>null;
-        data["fileMetadata"] = this.fileMetadata ? this.fileMetadata.toJSON() : <any>null;
-        return data;
-    }
+    name?: string | null;
+    value?: string | null;
 }
 
-export class UploadDetailsDTO {
+export class UploadDetailsDto implements IUploadDetailsDto {
     id?: number;
     description?: string | null;
     title?: string | null;
     tags?: string[] | null;
+
+    constructor(data?: IUploadDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(_data?: any) {
         if (_data) {
@@ -1696,9 +1719,9 @@ export class UploadDetailsDTO {
         }
     }
 
-    static fromJS(data: any): UploadDetailsDTO {
+    static fromJS(data: any): UploadDetailsDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UploadDetailsDTO();
+        let result = new UploadDetailsDto();
         result.init(data);
         return result;
     }
@@ -1717,9 +1740,77 @@ export class UploadDetailsDTO {
     }
 }
 
-export class UserCredentialsDTO {
+export interface IUploadDetailsDto {
+    id?: number;
+    description?: string | null;
+    title?: string | null;
+    tags?: string[] | null;
+}
+
+export class UploadDto implements IUploadDto {
+    id?: number;
+    ownerId?: number;
+    libraryId?: number;
+    details?: UploadDetailsDto;
+    fileMetadata?: FileMetadataDto;
+
+    constructor(data?: IUploadDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+            this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
+            this.details = _data["details"] ? UploadDetailsDto.fromJS(_data["details"]) : <any>null;
+            this.fileMetadata = _data["fileMetadata"] ? FileMetadataDto.fromJS(_data["fileMetadata"]) : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UploadDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        data["libraryId"] = this.libraryId !== undefined ? this.libraryId : <any>null;
+        data["details"] = this.details ? this.details.toJSON() : <any>null;
+        data["fileMetadata"] = this.fileMetadata ? this.fileMetadata.toJSON() : <any>null;
+        return data;
+    }
+}
+
+export interface IUploadDto {
+    id?: number;
+    ownerId?: number;
+    libraryId?: number;
+    details?: UploadDetailsDto;
+    fileMetadata?: FileMetadataDto;
+}
+
+export class UserCredentialsDto implements IUserCredentialsDto {
     email?: string | null;
     password?: string | null;
+
+    constructor(data?: IUserCredentialsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(_data?: any) {
         if (_data) {
@@ -1728,9 +1819,9 @@ export class UserCredentialsDTO {
         }
     }
 
-    static fromJS(data: any): UserCredentialsDTO {
+    static fromJS(data: any): UserCredentialsDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserCredentialsDTO();
+        let result = new UserCredentialsDto();
         result.init(data);
         return result;
     }
@@ -1743,12 +1834,26 @@ export class UserCredentialsDTO {
     }
 }
 
-export class UserDTO {
+export interface IUserCredentialsDto {
+    email?: string | null;
+    password?: string | null;
+}
+
+export class UserDTO implements IUserDTO {
     id?: number;
     type?: number;
     email?: string | null;
     permissions?: string[] | null;
     settings?: SettingsDTO[] | null;
+
+    constructor(data?: IUserDTO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
 
     init(_data?: any) {
         if (_data) {
@@ -1798,6 +1903,14 @@ export class UserDTO {
         }
         return data;
     }
+}
+
+export interface IUserDTO {
+    id?: number;
+    type?: number;
+    email?: string | null;
+    permissions?: string[] | null;
+    settings?: SettingsDTO[] | null;
 }
 
 export class SwaggerException extends Error {
