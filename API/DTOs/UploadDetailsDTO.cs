@@ -1,9 +1,12 @@
+using System.Text.Json.Serialization;
+
 namespace API.DTOs;
 
-public class UploadDetailsDTO(int uploadId, string uploadDescription, string uploadTitle, List<string> uploadTags)
+[method: JsonConstructor]
+public class UploadDetailsDto(int id, string description, string title, List<string> tags)
 {
-    public int Id { get; set; } = uploadId;
-    public string Description { get; set; } = uploadDescription;
-    public string Title { get; set; } = uploadTitle;
-    public List<string> Tags { get; set; } = uploadTags;
+    public int Id { get; set; } = id;
+    public string Description { get; set; } = description;
+    public string Title { get; set; } = title;
+    public List<string> Tags { get; set; } = tags;
 }
