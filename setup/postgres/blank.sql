@@ -110,7 +110,7 @@ $do$
 BEGIN
    IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'uploads') THEN
       INSERT INTO uploads (user_id, upload_date, upload_type)
-      VALUES (1, NOW(), 'image/jpg');
+      VALUES (1, NOW(), 'image/png');
     END IF;
 END
 $do$;

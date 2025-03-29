@@ -36,3 +36,5 @@ Desktop.ini
 # Other
 **/venv/**
 .env
+
+setup/mongo/mongo_log.txt

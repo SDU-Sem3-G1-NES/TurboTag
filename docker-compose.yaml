@@ -19,8 +19,44 @@
     ports:
       - "5432:5432"
     
-    env_file:
-      - ./setup/postgres/.env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      
+    networks:
+      - turbotag
+    
+    dns: 
+      - 8.8.8.8
+      - 8.8.4.4
+        
+  mongo:
+    build:
+        context: ./setup/mongo
+        dockerfile: Dockerfile
+    volumes:
+      - mongo_data:/data/db
+    
+    ports:
+      - "27017:27017"
+    
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    
+    networks:
+      - turbotag
+    
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 volumes:
   db_data:
+  mongo_data:
+    
+networks:
+  turbotag:
+    driver: bridge
+    name: turbotag
+                
