@@ -13,7 +13,7 @@ public class RegisterController(IUserCredentialsService _userCredentialsService)
         return Ok(_userCredentialsService.CheckIfUserExistsByEmail());
     }
     [HttpPost("RegisterUser")]
-    public ActionResult RegisterUser([FromBody] UserCredentialsDTO userCredentials)
+    public ActionResult RegisterUser([FromBody] UserCredentialsDto userCredentials)
     {
         _userCredentialsService.StoreNewUserCredentials();
         return Ok();
