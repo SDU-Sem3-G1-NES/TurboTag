@@ -54,7 +54,7 @@
       "excludedParameterNames": [],
       "handleReferences": false,
       "generateTypeCheckFunctions": false,
-      "generateConstructorInterface": false,
+      "generateConstructorInterface": true,
       "convertConstructorInterfaceData": false,
       "injectHttpClient": true,
       "importRequiredTypes": true,
