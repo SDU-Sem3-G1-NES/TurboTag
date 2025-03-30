@@ -416,7 +416,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UploadDTO"
+                    "$ref": "#/components/schemas/UploadDto"
                   }
                 }
               },
@@ -424,7 +424,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UploadDTO"
+                    "$ref": "#/components/schemas/UploadDto"
                   }
                 }
               },
@@ -432,7 +432,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UploadDTO"
+                    "$ref": "#/components/schemas/UploadDto"
                   }
                 }
               }
@@ -462,17 +462,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDTO"
+                  "$ref": "#/components/schemas/UploadDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDTO"
+                  "$ref": "#/components/schemas/UploadDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDTO"
+                  "$ref": "#/components/schemas/UploadDto"
                 }
               }
             }
@@ -490,17 +490,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDTO"
+                "$ref": "#/components/schemas/UserCredentialsDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDTO"
+                "$ref": "#/components/schemas/UserCredentialsDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDTO"
+                "$ref": "#/components/schemas/UserCredentialsDto"
               }
             }
           }
@@ -652,17 +652,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDTO"
+                "$ref": "#/components/schemas/UserCredentialsDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDTO"
+                "$ref": "#/components/schemas/UserCredentialsDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDTO"
+                "$ref": "#/components/schemas/UserCredentialsDto"
               }
             }
           }
@@ -823,26 +823,28 @@
           "Upload"
         ],
         "operationId": "Upload_StoreUpload",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "string"
-                }
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -850,13 +852,12 @@
   },
   "components": {
     "schemas": {
-      "FileMetadataDTO": {
+      "FileMetadataDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32",
-            "readOnly": true
+            "format": "int32"
           },
           "fileType": {
             "type": "string",
@@ -877,8 +878,7 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time",
-            "readOnly": true
+            "format": "date-time"
           },
           "checkSum": {
             "type": "string",
@@ -919,31 +919,7 @@
         },
         "additionalProperties": false
       },
-      "UploadDTO": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "ownerId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "libraryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "details": {
-            "$ref": "#/components/schemas/UploadDetailsDTO"
-          },
-          "fileMetadata": {
-            "$ref": "#/components/schemas/FileMetadataDTO"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UploadDetailsDTO": {
+      "UploadDetailsDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -968,7 +944,31 @@
         },
         "additionalProperties": false
       },
-      "UserCredentialsDTO": {
+      "UploadDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ownerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "libraryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "details": {
+            "$ref": "#/components/schemas/UploadDetailsDto"
+          },
+          "fileMetadata": {
+            "$ref": "#/components/schemas/FileMetadataDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserCredentialsDto": {
         "type": "object",
         "properties": {
           "email": {

@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using API;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -19,7 +21,12 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => { options.OperationFilter<SwaggerOperationIdFilter>(); });
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });;
 
 // Configure Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -38,10 +45,14 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 API");
         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
     });
+    
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseRouting();
 app.UseCors("AllowAll");
+app.UseAuthorization();
 
 app.Run();
