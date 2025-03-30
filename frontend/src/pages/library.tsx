@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { LibraryDTO, UploadDTO } from './api/apiClient'
-import { ContentLibraryClient } from './api/apiClient'
+import { LibraryDTO, UploadDTO } from '../api/apiClient'
+import { ContentLibraryClient } from '../api/apiClient'
 
 const Library: React.FC = () => {
     const contentLibraryClient = new ContentLibraryClient()
