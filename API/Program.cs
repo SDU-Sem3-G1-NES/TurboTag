@@ -3,8 +3,10 @@ using System.Text.Json.Serialization;
 using API;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
+Env.Load();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -26,7 +28,8 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    });;
+    });
+;
 
 // Configure Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -45,7 +48,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 API");
         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
     });
-    
+
     app.UseDeveloperExceptionPage();
 }
 
