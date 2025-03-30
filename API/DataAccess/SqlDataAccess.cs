@@ -34,7 +34,7 @@ public class SqlDataAccess(string connectionString) : ISqlDbAccess
 
         using var command = new SqlCommand(query, connection);
         foreach (var parameter in parameters) command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-        command.CommandText += $" OFFSET {pageNumber * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+        command.CommandText += $" OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
 
         using var reader = command.ExecuteReader();
         var results = new List<T>();
