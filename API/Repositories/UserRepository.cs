@@ -1,27 +1,27 @@
-using API.DTOs;
+using API.Dtos;
 
 namespace API.Repositories
 {
     public interface IUserRepository : IRepositoryBase
     {
-        int AddUser(UserDTO user);
+        int AddUser(UserDto user);
         void AddUserCredentials(byte[] emailHash, byte[] passwordHash);
         bool UserEmailExists(string email);
-        UserDTO GetUserById(int userId);
-        List<UserDTO> GetAllUsers();
+        UserDto GetUserById(int userId);
+        List<UserDto> GetAllUsers();
         int GetUserId(string email);
         byte[] GetHashedPassword(byte[] emailHash);
-        void UpdateUser(UserDTO user);
+        void UpdateUser(UserDto user);
         void UpdateUserCredentials(byte[] emailHash, byte[] passwordHash);
         void DeleteUser(int userId);
         void DeleteUserCredentials(byte[] passwordHash);
         void StoreUserSession();
-        UserDTO GetUserBySession();
-        UserDTO GetUserByEmail(string email);
+        UserDto GetUserBySession();
+        UserDto GetUserByEmail(string email);
     }
     public class UserRepository : IUserRepository
     {
-        public int AddUser(UserDTO user)
+        public int AddUser(UserDto user)
         {
             return 1;
         }
@@ -33,16 +33,16 @@ namespace API.Repositories
         {
             return true;
         }
-        public UserDTO GetUserById(int userId)
+        public UserDto GetUserById(int userId)
         {
-            return new UserDTO(userId, 1, "mockuser@example.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>());
+            return new UserDto(userId, 1, "mockuser@example.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDto>());
         }
-        public List<UserDTO> GetAllUsers()
+        public List<UserDto> GetAllUsers()
         {
-            return new List<UserDTO>
+            return new List<UserDto>
             {
-                new UserDTO(1, 1, "mockuser1@example.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>()),
-                new UserDTO(2, 1, "mockuser2@example.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>())
+                new UserDto(1, 1, "mockuser1@example.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDto>()),
+                new UserDto(2, 1, "mockuser2@example.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDto>())
             };
         }
         public int GetUserId(string email)
@@ -53,7 +53,7 @@ namespace API.Repositories
         {
             return new byte[] { 0x00, 0x01, 0x02, 0x03 };
         }
-        public void UpdateUser(UserDTO user)
+        public void UpdateUser(UserDto user)
         {
             throw new NotImplementedException();
         }
@@ -73,13 +73,13 @@ namespace API.Repositories
         {
             throw new NotImplementedException();
         }
-        public UserDTO GetUserBySession()
+        public UserDto GetUserBySession()
         {
             throw new NotImplementedException();
         }
-        public UserDTO GetUserByEmail(string email)
+        public UserDto GetUserByEmail(string email)
         {
-            return new UserDTO(1, 1, email, new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>());
+            return new UserDto(1, 1, email, new List<string> { "Permission1", "Permission2" }, new List<SettingsDto>());
         }
     }
 }

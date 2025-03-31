@@ -1,6 +1,6 @@
-namespace API.DTOs;
+namespace API.Dtos;
 
-public class SettingsDTO(int settingId, string settingName, string settingValue)
+public class SettingsDto(int settingId, string settingName, string settingValue)
 {
     public int Id { get; set; } = settingId;
     public string Name { get; set; } = settingName;

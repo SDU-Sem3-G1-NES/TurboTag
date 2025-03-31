@@ -19,7 +19,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UserDTO"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 }
               },
@@ -27,7 +27,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UserDTO"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 }
               },
@@ -35,7 +35,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UserDTO"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 }
               }
@@ -58,7 +58,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
+                    "$ref": "#/components/schemas/LibraryDto"
                   }
                 }
               },
@@ -66,7 +66,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
+                    "$ref": "#/components/schemas/LibraryDto"
                   }
                 }
               },
@@ -74,7 +74,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
+                    "$ref": "#/components/schemas/LibraryDto"
                   }
                 }
               }
@@ -170,17 +170,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             }
           }
@@ -204,7 +204,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             },
@@ -212,7 +212,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             },
@@ -220,7 +220,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -243,17 +243,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/UserDto"
               }
             }
           }
@@ -277,7 +277,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             },
@@ -285,7 +285,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             },
@@ -293,7 +293,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -329,7 +329,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
+                    "$ref": "#/components/schemas/LibraryDto"
                   }
                 }
               },
@@ -337,7 +337,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
+                    "$ref": "#/components/schemas/LibraryDto"
                   }
                 }
               },
@@ -345,7 +345,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
+                    "$ref": "#/components/schemas/LibraryDto"
                   }
                 }
               }
@@ -375,17 +375,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/LibraryDTO"
+                  "$ref": "#/components/schemas/LibraryDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LibraryDTO"
+                  "$ref": "#/components/schemas/LibraryDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LibraryDTO"
+                  "$ref": "#/components/schemas/LibraryDto"
                 }
               }
             }
@@ -550,17 +550,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -696,17 +696,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               }
             }
@@ -726,7 +726,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               }
             },
@@ -734,7 +734,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               }
             },
@@ -742,7 +742,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               }
             }
@@ -765,17 +765,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsDTO"
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsDTO"
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsDTO"
+                "$ref": "#/components/schemas/SettingsDto"
               }
             }
           }
@@ -823,28 +823,26 @@
           "Upload"
         ],
         "operationId": "Upload_StoreUpload",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -887,7 +885,7 @@
         },
         "additionalProperties": false
       },
-      "LibraryDTO": {
+      "LibraryDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -901,7 +899,7 @@
         },
         "additionalProperties": false
       },
-      "SettingsDTO": {
+      "SettingsDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -982,7 +980,7 @@
         },
         "additionalProperties": false
       },
-      "UserDTO": {
+      "UserDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1007,7 +1005,7 @@
           "settings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SettingsDTO"
+              "$ref": "#/components/schemas/SettingsDto"
             },
             "nullable": true
           }

@@ -1,4 +1,4 @@
-using API.DTOs;
+using API.Dtos;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,14 +9,14 @@ namespace API.Controllers;
 public class AdminController(IAdminService _adminService) : ControllerBase
 {
     [HttpGet("GetAllUsers")]
-    public ActionResult<UserDTO[]> GetAllUsers()
+    public ActionResult<UserDto[]> GetAllUsers()
     {
         return Ok(_adminService.GetAllUsers());
 
     }
 
     [HttpGet("GetAllContentLibraries")]
-    public ActionResult<LibraryDTO[]> GetAllContentLibraries()
+    public ActionResult<LibraryDto[]> GetAllContentLibraries()
     {
         return Ok(_adminService.GetAllLibraries());
     }
@@ -36,28 +36,28 @@ public class AdminController(IAdminService _adminService) : ControllerBase
     }
 
     [HttpPut("UpdateUserById")]
-    public ActionResult UpdateUserById(int userId, [FromBody] UserDTO updatedUser)
+    public ActionResult UpdateUserById(int userId, [FromBody] UserDto updatedUser)
     {
         _adminService.UpdateUserById();
         return Ok();
     }
 
     [HttpPut("UpdateUsersById")]
-    public ActionResult UpdateUsersById([FromBody] UserDTO[] user) //idk how to do this one
+    public ActionResult UpdateUsersById([FromBody] UserDto[] user) //idk how to do this one
     {
         _adminService.UpdateUsersByIds();
         return Ok();
     }
 
     [HttpPost("CreateNewUser")]
-    public ActionResult CreateNewUser([FromBody] UserDTO user)
+    public ActionResult CreateNewUser([FromBody] UserDto user)
     {
         _adminService.CreateNewUser();
         return Ok();
     }
 
     [HttpPost("CreateNewUsers")]
-    public ActionResult CreateNewUsers([FromBody] UserDTO[] user)
+    public ActionResult CreateNewUsers([FromBody] UserDto[] user)
     {
         _adminService.CreateNewUsers();
         return Ok();
