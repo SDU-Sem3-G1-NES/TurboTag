@@ -1,4 +1,4 @@
-using API.DTOs;
+using API.Dtos;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ public class LoginController(IUserCredentialsService _userCredentialsService) : 
     }
 
     [HttpGet("GetUserDataByEmail")]
-    public ActionResult<UserDTO> GetUserDataByEmail(string email)
+    public ActionResult<UserDto> GetUserDataByEmail(string email)
     {
         return Ok(_userCredentialsService.GetUserDataByEmail());
     }
