@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace API.DTOs;
+namespace API.Dtos;
 
 [method: JsonConstructor]
 public class UploadDetailsDto(int id, string description, string title, List<string> tags)

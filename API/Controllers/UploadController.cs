@@ -1,16 +1,16 @@
-using System.Diagnostics;
-using API.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using API.Services;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UploadController : ControllerBase
+public class UploadController(IUploadService _uploadService) : ControllerBase
 {
     [HttpPost("StoreUpload")]
-    public ActionResult StoreUpload(UploadDto upload)
+    public ActionResult<string> StoreUpload()
     {
-        return Ok();
+
+        return Ok(_uploadService.StoreUpload());
     }
 }

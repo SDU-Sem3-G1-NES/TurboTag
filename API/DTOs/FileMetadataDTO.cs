@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace API.DTOs;
+namespace API.Dtos;
 
 [method: JsonConstructor]
 public class FileMetadataDto(int id, string fileType, string fileName, float fileSize, int? duration, DateTime date, string checkSum)

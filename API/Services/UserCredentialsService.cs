@@ -1,4 +1,4 @@
-using API.DTOs;
+using API.Dtos;
 using API.Repositories;
 
 namespace API.Services;
@@ -7,9 +7,9 @@ public interface IUserCredentialsService : IServiceBase
     bool CheckIfUserExistsByEmail();
     void StoreNewUserCredentials();
     bool ValidateUserCredentials();
-    UserDTO GetUserDataByEmail();
+    UserDto GetUserDataByEmail();
     void StoreUserSession();
-    UserDTO GetUserDataBySession();
+    UserDto GetUserDataBySession();
 }
 public class UserCredentialsService(IUserRepository _userRepository) : IUserCredentialsService
 {
@@ -35,9 +35,9 @@ public class UserCredentialsService(IUserRepository _userRepository) : IUserCred
         return true;
     }
     /// <summary>
-    /// Method that gets user data from the database and returns it as a UserDTO object.
+    /// Method that gets user data from the database and returns it as a UserDto object.
     /// </summary>
-    public UserDTO GetUserDataByEmail()
+    public UserDto GetUserDataByEmail()
     {
         return _userRepository.GetUserByEmail("mock@mock.com");
     }
@@ -49,9 +49,9 @@ public class UserCredentialsService(IUserRepository _userRepository) : IUserCred
         _userRepository.StoreUserSession();
     }
     /// <summary>
-    /// Metho that gets user data from the database by session id and returns it as a UserDTO object.
+    /// Metho that gets user data from the database by session id and returns it as a UserDto object.
     /// </summary>
-    public UserDTO GetUserDataBySession()
+    public UserDto GetUserDataBySession()
     {
         return _userRepository.GetUserBySession();
     }
