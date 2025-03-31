@@ -1,34 +1,34 @@
-using API.DTOs;
+using API.Dtos;
 
 namespace API.Repositories
 {
     public interface ILibraryRepository : IRepositoryBase
     {
-        int AddLibrary(LibraryDTO library);
-        LibraryDTO GetLibraryById(int libraryId);
-        List<LibraryDTO> GetAllLibraries();
-        void UpdateLibrary(LibraryDTO library);
+        int AddLibrary(LibraryDto library);
+        LibraryDto GetLibraryById(int libraryId);
+        List<LibraryDto> GetAllLibraries();
+        void UpdateLibrary(LibraryDto library);
         void DeleteLibrary(int libraryId);
     }
     public class LibraryRepository : ILibraryRepository
     {
-        public int AddLibrary(LibraryDTO library)
+        public int AddLibrary(LibraryDto library)
         {
             return 1;
         }
-        public LibraryDTO GetLibraryById(int libraryId)
+        public LibraryDto GetLibraryById(int libraryId)
         {
-            return new LibraryDTO(1, "Mock Library 1");
+            return new LibraryDto(1, "Mock Library 1");
         }
-        public List<LibraryDTO> GetAllLibraries()
+        public List<LibraryDto> GetAllLibraries()
         {
-            return new List<LibraryDTO>
+            return new List<LibraryDto>
             {
-                new LibraryDTO(1, "Mock Library 1"),
-                new LibraryDTO(2, "Mock Library 2"),
+                new LibraryDto(1, "Mock Library 1"),
+                new LibraryDto(2, "Mock Library 2"),
             };
         }
-        public void UpdateLibrary(LibraryDTO library)
+        public void UpdateLibrary(LibraryDto library)
         {
             throw new NotImplementedException();
         }

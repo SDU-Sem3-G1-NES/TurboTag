@@ -1,5 +1,5 @@
 using API.Repositories;
-using API.DTOs;
+using API.Dtos;
 
 namespace API.Services;
 public interface IUploadService : IServiceBase
