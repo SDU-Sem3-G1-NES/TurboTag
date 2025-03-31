@@ -3,8 +3,10 @@ using System.Text.Json.Serialization;
 using API;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
+Env.Load("../.env");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

@@ -6,60 +6,60 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AdminController(IAdminService _adminService) : ControllerBase
+public class AdminController(IAdminService adminService) : ControllerBase
 {
     [HttpGet("GetAllUsers")]
     public ActionResult<UserDto[]> GetAllUsers()
     {
-        return Ok(_adminService.GetAllUsers());
+        return Ok(adminService.GetAllUsers());
 
     }
 
     [HttpGet("GetAllContentLibraries")]
     public ActionResult<LibraryDto[]> GetAllContentLibraries()
     {
-        return Ok(_adminService.GetAllLibraries());
+        return Ok(adminService.GetAllLibraries());
     }
 
     [HttpDelete("DeleteUserById")]
     public ActionResult DeleteUserById(int userId)
     {
-        _adminService.DeleteUserById();
+        adminService.DeleteUserById();
         return Ok();
     }
 
     [HttpDelete("DeleteUsersById")]
     public ActionResult DeleteUsersById([FromBody] int[] userIds)
     {
-        _adminService.DeleteUsersByIds();
+        adminService.DeleteUsersByIds();
         return Ok();
     }
 
     [HttpPut("UpdateUserById")]
     public ActionResult UpdateUserById(int userId, [FromBody] UserDto updatedUser)
     {
-        _adminService.UpdateUserById();
+        adminService.UpdateUserById();
         return Ok();
     }
 
     [HttpPut("UpdateUsersById")]
-    public ActionResult UpdateUsersById([FromBody] UserDto[] user) //idk how to do this one
+    public ActionResult UpdateUsersById([FromBody] UserDto[] user)
     {
-        _adminService.UpdateUsersByIds();
+        adminService.UpdateUsersByIds();
         return Ok();
     }
 
     [HttpPost("CreateNewUser")]
     public ActionResult CreateNewUser([FromBody] UserDto user)
     {
-        _adminService.CreateNewUser();
+        adminService.CreateNewUser();
         return Ok();
     }
 
     [HttpPost("CreateNewUsers")]
     public ActionResult CreateNewUsers([FromBody] UserDto[] user)
     {
-        _adminService.CreateNewUsers();
+        adminService.CreateNewUsers();
         return Ok();
     }
 }

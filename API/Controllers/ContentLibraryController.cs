@@ -6,26 +6,26 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ContentLibraryController(ILibraryService _libraryService) : ControllerBase
+public class ContentLibraryController(ILibraryService libraryService) : ControllerBase
 {
     [HttpGet("GetUserLibrariesById")]
     public ActionResult<LibraryDto[]> GetUserLibrariesById(string userId)
     {
-        return Ok(_libraryService.GetUserLibrariesById());
+        return Ok(libraryService.GetUserLibrariesById());
     }
     [HttpGet("GetUserLibraryId")]
     public ActionResult<LibraryDto> GetUserLibraryId(string libraryId)
     {
-        return Ok(_libraryService.GetUserLibraryById());
+        return Ok(libraryService.GetUserLibraryById());
     }
     [HttpGet("GetLibraryUploadsById")]
     public ActionResult<UploadDto[]> GetLibraryUploadsById(string libraryId)
     {
-        return Ok(_libraryService.GetLibraryUploadsById());
+        return Ok(libraryService.GetLibraryUploadsById());
     }
     [HttpGet("GetLibraryUploadById")]
     public ActionResult<UploadDto> GetLibraryUploadById(string uploadId)
     {
-        return Ok(_libraryService.GetLibraryUploadById());
+        return Ok(libraryService.GetLibraryUploadById());
     }
 }

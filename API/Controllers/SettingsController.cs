@@ -6,25 +6,25 @@ namespace API.Controllers;
         
 [ApiController]
 [Route("[controller]")]
-public class SettingsController(ISettingsService _settingsService) : ControllerBase
+public class SettingsController(ISettingsService settingsService) : ControllerBase
 {
     [HttpGet("GetUserSettingsById")]
     public ActionResult<SettingsDto> GetUserSettingsById(int id)
     {
-        return Ok(_settingsService.GetUserSettingsById());
+        return Ok(settingsService.GetUserSettingsById());
     }
         
     [HttpPut("UpdateUserSettingsById")]
     public ActionResult UpdateUserSettingsById([FromBody] SettingsDto[] updatedSettings)
     {
-        _settingsService.UpdateUserSettingsById();
+        settingsService.UpdateUserSettingsById();
         return Ok();
     }
         
     [HttpPut("UpdateUserSettingById")]
     public ActionResult UpdateUserSettingById([FromBody] SettingsDto setting)
     {
-        _settingsService.UpdateUserSettingById();
+        settingsService.UpdateUserSettingById();
         return Ok();
     }
 }

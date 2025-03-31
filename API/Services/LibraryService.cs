@@ -9,34 +9,34 @@ public interface ILibraryService : IServiceBase
     List<UploadDto> GetLibraryUploadsById();
     UploadDto GetLibraryUploadById();
 }
-public class LibraryService(ILibraryRepository _libraryRepository, IUploadRepository _uploadRepository) : ILibraryService
+public class LibraryService(ILibraryRepository libraryRepository, IUploadRepository uploadRepository) : ILibraryService
 {
     /// <summary>
     /// Method that returns a list of LibraryDto objects that belong to a User by Id.
     /// </summary>
     public List<LibraryDto> GetUserLibrariesById()
     {
-        return _libraryRepository.GetAllLibraries();
+        return libraryRepository.GetAllLibraries();
     }
     /// <summary>
     /// Method that returns a LibraryDto object that belongs to a User by Id.
     /// </summary>
     public LibraryDto GetUserLibraryById()
     {
-        return _libraryRepository.GetLibraryById(1);
+        return libraryRepository.GetLibraryById(1);
     }
     /// <summary>
     /// Method that returns a list of UploadDto objects that belong to a Library by Id.
     /// </summary>
     public List<UploadDto> GetLibraryUploadsById()
     {
-        return _uploadRepository.GetUploadsByLibraryId(1);
+        return uploadRepository.GetUploadsByLibraryId(1);
     }
     /// <summary>
     /// Method that returns an UploadDto object that belongs to a Library by Id.
     /// </summary>
     public UploadDto GetLibraryUploadById()
     {
-        return _uploadRepository.GetUploadById(1);
+        return uploadRepository.GetUploadById(1);
     }
 }

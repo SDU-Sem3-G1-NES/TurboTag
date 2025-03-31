@@ -1,21 +1,83 @@
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization;
+
 namespace API.DataAccess;
 
-public class MongoDb(string user, string password, string name, string port, string host, string connectionString) : IDbAccess
+public interface IMongoDb
 {
-    private string user { get; set; } = user;
-    private string password { get; set; } = password;
-    private string name { get; set; } = name;
-    private string port { get; set; } = port;
-    private string host { get; set; } = host;
-    private string connectionString { get; set; } = connectionString;
-    public string ReturnConnectionString()
+    List<T> Find<T>(string collectionName, string query);
+    void Insert<T>(string collectionName, T document);
+    void Replace<T>(string collectionName, string query, T document);
+    void Delete(string collectionName, string query);
+}
+public class MongoDb : IMongoDb
+{
+    private readonly IMongoClient _client;
+    public MongoDb(string connectionString)
     {
-        user = "mock";
-        password = "mock";
-        name = "mock";
-        host = "localhost";
-        port = "3306";
-        connectionString = $"Host={host};Port={port};Database={name};User Id={user};Password={password};";
-        return connectionString;
+        _client = new MongoClient(connectionString);
+    }
+    public List<T> Find<T>(string collectionName, string query)
+    {
+        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        try
+        {
+            var filter = BsonDocument.Parse(query);
+            var collection = database.GetCollection<T>(collectionName);
+            List<T> result = collection.Find(filter).ToList();
+            return result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return new List<T>();
+        }
+    }
+    public void Insert<T>(string collectionName, T document)
+    {
+        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        try 
+        {
+            var collection = database.GetCollection<T>(collectionName);
+            collection.InsertOne(document);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    public void Replace<T>(string collectionName, string query, T document)
+    {
+        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        try 
+        {
+            var filter = BsonDocument.Parse(query);
+            var collection = database.GetCollection<T>(collectionName);
+            //document.Remove("_id");
+            collection.ReplaceOne(filter, document);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    public void Delete(string collectionName, string query)
+    {
+        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        try 
+        {
+            var filter = BsonDocument.Parse(query);
+            var collection = database.GetCollection<BsonDocument>(collectionName);
+            collection.DeleteMany(filter);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    private string GetDatabaseName()
+    {
+        return "blank";
     }
 }

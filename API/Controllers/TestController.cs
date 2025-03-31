@@ -32,12 +32,12 @@ public class IntTestImplementation : IIntTest
 
 [ApiController]
 [Route("[controller]")]
-public class TestController(IStringTest _stringTest, IIntTest _intTest) : ControllerBase
+public class TestController(IStringTest stringTest, IIntTest intTest) : ControllerBase
 {
     [HttpGet]
     public string Get()
     {
-        return $"{_stringTest.GetString()} - {_intTest.GetInt()}";
+        return $"{stringTest.GetString()} - {intTest.GetInt()}";
         ;
     }
 }
