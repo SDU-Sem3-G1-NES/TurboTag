@@ -3,7 +3,6 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { useState } from 'react'
 import { AdminClient } from './api/apiClient.ts'
-
 function App() {
   const [count, setCount] = useState(0)
   const adminClient = new AdminClient()
