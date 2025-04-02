@@ -25,9 +25,9 @@ html, body {
 
 .ant-layout-content {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: flex-start; /* Align content to the top */
-  padding: 20px; /* Add some padding around the content */
+  justify-content: center; 
+  align-items: flex-start; 
+  padding: 20px;
 }
 
 .ant-layout-footer {
