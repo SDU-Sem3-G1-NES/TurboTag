@@ -8,3 +8,6 @@ dotnet_naming_symbols.parameter.applicable_accessibilities = *
 dotnet_naming_symbols.parameter.required_modifiers =
 
 dotnet_naming_style.parameter_style.capitalization = camel_case
+
+[API/DTOs/*.cs]
+resharper_convert_to_primary_constructor_highlighting = None

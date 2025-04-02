@@ -2,14 +2,33 @@ using System.Text.Json.Serialization;
 
 namespace API.DTOs;
 
-[method: JsonConstructor]
-public class FileMetadataDto(int id, string fileType, string fileName, float fileSize, int? duration, DateTime date, string checkSum)
+public class FileMetadataDto
 {
-    public int Id { get; } = id;
-    public string FileType { get; } = fileType;
-    public string FileName { get; } = fileName;
-    public float FileSize { get; } = fileSize;
-    public int? Duration { get; } = duration;
-    public DateTime Date { get; } = date;
-    public string CheckSum { get; } = checkSum;
+    public FileMetadataDto()
+    {
+        FileType = "";
+        FileName = "";
+        CheckSum = "";
+    }
+
+    [method: JsonConstructor]
+    public FileMetadataDto(int id, string fileType, string fileName, float fileSize, int? duration, DateTime date,
+        string checkSum)
+    {
+        Id = id;
+        FileType = fileType;
+        FileName = fileName;
+        FileSize = fileSize;
+        Duration = duration;
+        Date = date;
+        CheckSum = checkSum;
+    }
+
+    public int Id { get; }
+    public string FileType { get; }
+    public string FileName { get; }
+    public float FileSize { get; }
+    public int? Duration { get; }
+    public DateTime Date { get; }
+    public string CheckSum { get; }
 }

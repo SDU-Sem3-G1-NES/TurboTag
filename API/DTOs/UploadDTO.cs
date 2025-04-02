@@ -2,12 +2,28 @@ using System.Text.Json.Serialization;
 
 namespace API.DTOs;
 
-[method: JsonConstructor]
-public class UploadDto(int id, int ownerId, DateTime date, string type, int libraryId)
+public class UploadDto
 {
-    public int Id { get; set; } = id;
-    public int OwnerId { get; set; } = ownerId;
-    public DateTime Date { get; set; } = date;
-    public string Type { get; set; } = type;
-    public int LibraryId { get; set; } = libraryId;
+    public UploadDto()
+    {
+        Date = new DateTime();
+        Type = "";
+    }
+
+
+    [method: JsonConstructor]
+    public UploadDto(int id, int ownerId, DateTime date, string type, int libraryId)
+    {
+        Id = id;
+        OwnerId = ownerId;
+        Date = date;
+        Type = type;
+        LibraryId = libraryId;
+    }
+
+    public int Id { get; set; }
+    public int OwnerId { get; set; }
+    public DateTime Date { get; set; }
+    public string Type { get; set; }
+    public int LibraryId { get; set; }
 }

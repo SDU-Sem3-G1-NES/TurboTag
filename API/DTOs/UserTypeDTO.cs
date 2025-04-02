@@ -1,8 +1,21 @@
 namespace API.DTOs;
 
-public class UserTypeDto(int id, string name, Dictionary<string, bool> permissions)
+public class UserTypeDto
 {
-    public int Id { get; set; } = id;
-    public string Name { get; set; } = name;
-    public Dictionary<string, bool> Permissions { get; set; } = permissions;
+    public UserTypeDto()
+    {
+        Name = "";
+        Permissions = new Dictionary<string, bool>();
+    }
+
+    public UserTypeDto(int id, string name, Dictionary<string, bool> permissions)
+    {
+        Id = id;
+        Name = name;
+        Permissions = permissions;
+    }
+
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public Dictionary<string, bool> Permissions { get; set; }
 }

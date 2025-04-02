@@ -1,9 +1,26 @@
 namespace API.DTOs;
-public class UserDto(int id, int userTypeId, string name, string email, List<int> accessibleLibraryIds)
+
+public class UserDto
 {
-    public int Id { get; set; } = id;
-    public int UserTypeId { get; set; } = userTypeId;
-    public string Name { get; set; } = name;
-    public string Email { get; set; } = email;
-    public List<int> AccessibleLibraryIds { get; set; } = accessibleLibraryIds;
+    public UserDto()
+    {
+        Name = "";
+        Email = "";
+        AccessibleLibraryIds = new List<int>();
+    }
+
+    public UserDto(int id, int userTypeId, string name, string email, List<int> accessibleLibraryIds)
+    {
+        Id = id;
+        UserTypeId = userTypeId;
+        Name = name;
+        Email = email;
+        AccessibleLibraryIds = accessibleLibraryIds;
+    }
+
+    public int Id { get; set; }
+    public int UserTypeId { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public List<int> AccessibleLibraryIds { get; set; }
 }

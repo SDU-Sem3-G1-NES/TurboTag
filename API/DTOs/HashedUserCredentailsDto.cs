@@ -1,8 +1,21 @@
 namespace API.DTOs;
 
-public class HashedUserCredentialsDto(int userId, byte[] passwordHash, byte[] passwordSalt)
+public class HashedUserCredentialsDto
 {
-    public int UserId { get; set; } = userId;
-    public byte[] PasswordHash { get; set; } = passwordHash;
-    public byte[] PasswordSalt { get; set; } = passwordSalt;
+    public HashedUserCredentialsDto()
+    {
+        PasswordHash = [];
+        PasswordSalt = [];
+    }
+
+    public HashedUserCredentialsDto(int userId, byte[] passwordHash, byte[] passwordSalt)
+    {
+        UserId = userId;
+        PasswordHash = passwordHash;
+        PasswordSalt = passwordSalt;
+    }
+
+    public int UserId { get; set; }
+    public byte[] PasswordHash { get; set; }
+    public byte[] PasswordSalt { get; set; }
 }
