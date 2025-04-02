@@ -15,19 +15,8 @@ public class LoginController(IUserCredentialsService _userCredentialsService) : 
     }
 
     [HttpGet("GetUserDataByEmail")]
-    public ActionResult<UserDTO> GetUserDataByEmail(string email)
+    public ActionResult<UserDto> GetUserDataByEmail(string email)
     {
         return Ok(_userCredentialsService.GetUserDataByEmail());
-    }
-    [HttpPost("StoreUserSession")]
-    public ActionResult StoreUserSession()
-    {
-        _userCredentialsService.StoreUserSession();
-        return Ok();
-    }
-    [HttpGet("GetUserDataBySessionId")]
-    public ActionResult GetUserDataBySessionId(string sessionId)
-    {
-        return Ok(_userCredentialsService.GetUserDataBySession());
     }
 }

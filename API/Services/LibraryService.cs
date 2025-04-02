@@ -4,8 +4,8 @@ using API.Repositories;
 namespace API.Services;
 public interface ILibraryService : IServiceBase
 {
-    List<LibraryDTO> GetUserLibrariesById();
-    LibraryDTO GetUserLibraryById();
+    List<LibraryDto> GetUserLibrariesById();
+    LibraryDto GetUserLibraryById();
     List<UploadDto> GetLibraryUploadsById();
     UploadDto GetLibraryUploadById();
 }
@@ -14,14 +14,14 @@ public class LibraryService(ILibraryRepository _libraryRepository, IUploadReposi
     /// <summary>
     /// Method that returns a list of LibraryDTO objects that belong to a User by Id.
     /// </summary>
-    public List<LibraryDTO> GetUserLibrariesById()
+    public List<LibraryDto> GetUserLibrariesById()
     {
-        return _libraryRepository.GetAllLibraries();
+        return _libraryRepository.GetAllLibraries().Items;
     }
     /// <summary>
     /// Method that returns a LibraryDTO object that belongs to a User by Id.
     /// </summary>
-    public LibraryDTO GetUserLibraryById()
+    public LibraryDto GetUserLibraryById()
     {
         return _libraryRepository.GetLibraryById(1);
     }
@@ -30,7 +30,18 @@ public class LibraryService(ILibraryRepository _libraryRepository, IUploadReposi
     /// </summary>
     public List<UploadDto> GetLibraryUploadsById()
     {
-        return _uploadRepository.GetUploadsByLibraryId(1);
+        var filter = new UploadFilter(
+            uploadIds: null, 
+            ownerIds: null, 
+            libraryIds: new List<int> { 1 }, 
+            uploadTypes: null,
+            dateFrom: null,
+            dateTo: null,
+            pageNumber: null,
+            pageSize: null
+        );
+        
+        return _uploadRepository.GetAllUploads(filter).Items;
     }
     /// <summary>
     /// Method that returns an UploadDTO object that belongs to a Library by Id.

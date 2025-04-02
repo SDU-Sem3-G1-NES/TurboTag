@@ -7,9 +7,7 @@ public interface IUserCredentialsService : IServiceBase
     bool CheckIfUserExistsByEmail();
     void StoreNewUserCredentials();
     bool ValidateUserCredentials();
-    UserDTO GetUserDataByEmail();
-    void StoreUserSession();
-    UserDTO GetUserDataBySession();
+    UserDto GetUserDataByEmail();
 }
 public class UserCredentialsService(IUserRepository _userRepository) : IUserCredentialsService
 {
@@ -25,7 +23,7 @@ public class UserCredentialsService(IUserRepository _userRepository) : IUserCred
     /// </summary>
     public void StoreNewUserCredentials()
     {
-        _userRepository.AddUserCredentials(new byte[] { 0x00, 0x01, 0x02, 0x03 }, new byte[] { 0x00, 0x01, 0x02, 0x03 });
+        _userRepository.AddUserCredentials(1, new byte[] { 0x00, 0x01, 0x02, 0x03 }, new byte[] { 0x00, 0x01, 0x02, 0x03 });
     }
     /// <summary>
     /// Method that validates user credentials by hashed input email and password.
@@ -37,22 +35,8 @@ public class UserCredentialsService(IUserRepository _userRepository) : IUserCred
     /// <summary>
     /// Method that gets user data from the database and returns it as a UserDTO object.
     /// </summary>
-    public UserDTO GetUserDataByEmail()
+    public UserDto GetUserDataByEmail()
     {
         return _userRepository.GetUserByEmail("mock@mock.com");
-    }
-    /// <summary>
-    /// Method that stores a user session in the database.
-    /// </summary>
-    public void StoreUserSession()
-    {
-        _userRepository.StoreUserSession();
-    }
-    /// <summary>
-    /// Metho that gets user data from the database by session id and returns it as a UserDTO object.
-    /// </summary>
-    public UserDTO GetUserDataBySession()
-    {
-        return _userRepository.GetUserBySession();
     }
 }

@@ -1,7 +1,7 @@
 namespace API.DTOs;
 
-public class LibraryDTO(int libraryId, string libraryName)
+public class LibraryDto(int id, string name)
 {
-    public int Id { get; set; } = libraryId;
-    public string Name { get; set; } = libraryName;
+    public int Id { get; set; } = id;
+    public string Name { get; set; } = name;
 }
