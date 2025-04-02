@@ -53,6 +53,11 @@ public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
     
     public LessonDto? GetLessonByObjectId(string objectId)
     {
+        if (!ObjectId.TryParse(objectId, out _))
+        {
+            Console.WriteLine("Invalid ObjectId format provided while fetching a lesson.");
+            return null;
+        }
         return mongoDb.Find<LessonDto>(
                 "lesson",
                 $"{{\"_id\": ObjectId(\"{objectId}\")}}")
@@ -78,6 +83,11 @@ public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
     }
     public void DeleteLessonByObjectId(string objectId)
     {
+        if (!ObjectId.TryParse(objectId, out _))
+        {
+            Console.WriteLine("Invalid ObjectId format provided while deleting a lesson.");
+            return;
+        }
         mongoDb.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
     }
 }
