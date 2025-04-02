@@ -9,21 +9,21 @@ public interface IUserCredentialsService : IServiceBase
     bool ValidateUserCredentials();
     UserDto GetUserDataByEmail();
 }
-public class UserCredentialsService(IUserRepository _userRepository) : IUserCredentialsService
+public class UserCredentialsService(IUserRepository userRepository) : IUserCredentialsService
 {
     /// <summary>
     /// Method that checks if the user exists in the database by input email.
     /// </summary>
     public bool CheckIfUserExistsByEmail()
     {
-        return _userRepository.UserEmailExists("mock@mock.com");
+        return userRepository.UserEmailExists("mock@mock.com");
     }
     /// <summary>
     /// Method that stores hashed password and email in the database.
     /// </summary>
     public void StoreNewUserCredentials()
     {
-        _userRepository.AddUserCredentials(1, new byte[] { 0x00, 0x01, 0x02, 0x03 }, new byte[] { 0x00, 0x01, 0x02, 0x03 });
+        userRepository.AddUserCredentials(1, new byte[] { 0x00, 0x01, 0x02, 0x03 }, new byte[] { 0x00, 0x01, 0x02, 0x03 });
     }
     /// <summary>
     /// Method that validates user credentials by hashed input email and password.
@@ -37,6 +37,6 @@ public class UserCredentialsService(IUserRepository _userRepository) : IUserCred
     /// </summary>
     public UserDto GetUserDataByEmail()
     {
-        return _userRepository.GetUserByEmail("mock@mock.com");
+        return userRepository.GetUserByEmail("mock@mock.com");
     }
 }

@@ -6,13 +6,13 @@ public interface IUploadService : IServiceBase
 {
     int StoreUpload();
 }
-public class UploadService(IUploadRepository _uploadRepository) : IUploadService
+public class UploadService(IUploadRepository uploadRepository) : IUploadService
 {
     /// <summary>
     /// Method that stores an upload to the database and returns the BlobId of the upload.
     /// </summary>
     public int StoreUpload()
     {
-        return _uploadRepository.AddUpload(new UploadDto(1, 1, DateTime.Now, "image/png", 1));
+        return uploadRepository.AddUpload(new UploadDto(1, 1, DateTime.Now, "image/png", 1));
     }
 }
