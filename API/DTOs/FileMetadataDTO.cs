@@ -5,20 +5,20 @@ namespace API.Dtos;
 
 [method: JsonConstructor]
 [BsonIgnoreExtraElements]
-public class FileMetadataDto(int id, string fileType, string fileName, float fileSize, int duration, DateTime date, string checkSum)
+public class FileMetadataDto(int? id, string? fileType, string? fileName, float? fileSize, int? duration, DateTime? date, string? checkSum)
 {
     [BsonElement("id")]
-    public int Id { get; } = id;
+    public int? Id { get; set; } = id;
     [BsonElement("file_type")]
-    public string FileType { get; } = fileType;
+    public string? FileType { get; set; } = fileType;
     [BsonElement("file_name")] 
-    public string FileName { get; } = fileName;
+    public string? FileName { get; set; } = fileName;
     [BsonElement("file_size")]
-    public float FileSize { get; } = fileSize;
+    public float? FileSize { get; set; } = fileSize;
     [BsonElement("duration")]
-    public int Duration { get; } = duration;
+    public int? Duration { get; set; } = duration;
     [BsonElement("date")]
-    public DateTime Date { get; } = date;
+    public DateTime? Date { get; set; } = date;
     [BsonElement("checksum")]
-    public string CheckSum { get; } = checkSum;
+    public string? CheckSum { get; set; } = checkSum;
 }

@@ -54,7 +54,6 @@ public class MongoDb : IMongoDb
         {
             var filter = BsonDocument.Parse(query);
             var collection = database.GetCollection<T>(collectionName);
-            //document.Remove("_id");
             collection.ReplaceOne(filter, document);
         }
         catch (Exception e)
