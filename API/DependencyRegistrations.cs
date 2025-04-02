@@ -29,8 +29,8 @@ public class DependencyRegistrations : Module
             .Where(t => typeof(IRepositoryBase).IsAssignableFrom(t));
         
         // Register the MongoDB client
-        builder.RegisterType<MongoDb>()
-            .As<IMongoDb>()
+        builder.RegisterType<MongoDataAccess>()
+            .As<IDocumentDbAccess>()
             .WithParameter("connectionString", $"mongodb://{_mongoUser}:{_mongoPass}@{_mongoHost}:{_mongoPort}");
     }
 }

@@ -6,12 +6,12 @@ namespace API.Services;
 public interface ILessonService : IServiceBase
 {
     void AddLesson(LessonDto lesson);
-    public List<LessonDto>? GetLessonsByTags(string[] tags);
-    public List<LessonDto>? GetLessonsByTitle(string title);
+    List<LessonDto> GetAllLessons();
+    public List<LessonDto> GetLessonsByTags(string[] tags);
+    public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonById(string lessonId);
     LessonDto? GetLessonByObjectId(string objectId);
     LessonDto? GetLessonByUploadId(int uploadId);
-    List<LessonDto>? GetAllLessons();
     void UpdateLesson(LessonDto lesson);
     void DeleteLessonById(int uploadId);
     void DeleteLessonByObjectId(string objectId);
@@ -22,12 +22,18 @@ public class LessonService(ILessonRepository lessonRepository) : ILessonService
     {
         lessonRepository.AddLesson(lesson);
     }
-    public List<LessonDto>? GetLessonsByTags(string[] tags)
+    
+    public List<LessonDto> GetAllLessons()
+    {
+        return lessonRepository.GetAllLessons();
+    }
+    
+    public List<LessonDto> GetLessonsByTags(string[] tags)
     {
         return lessonRepository.GetLessonsByTags(tags);
     }
 
-    public List<LessonDto>? GetLessonsByTitle(string title)
+    public List<LessonDto> GetLessonsByTitle(string title)
     {
         return lessonRepository.GetLessonsByTitle(title);
     }
@@ -42,10 +48,6 @@ public class LessonService(ILessonRepository lessonRepository) : ILessonService
     public LessonDto? GetLessonByObjectId(string objectId)
     {
         return lessonRepository.GetLessonByObjectId(objectId);
-    }
-    public List<LessonDto>? GetAllLessons()
-    {
-        return lessonRepository.GetAllLessons();
     }
     public void UpdateLesson(LessonDto lesson)
     {

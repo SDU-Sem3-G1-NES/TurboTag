@@ -29,19 +29,34 @@ public class LessonController(ILessonService lessonService) : ControllerBase
     [HttpGet("GetLessonById")]
     public ActionResult GetLessonById(string lessonId)
     {
-        return Ok(lessonService.GetLessonById(lessonId));
+        var result = lessonService.GetLessonById(lessonId);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
     }
     
     [HttpGet("GetLessonByObjectId")]
     public ActionResult GetLessonByObjectId(string objectId)
     {
-        return Ok(lessonService.GetLessonByObjectId(objectId));
+        var result = lessonService.GetLessonByObjectId(objectId);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
     }
 
     [HttpGet("GetLessonByUploadId")]
     public ActionResult GetLessonByUploadId(int uploadId)
     {
-        return Ok(lessonService.GetLessonByUploadId(uploadId));
+        var result = lessonService.GetLessonByUploadId(uploadId);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
     }
 
     [HttpPost("AddLesson")]
@@ -58,7 +73,7 @@ public class LessonController(ILessonService lessonService) : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("DeleteLesson")]
+    [HttpDelete("DeleteLessonById")]
     public ActionResult DeleteLessonById(int lessonId)
     {
         lessonService.DeleteLessonById(lessonId);

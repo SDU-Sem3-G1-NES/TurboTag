@@ -1,23 +1,12 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Bson.Serialization;
 
 namespace API.DataAccess;
 
-public interface IMongoDb
+public class MongoDataAccess(string connectionString) : IDocumentDbAccess
 {
-    List<T> Find<T>(string collectionName, string query);
-    void Insert<T>(string collectionName, T document);
-    void Replace<T>(string collectionName, string query, T document);
-    void Delete(string collectionName, string query);
-}
-public class MongoDb : IMongoDb
-{
-    private readonly IMongoClient _client;
-    public MongoDb(string connectionString)
-    {
-        _client = new MongoClient(connectionString);
-    }
+    private readonly IMongoClient _client = new MongoClient(connectionString);
+
     public List<T> Find<T>(string collectionName, string query)
     {
         IMongoDatabase database = _client.GetDatabase(GetDatabaseName());

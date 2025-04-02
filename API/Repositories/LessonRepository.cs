@@ -1,17 +1,15 @@
 using API.DataAccess;
 using API.Dtos;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using Sprache;
 
 namespace API.Repositories;
 
 public interface ILessonRepository : IRepositoryBase
 {
     void AddLesson(LessonDto lesson);
-    List<LessonDto>? GetAllLessons();
-    public List<LessonDto>? GetLessonsByTags(string[] tags);
-    public List<LessonDto>? GetLessonsByTitle(string title);
+    List<LessonDto> GetAllLessons();
+    public List<LessonDto> GetLessonsByTags(string[] tags);
+    public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonByObjectId(string objectId);
     LessonDto? GetLessonById(string lessonId);
     LessonDto? GetLessonByUploadId(int uploadId);
@@ -20,7 +18,7 @@ public interface ILessonRepository : IRepositoryBase
     void DeleteLessonByObjectId(string objectId);
 }
 
-public class LessonRepository(IMongoDb mongoDb) : ILessonRepository
+public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
 {
     public void AddLesson(LessonDto lesson)
     {
@@ -28,18 +26,18 @@ public class LessonRepository(IMongoDb mongoDb) : ILessonRepository
         mongoDb.Insert("lesson", lesson.ToBsonDocument());
     }
 
-    public List<LessonDto>? GetAllLessons()
+    public List<LessonDto> GetAllLessons()
     {
         return mongoDb.Find<LessonDto>("lesson", "{}");
     }
     
-    public List<LessonDto>? GetLessonsByTags(string[] tags)
+    public List<LessonDto> GetLessonsByTags(string[] tags)
     {
         var filter = $"{{\"lesson_details.tags\": {{$all: [{string.Join(",", tags.Select(tag => $"\"{tag}\""))}]}}}}";
         return mongoDb.Find<LessonDto>("lesson", filter);
     }
     
-    public List<LessonDto>? GetLessonsByTitle(string title)
+    public List<LessonDto> GetLessonsByTitle(string title)
     {
         var filter = $"{{\"lesson_details.title\": {{$regex: \"{title}\", $options: \"i\"}}}}";
         return mongoDb.Find<LessonDto>("lesson", filter);
@@ -71,7 +69,7 @@ public class LessonRepository(IMongoDb mongoDb) : ILessonRepository
 
     public void UpdateLesson(LessonDto lesson)
     {
-        mongoDb.Replace<LessonDto>("lesson", $"{{\"_id\": ObjectId(\"{lesson.MongoId}\")}}", lesson);
+        mongoDb.Replace("lesson", $"{{\"_id\": ObjectId(\"{lesson.MongoId}\")}}", lesson);
     }
 
     public void DeleteLessonById(int lessonId)
