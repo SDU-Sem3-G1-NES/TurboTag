@@ -1,5 +1,5 @@
-using API.DTOs;
 using API.DataAccess;
+using API.DTOs;
 
 namespace API.Repositories;
 
@@ -11,10 +11,11 @@ public interface IUploadRepository : IRepositoryBase
     void UpdateUpload(UploadDto upload);
     void DeleteUploadById(int uploadId);
 }
+
 public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
 {
     private readonly string _databaseName = "blank";
-    
+
     public int AddUpload(UploadDto upload)
     {
         var parameters = new Dictionary<string, object>
@@ -51,6 +52,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
 
         return uploadId;
     }
+
     public UploadDto GetUploadById(int uploadId)
     {
         var parameters = new Dictionary<string, object>
@@ -76,10 +78,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
             "",
             parameters).FirstOrDefault();
 
-        if (result == null)
-        {
-            throw new InvalidOperationException($"Upload with ID {uploadId} not found");
-        }
+        if (result == null) throw new InvalidOperationException($"Upload with ID {uploadId} not found");
 
         return result;
     }
@@ -95,7 +94,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
                 lu.library_id as LibraryId ";
 
         var countSql = "SELECT COUNT(*)";
-        
+
         var fromWhereSql = @"
             FROM uploads u
             JOIN library_uploads lu ON u.upload_id = lu.upload_id
@@ -141,7 +140,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
                 fromWhereSql += " AND u.upload_date <= @dateTo";
             }
         }
-        
+
         var orderBy = " ORDER BY u.upload_id";
 
         if (filter is { PageSize: not null, PageNumber: not null })
@@ -188,6 +187,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
             TotalPages = 1
         };
     }
+
     public void UpdateUpload(UploadDto upload)
     {
         var parameters = new Dictionary<string, object>
@@ -215,7 +215,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
         };
 
         var deleteLibraryAssocSql = @"DELETE FROM library_uploads WHERE upload_id = @uploadId";
-        sqlDbAccess.ExecuteNonQuery(_databaseName, deleteLibraryAssocSql, 
+        sqlDbAccess.ExecuteNonQuery(_databaseName, deleteLibraryAssocSql,
             new Dictionary<string, object> { { "@uploadId", upload.Id } });
 
         var libraryUploadSql = @"
@@ -223,6 +223,7 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
             VALUES (@libraryId, @uploadId)";
         sqlDbAccess.ExecuteNonQuery(_databaseName, libraryUploadSql, libraryParameters);
     }
+
     public void DeleteUploadById(int uploadId)
     {
         var parameters = new Dictionary<string, object>
@@ -240,22 +241,37 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
     }
 }
 
-public class UploadFilter(
-    List<int>? uploadIds, 
-    List<int>? ownerIds, 
-    List<int>? libraryIds, 
-    List<string>? uploadTypes, 
-    DateTime? dateFrom, 
-    DateTime? dateTo, 
-    int? pageNumber, 
-    int? pageSize) : PaginationFilter(pageNumber, pageSize)
+public class UploadFilter : PaginationFilter
 {
-    public List<int>? UploadIds { get; set; } = uploadIds;
-    public List<int>? OwnerIds { get; set; } = ownerIds;
-    public List<int>? LibraryIds { get; set; } = libraryIds;
-    public List<string>? UploadTypes { get; set; } = uploadTypes;
-    public DateTime? DateFrom { get; set; } = dateFrom;
-    public DateTime? DateTo { get; set; } = dateTo;
-    public int? PageNumber { get; set; } = pageNumber;
-    public int? PageSize { get; set; } = pageSize;
+    public UploadFilter(List<int>? uploadIds,
+        List<int>? ownerIds,
+        List<int>? libraryIds,
+        List<string>? uploadTypes,
+        DateTime? dateFrom,
+        DateTime? dateTo,
+        int? pageNumber,
+        int? pageSize) : base(pageNumber, pageSize)
+    {
+        UploadIds = uploadIds;
+        OwnerIds = ownerIds;
+        LibraryIds = libraryIds;
+        UploadTypes = uploadTypes;
+        DateFrom = dateFrom;
+        DateTo = dateTo;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+    }
+
+    public UploadFilter()
+    {
+    }
+
+    public List<int>? UploadIds { get; set; }
+    public List<int>? OwnerIds { get; set; }
+    public List<int>? LibraryIds { get; set; }
+    public List<string>? UploadTypes { get; set; }
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
+    public int? PageNumber { get; set; }
+    public int? PageSize { get; set; }
 }

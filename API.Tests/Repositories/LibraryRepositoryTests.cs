@@ -6,8 +6,8 @@ namespace API.Tests.Repositories;
 
 public class LibraryRepositoryTests
 {
-    private readonly Mock<ISqlDbAccess> _mockSqlDbAccess;
     private readonly LibraryRepository _libraryRepository;
+    private readonly Mock<ISqlDbAccess> _mockSqlDbAccess;
 
     public LibraryRepositoryTests()
     {
@@ -23,11 +23,11 @@ public class LibraryRepositoryTests
         var expectedId = 1;
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p.ContainsKey("@libraryName"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p.ContainsKey("@libraryName"))))
             .Returns(new List<int> { expectedId });
 
         // Act
@@ -36,11 +36,11 @@ public class LibraryRepositoryTests
         // Assert
         Assert.Equal(expectedId, result);
         _mockSqlDbAccess.Verify(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@libraryName"].Equals(library.Name))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@libraryName"].Equals(library.Name))),
             Times.Once);
     }
 
@@ -52,11 +52,11 @@ public class LibraryRepositoryTests
         var expectedLibrary = new LibraryDto(libraryId, "Test Library");
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<LibraryDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p.ContainsKey("@libraryId"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p.ContainsKey("@libraryId"))))
             .Returns(new List<LibraryDto> { expectedLibrary });
 
         // Act
@@ -73,11 +73,11 @@ public class LibraryRepositoryTests
         // Arrange
         var libraryId = 999;
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<LibraryDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p.ContainsKey("@libraryId"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p.ContainsKey("@libraryId"))))
             .Returns(new List<LibraryDto>());
 
         // Act & Assert
@@ -97,11 +97,11 @@ public class LibraryRepositoryTests
         };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<LibraryDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>()))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>()))
             .Returns(expectedLibraries);
 
         // Act
@@ -118,11 +118,16 @@ public class LibraryRepositoryTests
     {
         // Arrange
         var filter = new LibraryFilter(
-            libraryIds: new List<int> { 1, 2 },
-            libraryNames: new List<string> { "Library 1" },
-            pageNumber: 1,
-            pageSize: 10
+            new List<int> { 1, 2 },
+            new List<string> { "Library 1" },
+            1,
+            10
         );
+
+        var expectedPagedLibraries = new PagedResult<LibraryDto>
+        {
+            new(1, "Library 1")
+        };
 
         var expectedLibraries = new List<LibraryDto>
         {
@@ -130,29 +135,29 @@ public class LibraryRepositoryTests
         };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>()))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>()))
             .Returns(new List<int> { expectedLibraries.Count });
 
         _mockSqlDbAccess.Setup(db => db.GetPagedResult<LibraryDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>(),
-            It.IsAny<int>(),
-            It.IsAny<int>()))
-            .Returns(expectedLibraries);
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+            .Returns(expectedPagedLibraries);
 
         // Act
         var result = _libraryRepository.GetAllLibraries(filter);
 
         // Assert
         Assert.Equal(expectedLibraries.Count, result.Items.Count);
-        Assert.Equal(expectedLibraries.Count, result.TotalCount);
+        Assert.Equal(expectedPagedLibraries.Count(), result.TotalCount);
         Assert.Equal(1, result.TotalPages);
     }
 
@@ -167,11 +172,11 @@ public class LibraryRepositoryTests
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => 
-                p["@libraryId"].Equals(library.Id) && 
-                p["@libraryName"].Equals(library.Name))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@libraryId"].Equals(library.Id) &&
+                    p["@libraryName"].Equals(library.Name))),
             Times.Once);
     }
 
@@ -187,23 +192,23 @@ public class LibraryRepositoryTests
         // Assert
         // Verify user access deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
-            It.Is<Dictionary<string, object>>(p => p["@libraryId"].Equals(libraryId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
+                It.Is<Dictionary<string, object>>(p => p["@libraryId"].Equals(libraryId))),
             Times.Once);
 
         // Verify library uploads deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM library_uploads")),
-            It.Is<Dictionary<string, object>>(p => p["@libraryId"].Equals(libraryId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM library_uploads")),
+                It.Is<Dictionary<string, object>>(p => p["@libraryId"].Equals(libraryId))),
             Times.Once);
 
         // Verify library deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM libraries")),
-            It.Is<Dictionary<string, object>>(p => p["@libraryId"].Equals(libraryId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM libraries")),
+                It.Is<Dictionary<string, object>>(p => p["@libraryId"].Equals(libraryId))),
             Times.Once);
     }
 }

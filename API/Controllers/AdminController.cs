@@ -9,10 +9,10 @@ namespace API.Controllers;
 public class AdminController(IAdminService adminService) : ControllerBase
 {
     [HttpGet("GetAllUsers")]
-    public ActionResult<UserDto[]> GetAllUsers()
+    public ActionResult<IEnumerable<UserDto>> GetAllUsers()
     {
-        return Ok(adminService.GetAllUsers());
-
+        var response = adminService.GetAllUsers();
+        return Ok(response);
     }
 
     [HttpGet("GetAllContentLibraries")]

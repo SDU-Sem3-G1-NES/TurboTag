@@ -1,5 +1,5 @@
-using API.DTOs;
 using API.DataAccess;
+using API.DTOs;
 
 namespace API.Repositories;
 
@@ -10,7 +10,7 @@ public interface IUserRepository : IRepositoryBase
     bool UserEmailExists(string email);
     UserDto GetUserById(int userId);
     UserDto GetUserByEmail(string email);
-    public PagedResult<UserDto> GetAllUsers(UserFilter? filter = null);
+    public IEnumerable<UserDto> GetAllUsers(UserFilter? filter = null);
     HashedUserCredentialsDto GetUserCredentials(int userId);
     void UpdateUser(UserDto user);
     void UpdateUserCredentials(int userId, byte[] passwordHash, byte[] passwordSalt);
@@ -43,8 +43,7 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             parameters).FirstOrDefault();
 
         // Add library access entries if the user has accessible libraries
-        if (user.AccessibleLibraryIds.Count > 0)
-        {
+        if (user.AccessibleLibraryIds.Count > 0 && userId != 0)
             foreach (var libraryId in user.AccessibleLibraryIds)
             {
                 var libraryParameters = new Dictionary<string, object>
@@ -59,7 +58,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
 
                 sqlDbAccess.ExecuteNonQuery(_databaseName, libraryAccessSql, libraryParameters);
             }
-        }
 
         return userId;
     }
@@ -147,11 +145,8 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
 
             user.AccessibleLibraryIds = libraryIds;
         }
-        
-        if (user == null)
-        {
-            throw new InvalidOperationException($"User with email {userId} not found");
-        }
+
+        if (user == null) throw new InvalidOperationException($"User with email {userId} not found");
 
         return user;
     }
@@ -205,15 +200,12 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             user.AccessibleLibraryIds = libraryIds;
         }
 
-        if (user == null)
-        {
-            throw new InvalidOperationException($"User with email {email} not found");
-        }
+        if (user == null) throw new InvalidOperationException($"User with email {email} not found");
 
         return user;
     }
 
-    public PagedResult<UserDto> GetAllUsers(UserFilter? filter = null)
+    public IEnumerable<UserDto> GetAllUsers(UserFilter? filter = null)
     {
         var selectSql = @"
             SELECT
@@ -221,12 +213,14 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
                 u.user_type_id as UserTypeId,
                 u.user_name as Name,
                 u.user_email as Email ";
-        
+
         var countSql = "SELECT COUNT(*)";
-        
+
         var fromWhereSql = @"FROM users u WHERE 1=1";
-        
+
         var parameters = new Dictionary<string, object>();
+
+        IEnumerable<UserDto> result;
 
         if (filter != null)
         {
@@ -235,94 +229,53 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
                 var ids = string.Join(",", filter.UserIds);
                 fromWhereSql += $" AND u.user_id IN ({ids})";
             }
-            
+
             if (filter.UserTypeIds != null && filter.UserTypeIds.Any())
             {
                 var typeIds = string.Join(",", filter.UserTypeIds);
                 fromWhereSql += $" AND u.user_type_id IN ({typeIds})";
             }
-            
+
             if (!string.IsNullOrEmpty(filter.Name))
             {
                 parameters.Add("@name", $"%{filter.Name}%");
                 fromWhereSql += " AND u.user_name LIKE @name";
             }
-            
+
             if (!string.IsNullOrEmpty(filter.Email))
             {
                 parameters.Add("@email", $"%{filter.Email}%");
                 fromWhereSql += " AND u.user_email LIKE @email";
             }
-            
+
             if (filter.LibraryId.HasValue)
-            {
                 fromWhereSql += @" AND EXISTS (
                     SELECT 1 FROM user_library_access ula 
                     WHERE ula.user_id = u.user_id 
                     AND ula.library_id = " + filter.LibraryId.Value + ")";
-            }
         }
-        
+
         var orderBy = " ORDER BY u.user_id";
 
         if (filter is { PageSize: not null, PageNumber: not null })
-        {
-            var totalCount = sqlDbAccess.ExecuteQuery<int>(
-                _databaseName,
-                countSql,
-                fromWhereSql,
-                "",
-                parameters).FirstOrDefault();
-
-            var pagedUsers = sqlDbAccess.GetPagedResult<UserDto>(
+            result = sqlDbAccess.GetPagedResult<UserDto>(
                 _databaseName,
                 selectSql,
                 fromWhereSql,
                 orderBy,
                 parameters,
                 filter.PageNumber.Value,
-                filter.PageSize.Value).ToList();
-
-            // Get library access for each user
-            foreach (var user in pagedUsers)
-            {
-                var libraryParams = new Dictionary<string, object>
-                {
-                    { "@userId", user.Id }
-                };
-
-                var librarySql = @"
-                    SELECT library_id
-                    FROM user_library_access
-                    WHERE user_id = @userId";
-
-                user.AccessibleLibraryIds = sqlDbAccess.ExecuteQuery<int>(
-                    _databaseName,
-                    librarySql,
-                    "",
-                    "",
-                    libraryParams).ToList();
-            }
-
-            return new PagedResult<UserDto>
-            {
-                Items = pagedUsers,
-                TotalCount = totalCount,
-                PageSize = filter.PageSize.Value,
-                CurrentPage = filter.PageNumber.Value,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize.Value)
-            };
-        }
-
-        var allUsers = sqlDbAccess.ExecuteQuery<UserDto>(
-            _databaseName,
-            selectSql,
-            fromWhereSql,
-            orderBy,
-            parameters).ToList();
+                filter.PageSize.Value);
+        else
+            result = sqlDbAccess.ExecuteQuery<UserDto>(
+                _databaseName,
+                selectSql,
+                fromWhereSql,
+                orderBy,
+                parameters).ToList();
 
         // Get library access for each user
-        foreach (var user in allUsers)
+        foreach (var user in result)
         {
             var libraryParams = new Dictionary<string, object>
             {
@@ -330,9 +283,9 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             };
 
             var librarySql = @"
-                SELECT library_id as Id
-                FROM user_library_access
-                WHERE user_id = @userId";
+                    SELECT library_id
+                    FROM user_library_access
+                    WHERE user_id = @userId";
 
             user.AccessibleLibraryIds = sqlDbAccess.ExecuteQuery<int>(
                 _databaseName,
@@ -342,14 +295,7 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
                 libraryParams).ToList();
         }
 
-        return new PagedResult<UserDto>
-        {
-            Items = allUsers,
-            TotalCount = allUsers.Count,
-            PageSize = allUsers.Count,
-            CurrentPage = 1,
-            TotalPages = 1
-        };
+        return result;
     }
 
     public HashedUserCredentialsDto GetUserCredentials(int userId)
@@ -371,11 +317,8 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             "",
             "",
             parameters).FirstOrDefault();
-        
-        if (result == null)
-        {
-            throw new InvalidOperationException($"User credentials for user ID {userId} not found");
-        }
+
+        if (result == null) throw new InvalidOperationException($"User credentials for user ID {userId} not found");
 
         return new HashedUserCredentialsDto(result.UserId, result.PasswordHash, result.PasswordSalt);
     }
@@ -406,7 +349,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
 
         // Then add new entries
         if (user.AccessibleLibraryIds.Count > 0)
-        {
             foreach (var libraryId in user.AccessibleLibraryIds)
             {
                 var libraryParameters = new Dictionary<string, object>
@@ -421,7 +363,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
 
                 sqlDbAccess.ExecuteNonQuery(_databaseName, libraryAccessSql, libraryParameters);
             }
-        }
     }
 
     public void UpdateUserCredentials(int userId, byte[] passwordHash, byte[] passwordSalt)
@@ -460,20 +401,35 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             new Dictionary<string, object> { { "@userId", userId } });
     }
 }
-public class UserFilter(
-    List<int>? userIds,
-    List<int>? userTypeIds,
-    string? name,
-    string? email,
-    int? libraryId,
-    int? pageNumber,
-    int? pageSize) : PaginationFilter(pageNumber, pageSize)
+
+public class UserFilter : PaginationFilter
 {
-    public List<int>? UserIds { get; set; } = userIds;
-    public List<int>? UserTypeIds { get; set; } = userTypeIds;
-    public string? Name { get; set; } = name;
-    public string? Email { get; set; } = email;
-    public int? LibraryId { get; set; } = libraryId;
-    public int? PageNumber { get; set; } = pageNumber;
-    public int? PageSize { get; set; } = pageSize;
+    public UserFilter(List<int>? userIds,
+        List<int>? userTypeIds,
+        string? name,
+        string? email,
+        int? libraryId,
+        int? pageNumber,
+        int? pageSize) : base(pageNumber, pageSize)
+    {
+        UserIds = userIds;
+        UserTypeIds = userTypeIds;
+        Name = name;
+        Email = email;
+        LibraryId = libraryId;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+    }
+
+    public UserFilter()
+    {
+    }
+
+    public List<int>? UserIds { get; set; }
+    public List<int>? UserTypeIds { get; set; }
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public int? LibraryId { get; set; }
+    public int? PageNumber { get; set; }
+    public int? PageSize { get; set; }
 }

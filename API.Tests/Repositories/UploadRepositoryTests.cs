@@ -23,14 +23,14 @@ public class UploadRepositoryTests
         var expectedId = 1;
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => 
-                p.ContainsKey("@userId") &&
-                p.ContainsKey("@uploadDate") &&
-                p.ContainsKey("@uploadType"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p.ContainsKey("@userId") &&
+                    p.ContainsKey("@uploadDate") &&
+                    p.ContainsKey("@uploadType"))))
             .Returns(new List<int> { expectedId });
 
         // Act
@@ -38,26 +38,26 @@ public class UploadRepositoryTests
 
         // Assert
         Assert.Equal(expectedId, result);
-        
+
         // Verify upload insertion
         _mockSqlDbAccess.Verify(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => 
-                p["@userId"].Equals(upload.OwnerId) &&
-                p["@uploadDate"].Equals(upload.Date) &&
-                p["@uploadType"].Equals(upload.Type))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@userId"].Equals(upload.OwnerId) &&
+                    p["@uploadDate"].Equals(upload.Date) &&
+                    p["@uploadType"].Equals(upload.Type))),
             Times.Once);
-        
+
         // Verify library association
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => 
-                p["@libraryId"].Equals(upload.LibraryId) &&
-                p["@uploadId"].Equals(expectedId))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@libraryId"].Equals(upload.LibraryId) &&
+                    p["@uploadId"].Equals(expectedId))),
             Times.Once);
     }
 
@@ -69,11 +69,11 @@ public class UploadRepositoryTests
         var expectedUpload = new UploadDto(uploadId, 1, DateTime.Now, "image/png", 1);
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UploadDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p.ContainsKey("@uploadId"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p.ContainsKey("@uploadId"))))
             .Returns(new List<UploadDto> { expectedUpload });
 
         // Act
@@ -92,11 +92,11 @@ public class UploadRepositoryTests
         // Arrange
         var uploadId = 999;
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UploadDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p.ContainsKey("@uploadId"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p.ContainsKey("@uploadId"))))
             .Returns(new List<UploadDto>());
 
         // Act & Assert
@@ -117,11 +117,11 @@ public class UploadRepositoryTests
         };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UploadDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>()))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>()))
             .Returns(expectedUploads);
 
         // Act
@@ -138,15 +138,20 @@ public class UploadRepositoryTests
     {
         // Arrange
         var filter = new UploadFilter(
-            uploadIds: new List<int> { 1 },
-            ownerIds: new List<int> { 1 },
-            libraryIds: new List<int> { 1 },
-            uploadTypes: new List<string> { "image/png" },
-            dateFrom: DateTime.Now.AddDays(-1),
-            dateTo: DateTime.Now,
-            pageNumber: 1,
-            pageSize: 10
+            new List<int> { 1 },
+            new List<int> { 1 },
+            new List<int> { 1 },
+            new List<string> { "image/png" },
+            DateTime.Now.AddDays(-1),
+            DateTime.Now,
+            1,
+            10
         );
+
+        var expectedPagedUploads = new PagedResult<UploadDto>
+        {
+            new(1, 1, DateTime.Now, "image/png", 1)
+        };
 
         var expectedUploads = new List<UploadDto>
         {
@@ -154,29 +159,29 @@ public class UploadRepositoryTests
         };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>()))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>()))
             .Returns(new List<int> { expectedUploads.Count });
 
         _mockSqlDbAccess.Setup(db => db.GetPagedResult<UploadDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>(),
-            It.IsAny<int>(),
-            It.IsAny<int>()))
-            .Returns(expectedUploads);
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+            .Returns(expectedPagedUploads);
 
         // Act
         var result = _uploadRepository.GetAllUploads(filter);
 
         // Assert
         Assert.Equal(expectedUploads.Count, result.Items.Count);
-        Assert.Equal(expectedUploads.Count, result.TotalCount);
+        Assert.Equal(expectedPagedUploads.Count(), result.TotalCount);
         Assert.Equal(1, result.TotalPages);
     }
 
@@ -192,33 +197,33 @@ public class UploadRepositoryTests
         // Assert
         // Verify upload update
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p =>
-                p.ContainsKey("@uploadId") &&
-                p["@uploadId"].Equals(upload.Id) &&
-                p.ContainsKey("@userId") &&
-                p["@userId"].Equals(upload.OwnerId) &&
-                p.ContainsKey("@uploadDate") &&
-                p["@uploadDate"].Equals(upload.Date) &&
-                p.ContainsKey("@uploadType") &&
-                p["@uploadType"].Equals(upload.Type))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p.ContainsKey("@uploadId") &&
+                    p["@uploadId"].Equals(upload.Id) &&
+                    p.ContainsKey("@userId") &&
+                    p["@userId"].Equals(upload.OwnerId) &&
+                    p.ContainsKey("@uploadDate") &&
+                    p["@uploadDate"].Equals(upload.Date) &&
+                    p.ContainsKey("@uploadType") &&
+                    p["@uploadType"].Equals(upload.Type))),
             Times.Once);
 
         // Verify library association deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM library_uploads")),
-            It.Is<Dictionary<string, object>>(p => p["@uploadId"].Equals(upload.Id))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM library_uploads")),
+                It.Is<Dictionary<string, object>>(p => p["@uploadId"].Equals(upload.Id))),
             Times.Once);
 
         // Verify library association creation
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("INSERT INTO library_uploads")),
-            It.Is<Dictionary<string, object>>(p => 
-                p["@libraryId"].Equals(upload.LibraryId) &&
-                p["@uploadId"].Equals(upload.Id))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("INSERT INTO library_uploads")),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@libraryId"].Equals(upload.LibraryId) &&
+                    p["@uploadId"].Equals(upload.Id))),
             Times.Once);
     }
 
@@ -234,16 +239,16 @@ public class UploadRepositoryTests
         // Assert
         // Verify library association deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM library_uploads")),
-            It.Is<Dictionary<string, object>>(p => p["@uploadId"].Equals(uploadId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM library_uploads")),
+                It.Is<Dictionary<string, object>>(p => p["@uploadId"].Equals(uploadId))),
             Times.Once);
 
         // Verify upload deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM uploads")),
-            It.Is<Dictionary<string, object>>(p => p["@uploadId"].Equals(uploadId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM uploads")),
+                It.Is<Dictionary<string, object>>(p => p["@uploadId"].Equals(uploadId))),
             Times.Once);
     }
 }

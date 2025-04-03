@@ -13,7 +13,7 @@ function App() {
     console.log('getTestString')
     adminClient.getAllUsers().then((response) => {
       console.log('response', response)
-      setTestString(response[0].email ?? null)
+      setTestString(JSON.stringify(response) ?? null)
       callback()
     })
   }

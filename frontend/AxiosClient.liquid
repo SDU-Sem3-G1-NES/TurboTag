@@ -3,8 +3,7 @@
         {% if ExportTypes %}export {% endif %}interface I{{ Class }} {
         {% for operation in Operations -%}
             {% template Client.Method.Documentation %}
-            {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}): Promise<{{ operation.ResultType }}>;
-        {% endfor -%}}
+            {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}): Promise<{% if operation.ResultType contains "PagedResult_" %}PagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}> | {{ operation.ResultType | replace: "PagedResult_", "" }}[]{% else %}{{ operation.ResultType }}{% endif %}>        {% endfor -%}}
     {%- endif %}
 
     {% if ExportTypes %}export {% endif %}class {{ Class }} {% if HasBaseClass %}extends {{ BaseClass }} {% endif %}{% if GenerateClientInterfaces %}implements I{{ Class }} {% endif %}{
@@ -24,8 +23,7 @@
     {% for operation in Operations %}
 
         {% template Client.Method.Documentation %}
-        {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters %}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor %}{% if UseAbortSignal %}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal{% else %}{% if operation.Parameters.size > 0 %},{% endif %} cancelToken?: CancelToken{% endif %}): Promise<{{ operation.ResultType }}> {
-        {% template Client.RequestUrl %}
+        {{ operation.MethodAccessModifier }}{{ operation.ActualOperationName }}({% for parameter in operation.Parameters -%}{{ parameter.VariableName }}{% if GenerateOptionalParameters and parameter.IsOptional %}?{% endif %}: {{ parameter.Type }}{{ parameter.TypePostfix }}{% if parameter.IsLast == false %}, {% endif %}{% endfor -%}{% if UseAbortSignal -%}{% if operation.Parameters.size > 0 %}, {% endif %}signal?: AbortSignal{% else -%}{% if operation.Parameters.size > 0 %},{% endif %} cancelToken?: CancelToken{% endif %}): Promise<{% if operation.ResultType contains "PagedResult_" -%}PagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}> | {{ operation.ResultType | replace: "PagedResult_", "" }}[]{% else -%}{{ operation.ResultType }}{% endif %}> {        {% template Client.RequestUrl %}
 
         {% if operation.HasBody -%}
             {% template Client.RequestBody %}
@@ -79,10 +77,50 @@
         });
         }
 
-        protected process{{ operation.ActualOperationNameUpper }}(response: AxiosResponse): Promise<{{ operation.ResultType }}> {
-        const status = response.status;
-        {% template Client.ProcessResponse %}
+    protected process{{ operation.ActualOperationNameUpper }}(response: AxiosResponse): Promise<{% if operation.ResultType == "void" -%}void{% elsif operation.ResultType contains "PagedResult_" -%}PagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}> | {{ operation.ResultType | replace: "PagedResult_", "" }}[]{% else -%}{{ operation.ResultType }}{% endif %}> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
         }
+    }
+    if (status === 200) {
+        {% if operation.ResultType == "void" -%}
+        return Promise.resolve<void>(null as any);
+        {% else -%}
+        const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+        {% if operation.ResultType contains "PagedResult_" -%}
+        if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push({{ operation.ResultType | replace: "PagedResult_", "" }}.fromJS(item));
+        } else if (isPagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}>(resultData200)) {
+            result200 = resultData200 as PagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}>;
+        } else {
+            result200 = <any>null;
+        }
+        {% elsif operation.ResultType == "boolean" -%}
+        result200 = resultData200 as boolean;
+        {% elsif operation.ResultType == "string" -%}
+        result200 = resultData200 as string;
+        {% elsif operation.ResultType == "number" -%}
+        result200 = resultData200 as number;
+        {% else -%}
+        result200 = {{ operation.ResultType }}.fromJS(resultData200);
+        {% endif %}
+        return Promise.resolve<{% if operation.ResultType contains "PagedResult_" -%}PagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}> | {{ operation.ResultType | replace: "PagedResult_", "" }}[]{% else -%}{{ operation.ResultType }}{% endif %}>(result200);
+        {% endif %}
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<{% if operation.ResultType == "void" -%}void{% elsif operation.ResultType contains "PagedResult_" -%}PagedResult<{{ operation.ResultType | replace: "PagedResult_", "" }}> | {{ operation.ResultType | replace: "PagedResult_", "" }}[]{% else -%}{{ operation.ResultType }}{% endif %}>(null as any);
+}
     {% endfor -%}
     }
 {%- endif %}

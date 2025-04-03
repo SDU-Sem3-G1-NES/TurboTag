@@ -23,14 +23,14 @@ public class UserRepositoryTests
         var expectedId = 1;
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p =>
-                p.ContainsKey("@userTypeId") &&
-                p.ContainsKey("@userName") &&
-                p.ContainsKey("@userEmail"))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p.ContainsKey("@userTypeId") &&
+                    p.ContainsKey("@userName") &&
+                    p.ContainsKey("@userEmail"))))
             .Returns(new List<int> { expectedId });
 
         // Act
@@ -41,27 +41,25 @@ public class UserRepositoryTests
 
         // Verify user insertion
         _mockSqlDbAccess.Verify(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p =>
-                p["@userTypeId"].Equals(user.UserTypeId) &&
-                p["@userName"].Equals(user.Name) &&
-                p["@userEmail"].Equals(user.Email))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@userTypeId"].Equals(user.UserTypeId) &&
+                    p["@userName"].Equals(user.Name) &&
+                    p["@userEmail"].Equals(user.Email))),
             Times.Once);
 
         // Verify library access entries
         foreach (var libraryId in user.AccessibleLibraryIds)
-        {
             _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.Is<Dictionary<string, object>>(p =>
-                    p["@userId"].Equals(expectedId) &&
-                    p["@libraryId"].Equals(libraryId))),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.Is<Dictionary<string, object>>(p =>
+                        p["@userId"].Equals(expectedId) &&
+                        p["@libraryId"].Equals(libraryId))),
                 Times.Once);
-        }
     }
 
     [Fact]
@@ -77,12 +75,12 @@ public class UserRepositoryTests
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p =>
-                p["@userId"].Equals(userId) &&
-                p["@passwordHash"].Equals(passwordHash) &&
-                p["@passwordSalt"].Equals(passwordSalt))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@userId"].Equals(userId) &&
+                    p["@passwordHash"].Equals(passwordHash) &&
+                    p["@passwordSalt"].Equals(passwordSalt))),
             Times.Once);
     }
 
@@ -92,11 +90,11 @@ public class UserRepositoryTests
         // Arrange
         var email = "test@example.com";
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
             .Returns(new List<int> { 1 });
 
         // Act
@@ -112,11 +110,11 @@ public class UserRepositoryTests
         // Arrange
         var email = "nonexistent@example.com";
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
             .Returns(new List<int> { 0 });
 
         // Act
@@ -135,19 +133,19 @@ public class UserRepositoryTests
         var libraryIds = new List<int> { 1, 2 };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("user_id = @userId")),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("user_id = @userId")),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
             .Returns(new List<UserDto> { expectedUser });
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("library_id")),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("library_id")),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
             .Returns(libraryIds);
 
         // Act
@@ -167,11 +165,11 @@ public class UserRepositoryTests
         // Arrange
         var userId = 999;
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("user_id = @userId")),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("user_id = @userId")),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
             .Returns(new List<UserDto>());
 
         // Act & Assert
@@ -189,19 +187,19 @@ public class UserRepositoryTests
         var libraryIds = new List<int> { 1, 2 };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("user_email = @email")),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("user_email = @email")),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
             .Returns(new List<UserDto> { expectedUser });
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("library_id")),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(expectedUser.Id))))
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("library_id")),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(expectedUser.Id))))
             .Returns(libraryIds);
 
         // Act
@@ -221,11 +219,11 @@ public class UserRepositoryTests
         // Arrange
         var email = "nonexistent@example.com";
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("user_email = @email")),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("user_email = @email")),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
             .Returns(new List<UserDto>());
 
         // Act & Assert
@@ -238,40 +236,40 @@ public class UserRepositoryTests
     public void GetAllUsers_ShouldReturnAllUsers_WhenNoFilterProvided()
     {
         // Arrange
-        var expectedUsers = new List<UserDto>
+        var expectedUsers = new PagedResult<UserDto>
         {
             new(1, 1, "User 1", "user1@example.com", new List<int>()),
             new(2, 2, "User 2", "user2@example.com", new List<int>())
         };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>()))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>()))
             .Returns(expectedUsers);
 
         foreach (var user in expectedUsers)
         {
             var libraryIds = new List<int> { user.Id }; // Just using user ID as library ID for testing
             _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-                It.IsAny<string>(),
-                It.Is<string>(s => s.Contains("library_id")),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(user.Id))))
+                    It.IsAny<string>(),
+                    It.Is<string>(s => s.Contains("library_id")),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(user.Id))))
                 .Returns(libraryIds);
         }
 
         // Act
-        var result = _userRepository.GetAllUsers();
+        var result = _userRepository.GetAllUsers() as PagedResult<UserDto>;
 
         // Assert
-        Assert.Equal(expectedUsers.Count, result.Items.Count);
-        Assert.Equal(expectedUsers.Count, result.TotalCount);
+        Assert.Equal(expectedUsers.Count(), result.Items.Count);
+        Assert.Equal(expectedUsers.Count(), result.TotalCount);
         Assert.Equal(1, result.TotalPages);
-        for (int i = 0; i < expectedUsers.Count; i++)
+        for (var i = 0; i < expectedUsers.Count(); i++)
         {
             Assert.Equal(expectedUsers[i].Id, result.Items[i].Id);
             Assert.Equal(expectedUsers[i].UserTypeId, result.Items[i].UserTypeId);
@@ -286,52 +284,52 @@ public class UserRepositoryTests
     {
         // Arrange
         var filter = new UserFilter(
-            userIds: new List<int> { 1 },
-            userTypeIds: new List<int> { 1 },
-            name: "Test",
-            email: "test",
-            libraryId: 1,
-            pageNumber: 1,
-            pageSize: 10
+            new List<int> { 1 },
+            new List<int> { 1 },
+            "Test",
+            "test",
+            1,
+            1,
+            10
         );
 
-        var expectedUsers = new List<UserDto>
+        var expectedUsers = new PagedResult<UserDto>
         {
             new(1, 1, "Test User", "test@example.com", new List<int>())
         };
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("COUNT")),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>()))
-            .Returns(new List<int> { expectedUsers.Count });
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("COUNT")),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>()))
+            .Returns(new List<int> { expectedUsers.Count() });
 
         _mockSqlDbAccess.Setup(db => db.GetPagedResult<UserDto>(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Dictionary<string, object>>(),
-            It.IsAny<int>(),
-            It.IsAny<int>()))
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
             .Returns(expectedUsers);
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-            It.IsAny<string>(),
-            It.Is<string>(s => s.Contains("library_id")),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(expectedUsers[0].Id))))
+                It.IsAny<string>(),
+                It.Is<string>(s => s.Contains("library_id")),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(expectedUsers[0].Id))))
             .Returns(new List<int> { 1 });
 
         // Act
-        var result = _userRepository.GetAllUsers(filter);
+        var result = _userRepository.GetAllUsers(filter) as PagedResult<UserDto>;
 
         // Assert
-        Assert.Equal(expectedUsers.Count, result.Items.Count);
-        Assert.Equal(expectedUsers.Count, result.TotalCount);
+        Assert.Equal(expectedUsers.Count(), result.Items.Count);
+        Assert.Equal(expectedUsers.Count(), result.TotalCount);
         Assert.Equal(1, result.TotalPages);
         Assert.Equal(expectedUsers[0].Id, result.Items[0].Id);
         Assert.Equal(expectedUsers[0].UserTypeId, result.Items[0].UserTypeId);
@@ -353,9 +351,9 @@ public class UserRepositoryTests
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
-            .Returns(new List<HashedUserCredentialsDto> 
-            { 
-                new HashedUserCredentialsDto(userId, expectedHash, expectedSalt) 
+            .Returns(new List<HashedUserCredentialsDto>
+            {
+                new(userId, expectedHash, expectedSalt)
             });
 
         // Act
@@ -379,37 +377,35 @@ public class UserRepositoryTests
         // Assert
         // Verify user update
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p =>
-                p.ContainsKey("@userId") &&
-                p["@userId"].Equals(user.Id) &&
-                p.ContainsKey("@userTypeId") &&
-                p["@userTypeId"].Equals(user.UserTypeId) &&
-                p.ContainsKey("@userName") &&
-                p["@userName"].Equals(user.Name) &&
-                p.ContainsKey("@userEmail") &&
-                p["@userEmail"].Equals(user.Email))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p.ContainsKey("@userId") &&
+                    p["@userId"].Equals(user.Id) &&
+                    p.ContainsKey("@userTypeId") &&
+                    p["@userTypeId"].Equals(user.UserTypeId) &&
+                    p.ContainsKey("@userName") &&
+                    p["@userName"].Equals(user.Name) &&
+                    p.ContainsKey("@userEmail") &&
+                    p["@userEmail"].Equals(user.Email))),
             Times.Once);
 
         // Verify library access deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(user.Id))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(user.Id))),
             Times.Once);
 
         // Verify library access creation
         foreach (var libraryId in user.AccessibleLibraryIds)
-        {
             _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-                It.IsAny<string>(),
-                It.Is<string>(sql => sql.Contains("INSERT INTO user_library_access")),
-                It.Is<Dictionary<string, object>>(p =>
-                    p["@userId"].Equals(user.Id) &&
-                    p["@libraryId"].Equals(libraryId))),
+                    It.IsAny<string>(),
+                    It.Is<string>(sql => sql.Contains("INSERT INTO user_library_access")),
+                    It.Is<Dictionary<string, object>>(p =>
+                        p["@userId"].Equals(user.Id) &&
+                        p["@libraryId"].Equals(libraryId))),
                 Times.Once);
-        }
     }
 
     [Fact]
@@ -425,12 +421,12 @@ public class UserRepositoryTests
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.Is<Dictionary<string, object>>(p =>
-                p["@userId"].Equals(userId) &&
-                p["@passwordHash"].Equals(passwordHash) &&
-                p["@passwordSalt"].Equals(passwordSalt))),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<Dictionary<string, object>>(p =>
+                    p["@userId"].Equals(userId) &&
+                    p["@passwordHash"].Equals(passwordHash) &&
+                    p["@passwordSalt"].Equals(passwordSalt))),
             Times.Once);
     }
 
@@ -446,23 +442,23 @@ public class UserRepositoryTests
         // Assert
         // Verify credentials deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM user_credentials")),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM user_credentials")),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
             Times.Once);
 
         // Verify library access deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
             Times.Once);
 
         // Verify user deletion
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-            It.IsAny<string>(),
-            It.Is<string>(sql => sql.Contains("DELETE FROM users")),
-            It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
+                It.IsAny<string>(),
+                It.Is<string>(sql => sql.Contains("DELETE FROM users")),
+                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
             Times.Once);
     }
 }
