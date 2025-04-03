@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,9 @@ public class AdminController(IAdminService adminService) : ControllerBase
     [HttpGet("GetAllUsers")]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers()
     {
-        var response = adminService.GetAllUsers();
+        UserFilter? filter = null;
+        //filter = new UserFilter { PageNumber = 1, PageSize = 10 };
+        var response = adminService.GetAllUsers(filter);
         return Ok(response);
     }
 

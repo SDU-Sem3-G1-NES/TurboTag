@@ -5,7 +5,7 @@ namespace API.Services;
 
 public interface IAdminService : IServiceBase
 {
-    IEnumerable<UserDto> GetAllUsers();
+    IEnumerable<UserDto> GetAllUsers(UserFilter filter);
     UserDto GetUserById();
     IEnumerable<LibraryDto> GetAllLibraries();
     LibraryDto GetLibraryById();
@@ -22,10 +22,8 @@ public class AdminService(IUserRepository userRepository, ILibraryRepository lib
     /// <summary>
     ///     Method that returns a list of all Users from the database.
     /// </summary>
-    public IEnumerable<UserDto> GetAllUsers()
+    public IEnumerable<UserDto> GetAllUsers(UserFilter filter)
     {
-        UserFilter? filter = null;
-        //filter = new UserFilter { PageNumber = 1, PageSize = 10 };
         return userRepository.GetAllUsers(filter);
     }
 
