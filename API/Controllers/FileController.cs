@@ -18,10 +18,10 @@ public class FileController(IFileService fileService) : ControllerBase
     }
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
-    [HttpGet("GetFile")]
-    public async Task<ActionResult> GetFile(string id)
+    [HttpGet("GetFileById")]
+    public async Task<ActionResult> GetFileById(string id)
     {
-        var fileStream = await fileService.GetFile(id);
+        var fileStream = await fileService.GetFileById(id);
         if (fileStream == null)
         {
             return NotFound();

@@ -38,6 +38,9 @@ function App() {
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
       <button onClick={() => getTestString(() => console.log('weather updated'))}>Test</button>
       <p>{testString}</p>
+      <img src={"http://localhost:5088/File/GetFileById?id=67e852b07eba9a8b9ee2c14d"} alt="Shrek.png" />
+      <img src={"http://localhost:5088/File/GetFileById?id=67e852b07eba9a8b9ee2c14d"} alt="Shrek.png" />
+      <img src={"http://localhost:5088/File/GetFileById?id=67e852b07eba9a8b9ee2c14d"} alt="Shrek.png" />
     </div>
   )
 }

@@ -5,7 +5,7 @@ namespace API.Services;
 public interface IFileService : IServiceBase
 {
     public Task<string?> UploadFile(IFormFile file);
-    public Task<Stream?> GetFile(string id);
+    public Task<Stream?> GetFileById(string id);
     public Task DeleteFile(string id);
 }
 public class FileService(IFileRepository fileRepository) : IFileService
@@ -15,9 +15,9 @@ public class FileService(IFileRepository fileRepository) : IFileService
         return fileRepository.UploadFile(file);
     }
 
-    public Task<Stream?> GetFile(string id)
+    public Task<Stream?> GetFileById(string id)
     {
-        return fileRepository.GetFile(id);
+        return fileRepository.GetFileById(id);
     }
 
     public Task DeleteFile(string id)
