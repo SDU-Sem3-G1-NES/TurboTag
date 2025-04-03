@@ -30,7 +30,7 @@ public class DependencyRegistrations : Module
         
         // Register the MongoDB client
         builder.RegisterType<MongoDataAccess>()
-            .As<IDocumentDbAccess>()
+            .As<IDocumentDataAccess, IFileDataAccess>()
             .WithParameter("connectionString", $"mongodb://{_mongoUser}:{_mongoPass}@{_mongoHost}:{_mongoPort}");
     }
 }

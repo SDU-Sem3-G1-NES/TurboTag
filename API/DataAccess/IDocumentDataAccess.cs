@@ -1,6 +1,6 @@
 namespace API.DataAccess;
 
-public interface IDocumentDbAccess
+public interface IDocumentDataAccess
 {
     List<T> Find<T>(string collectionName, string query);
     void Insert<T>(string collectionName, T document);

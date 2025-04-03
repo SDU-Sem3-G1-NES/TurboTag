@@ -18,34 +18,34 @@ public interface ILessonRepository : IRepositoryBase
     void DeleteLessonByObjectId(string objectId);
 }
 
-public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
+public class LessonRepository(IDocumentDataAccess database) : ILessonRepository
 {
     public void AddLesson(LessonDto lesson)
     {
         lesson.GenerateMongoId();
-        mongoDb.Insert("lesson", lesson.ToBsonDocument());
+        database.Insert("lesson", lesson.ToBsonDocument());
     }
 
     public List<LessonDto> GetAllLessons()
     {
-        return mongoDb.Find<LessonDto>("lesson", "{}");
+        return database.Find<LessonDto>("lesson", "{}");
     }
     
     public List<LessonDto> GetLessonsByTags(string[] tags)
     {
         var filter = $"{{\"lesson_details.tags\": {{$all: [{string.Join(",", tags.Select(tag => $"\"{tag}\""))}]}}}}";
-        return mongoDb.Find<LessonDto>("lesson", filter);
+        return database.Find<LessonDto>("lesson", filter);
     }
     
     public List<LessonDto> GetLessonsByTitle(string title)
     {
         var filter = $"{{\"lesson_details.title\": {{$regex: \"{title}\", $options: \"i\"}}}}";
-        return mongoDb.Find<LessonDto>("lesson", filter);
+        return database.Find<LessonDto>("lesson", filter);
     }
     
     public LessonDto? GetLessonById(string lessonId)
     {
-        return mongoDb.Find<LessonDto>(
+        return database.Find<LessonDto>(
                 "lesson",
                 $"{{\"lesson_details._id\": {lessonId}}}")
             .FirstOrDefault();
@@ -58,7 +58,7 @@ public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
             Console.WriteLine("Invalid ObjectId format provided while fetching a lesson.");
             return null;
         }
-        return mongoDb.Find<LessonDto>(
+        return database.Find<LessonDto>(
                 "lesson",
                 $"{{\"_id\": ObjectId(\"{objectId}\")}}")
             .FirstOrDefault();
@@ -66,7 +66,7 @@ public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
     
     public LessonDto? GetLessonByUploadId(int uploadId)
     {
-        return mongoDb.Find<LessonDto>(
+        return database.Find<LessonDto>(
                 "lesson",
                 $"{{upload_id: {uploadId}}}")
             .FirstOrDefault();
@@ -74,12 +74,12 @@ public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
 
     public void UpdateLesson(LessonDto lesson)
     {
-        mongoDb.Replace("lesson", $"{{\"_id\": ObjectId(\"{lesson.MongoId}\")}}", lesson);
+        database.Replace("lesson", $"{{\"_id\": ObjectId(\"{lesson.MongoId}\")}}", lesson);
     }
 
     public void DeleteLessonById(int lessonId)
     {
-        mongoDb.Delete( "lesson", $"{{\"lesson_details._id\": {lessonId}}}");
+        database.Delete( "lesson", $"{{\"lesson_details._id\": {lessonId}}}");
     }
     public void DeleteLessonByObjectId(string objectId)
     {
@@ -88,6 +88,6 @@ public class LessonRepository(IDocumentDbAccess mongoDb) : ILessonRepository
             Console.WriteLine("Invalid ObjectId format provided while deleting a lesson.");
             return;
         }
-        mongoDb.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
+        database.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
     }
 }
