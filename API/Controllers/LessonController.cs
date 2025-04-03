@@ -10,24 +10,24 @@ namespace API.Controllers;
 public class LessonController(ILessonService lessonService) : ControllerBase
 {
     [HttpGet("GetAllLessons")]
-    public ActionResult GetAllLessons()
+    public ActionResult<List<LessonDto>> GetAllLessons()
     {
         return Ok(lessonService.GetAllLessons());
     }
     
     [HttpGet("GetLessonsByTags")]
-    public ActionResult GetLessonsByTags([FromQuery] string[] tags)
+    public ActionResult<List<LessonDto>> GetLessonsByTags([FromQuery] string[] tags)
     {
         return Ok(lessonService.GetLessonsByTags(tags));
     }
     
     [HttpGet("GetLessonsByTitle")]
-    public ActionResult GetLessonsByTitle(string title)
+    public ActionResult<List<LessonDto>> GetLessonsByTitle(string title)
     {
         return Ok(lessonService.GetLessonsByTitle(title));
     }
     [HttpGet("GetLessonById")]
-    public ActionResult GetLessonById(int lessonId)
+    public ActionResult<LessonDto> GetLessonById(int lessonId)
     {
         var result = lessonService.GetLessonById(lessonId);
         if (result == null)
@@ -38,7 +38,7 @@ public class LessonController(ILessonService lessonService) : ControllerBase
     }
     
     [HttpGet("GetLessonByObjectId")]
-    public ActionResult GetLessonByObjectId(string objectId)
+    public ActionResult<LessonDto> GetLessonByObjectId(string objectId)
     {
         var result = lessonService.GetLessonByObjectId(objectId);
         if (result == null)
@@ -49,7 +49,7 @@ public class LessonController(ILessonService lessonService) : ControllerBase
     }
 
     [HttpGet("GetLessonByUploadId")]
-    public ActionResult GetLessonByUploadId(int uploadId)
+    public ActionResult<LessonDto> GetLessonByUploadId(int uploadId)
     {
         var result = lessonService.GetLessonByUploadId(uploadId);
         if (result == null)

@@ -11,7 +11,7 @@ public class FileController(IFileService fileService) : ControllerBase
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpPost("UploadFile")]
-    public async Task<ActionResult> UploadFile(IFormFile file)
+    public async Task<ActionResult<string>> UploadFile(IFormFile file)
     {
         var fileId = await fileService.UploadFile(file);
         return Ok(fileId);
@@ -19,7 +19,7 @@ public class FileController(IFileService fileService) : ControllerBase
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpGet("GetFileById")]
-    public async Task<ActionResult> GetFileById(string id)
+    public async Task<ActionResult<FileStream>> GetFileById(string id)
     {
         var fileStream = await fileService.GetFileById(id);
         if (fileStream == null)
