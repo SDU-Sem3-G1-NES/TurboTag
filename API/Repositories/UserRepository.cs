@@ -212,15 +212,14 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
                 u.user_id as Id,
                 u.user_type_id as UserTypeId,
                 u.user_name as Name,
-                u.user_email as Email ";
+                u.user_email as Email,
+                COALESCE(array_remove(array_agg(ula.library_id), NULL), '{}'::integer[]) AS AccessibleLibraryIds ";
 
-        var countSql = "SELECT COUNT(*)";
-
-        var fromWhereSql = @"FROM users u WHERE 1=1";
+        var fromWhereSql = @"FROM users u 
+                                LEFT JOIN user_library_access ula ON ula.user_id = u.user_id
+                                WHERE 1=1";
 
         var parameters = new Dictionary<string, object>();
-
-        IEnumerable<UserDto> result;
 
         if (filter != null)
         {
@@ -255,10 +254,11 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
                     AND ula.library_id = " + filter.LibraryId.Value + ")";
         }
 
-        var orderBy = " ORDER BY u.user_id";
+        var orderBy = @" GROUP BY u.user_id, u.user_type_id, u.user_name, u.user_email 
+        ORDER BY u.user_id";
 
         if (filter is { PageSize: not null, PageNumber: not null })
-            result = sqlDbAccess.GetPagedResult<UserDto>(
+            return sqlDbAccess.GetPagedResult<UserDto>(
                 _databaseName,
                 selectSql,
                 fromWhereSql,
@@ -266,36 +266,12 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
                 parameters,
                 filter.PageNumber.Value,
                 filter.PageSize.Value);
-        else
-            result = sqlDbAccess.ExecuteQuery<UserDto>(
-                _databaseName,
-                selectSql,
-                fromWhereSql,
-                orderBy,
-                parameters).ToList();
-
-        // Get library access for each user
-        foreach (var user in result)
-        {
-            var libraryParams = new Dictionary<string, object>
-            {
-                { "@userId", user.Id }
-            };
-
-            var librarySql = @"
-                    SELECT library_id
-                    FROM user_library_access
-                    WHERE user_id = @userId";
-
-            user.AccessibleLibraryIds = sqlDbAccess.ExecuteQuery<int>(
-                _databaseName,
-                librarySql,
-                "",
-                "",
-                libraryParams).ToList();
-        }
-
-        return result;
+        return sqlDbAccess.ExecuteQuery<UserDto>(
+            _databaseName,
+            selectSql,
+            fromWhereSql,
+            orderBy,
+            parameters).ToList();
     }
 
     public HashedUserCredentialsDto GetUserCredentials(int userId)

@@ -1,6 +1,8 @@
 using API;
+using API.DataAccess;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Dapper;
 using DotNetEnv;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -9,6 +11,8 @@ using NSwag;
 
 var builder = WebApplication.CreateBuilder(args);
 Env.Load(".env");
+
+SqlMapper.AddTypeHandler(new GenericListHandler<int>());
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
