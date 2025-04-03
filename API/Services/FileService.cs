@@ -1,4 +1,3 @@
-using API.Dtos;
 using API.Repositories;
 
 namespace API.Services;
@@ -6,7 +5,7 @@ namespace API.Services;
 public interface IFileService : IServiceBase
 {
     public Task<string?> UploadFile(IFormFile file);
-    public Task<byte[]?> GetFile(string id);
+    public Task<Stream?> GetFile(string id);
     public Task DeleteFile(string id);
 }
 public class FileService(IFileRepository fileRepository) : IFileService
@@ -16,7 +15,7 @@ public class FileService(IFileRepository fileRepository) : IFileService
         return fileRepository.UploadFile(file);
     }
 
-    public Task<byte[]?> GetFile(string id)
+    public Task<Stream?> GetFile(string id)
     {
         return fileRepository.GetFile(id);
     }

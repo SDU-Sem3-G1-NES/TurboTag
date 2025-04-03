@@ -1,4 +1,3 @@
-using API.Dtos;
 using API.DataAccess;
 
 namespace API.Repositories;
@@ -6,7 +5,7 @@ namespace API.Repositories;
 public interface IFileRepository : IRepositoryBase
 {
     Task<String?> UploadFile(IFormFile file);
-    Task<Byte[]?> GetFile(string id);
+    Task<Stream?> GetFile(string id);
     Task DeleteFile(string id);
 }
 public class FileRepository(IFileDataAccess database) : IFileRepository 
@@ -17,7 +16,7 @@ public class FileRepository(IFileDataAccess database) : IFileRepository
         return await database.UploadFile("fs", file);
     }
 
-    public async Task<Byte[]?> GetFile(string id)
+    public async Task<Stream?> GetFile(string id)
     {
         return await database.GetFileById("fs", id);
     }

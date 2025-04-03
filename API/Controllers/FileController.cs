@@ -8,23 +8,25 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class FileController(IFileService fileService) : ControllerBase
 {
-    [RequestSizeLimit(long.MaxValue)]
+    [DisableRequestSizeLimit]
+    [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpPost("UploadFile")]
     public async Task<ActionResult> UploadFile(IFormFile file)
     {
         var fileId = await fileService.UploadFile(file);
         return Ok(fileId);
     }
-    [RequestSizeLimit(long.MaxValue)]
+    [DisableRequestSizeLimit]
+    [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpGet("GetFile")]
     public async Task<ActionResult> GetFile(string id)
     {
-        var file = await fileService.GetFile(id);
-        if (file == null)
+        var fileStream = await fileService.GetFile(id);
+        if (fileStream == null)
         {
             return NotFound();
         }
-        return File(file, "application/octet-stream", id);
+        return File(fileStream, "application/octet-stream", id);
     }
     [HttpDelete("DeleteFile")]
     public ActionResult DeleteFile(string id)

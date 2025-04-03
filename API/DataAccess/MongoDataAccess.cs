@@ -90,7 +90,7 @@ public class MongoDataAccess(string connectionString) : IDocumentDataAccess, IFi
         }
     }
 
-    public async Task<byte[]?> GetFileById(string bucketName, string id)
+    public async Task<Stream?> GetFileById(string bucketName, string id)
     {
         try
         {
@@ -101,7 +101,7 @@ public class MongoDataAccess(string connectionString) : IDocumentDataAccess, IFi
                 Console.WriteLine("File not found");
                 return null;
             }
-            return await bucket.DownloadAsBytesAsync(fileInfo.Id);
+            return await bucket.OpenDownloadStreamAsync(fileInfo.Id);
         }
         catch (Exception e)
         {
