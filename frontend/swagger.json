@@ -628,7 +628,8 @@
             "name": "lessonId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
