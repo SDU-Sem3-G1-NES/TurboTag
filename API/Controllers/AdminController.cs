@@ -9,10 +9,10 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class AdminController(IAdminService adminService) : ControllerBase
 {
-    [HttpGet("GetAllUsers")]
-    public ActionResult<IEnumerable<UserDto>> GetAllUsers()
+    [HttpPost("GetAllUsers")]
+    public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromBody] UserFilter? filter)
     {
-        UserFilter? filter = null;
+        //UserFilter? filter = null;
         //filter = new UserFilter { PageNumber = 1, PageSize = 10 };
         var response = adminService.GetAllUsers(filter);
         return Ok(response);

@@ -2,7 +2,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useState } from 'react'
-import { AdminClient } from './api/apiClient.ts'
+import { AdminClient, UserFilter } from './api/apiClient.ts'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,9 +11,21 @@ function App() {
 
   const getTestString = (callback: () => void) => {
     console.log('getTestString')
-    adminClient.getAllUsers().then((response) => {
+    adminClient.getAllUsers(new UserFilter()).then((response) => {
       console.log('response', response)
-      setTestString(JSON.stringify(response) ?? null)
+      setTestString(JSON.stringify(response))
+      setTestString((prevTestString) => (prevTestString ?? '') + '\n\n')
+      callback()
+    })
+
+    const filter = new UserFilter({
+      pageSize: 10,
+      pageNumber: 1
+    })
+
+    adminClient.getAllUsers(filter).then((response) => {
+      console.log('response', response)
+      setTestString((prevTestString) => (prevTestString ?? '') + JSON.stringify(response))
       callback()
     })
   }
@@ -37,7 +49,7 @@ function App() {
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
       <button onClick={() => getTestString(() => console.log('weather updated'))}>Test</button>
-      <p>{testString}</p>
+      <div dangerouslySetInnerHTML={{ __html: testString ?? '' }} />
     </div>
   )
 }

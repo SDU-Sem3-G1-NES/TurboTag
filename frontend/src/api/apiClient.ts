@@ -50,9 +50,10 @@ export class BaseApiClient {
 
 export interface IAdminClient {
                     /**
+             * @param body (optional) 
              * @return OK
              */
-            getAllUsers(): Promise<PagedResult<UserDto> | UserDto[]>                    /**
+            getAllUsers(body?: UserFilter | undefined): Promise<PagedResult<UserDto> | UserDto[]>                    /**
              * @return OK
              */
             getAllContentLibraries(): Promise<PagedResult<LibraryDto> | LibraryDto[]>                    /**
@@ -95,16 +96,21 @@ export interface IAdminClient {
     
 
         /**
+         * @param body (optional) 
          * @return OK
          */
-        getAllUsers( cancelToken?: CancelToken): Promise<PagedResult<UserDto> | UserDto[]> {        let url_ = this.baseUrl + "/Admin/GetAllUsers";
+        getAllUsers(body?: UserFilter | undefined, cancelToken?: CancelToken): Promise<PagedResult<UserDto> | UserDto[]> {        let url_ = this.baseUrl + "/Admin/GetAllUsers";
 url_ = url_.replace(/[?&]$/, "");
 
+                    const content_ = JSON.stringify(body);
+
                 let options_: AxiosRequestConfig = {
-                        method: "GET",
+                    data: content_,
+                        method: "POST",
         url: url_,
         headers: {
-                                    "Accept": "application/json"
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "application/json"
                 },
             cancelToken
         };
@@ -1856,6 +1862,88 @@ export interface IUserDto {
     name?: string | null;
     email?: string | null;
     accessibleLibraryIds?: number[] | null;
+}
+
+export class UserFilter implements IUserFilter {
+    userIds?: number[] | null;
+    userTypeIds?: number[] | null;
+    name?: string | null;
+    email?: string | null;
+    libraryId?: number | null;
+    pageNumber?: number | null;
+    pageSize?: number | null;
+
+    constructor(data?: IUserFilter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["userIds"])) {
+                this.userIds = [] as any;
+                for (let item of _data["userIds"])
+                    this.userIds!.push(item);
+            }
+            else {
+                this.userIds = <any>null;
+            }
+            if (Array.isArray(_data["userTypeIds"])) {
+                this.userTypeIds = [] as any;
+                for (let item of _data["userTypeIds"])
+                    this.userTypeIds!.push(item);
+            }
+            else {
+                this.userTypeIds = <any>null;
+            }
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
+            this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UserFilter {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserFilter();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.userIds)) {
+            data["userIds"] = [];
+            for (let item of this.userIds)
+                data["userIds"].push(item);
+        }
+        if (Array.isArray(this.userTypeIds)) {
+            data["userTypeIds"] = [];
+            for (let item of this.userTypeIds)
+                data["userTypeIds"].push(item);
+        }
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["email"] = this.email !== undefined ? this.email : <any>null;
+        data["libraryId"] = this.libraryId !== undefined ? this.libraryId : <any>null;
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        return data;
+    }
+}
+
+export interface IUserFilter {
+    userIds?: number[] | null;
+    userTypeIds?: number[] | null;
+    name?: string | null;
+    email?: string | null;
+    libraryId?: number | null;
+    pageNumber?: number | null;
+    pageSize?: number | null;
 }
 
 export class SwaggerException extends Error {
