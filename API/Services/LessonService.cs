@@ -9,7 +9,7 @@ public interface ILessonService : IServiceBase
     List<LessonDto> GetAllLessons();
     public List<LessonDto> GetLessonsByTags(string[] tags);
     public List<LessonDto> GetLessonsByTitle(string title);
-    LessonDto? GetLessonById(string lessonId);
+    LessonDto? GetLessonById(int lessonId);
     LessonDto? GetLessonByObjectId(string objectId);
     LessonDto? GetLessonByUploadId(int uploadId);
     void UpdateLesson(LessonDto lesson);
@@ -37,7 +37,7 @@ public class LessonService(ILessonRepository lessonRepository) : ILessonService
     {
         return lessonRepository.GetLessonsByTitle(title);
     }
-    public LessonDto? GetLessonById(string lessonId)
+    public LessonDto? GetLessonById(int lessonId)
     {
         return lessonRepository.GetLessonById(lessonId);
     }

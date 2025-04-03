@@ -27,7 +27,7 @@ public class LessonController(ILessonService lessonService) : ControllerBase
         return Ok(lessonService.GetLessonsByTitle(title));
     }
     [HttpGet("GetLessonById")]
-    public ActionResult GetLessonById(string lessonId)
+    public ActionResult GetLessonById(int lessonId)
     {
         var result = lessonService.GetLessonById(lessonId);
         if (result == null)

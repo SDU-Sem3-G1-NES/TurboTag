@@ -137,7 +137,7 @@ namespace API.Tests.Repositories
             _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {lessonId}}}")).Returns(new List<LessonDto> { lesson });
 
             // Act
-            var result = _repository.GetLessonById(lessonId.ToString());
+            var result = _repository.GetLessonById(lessonId);
 
             // Assert
             Assert.Equal(lesson, result);
@@ -147,11 +147,11 @@ namespace API.Tests.Repositories
         public void GetLessonById_ReturnsNullForInvalidId()
         {
             // Arrange
-            var invalidLessonId = "invalidLessonId";
+            var invalidLessonId = "-1";
             _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {invalidLessonId}}}")).Returns(new List<LessonDto>());
             
             // Act
-            var result = _repository.GetLessonById(invalidLessonId);
+            var result = _repository.GetLessonById(-1);
 
             // Assert
             Assert.Null(result);

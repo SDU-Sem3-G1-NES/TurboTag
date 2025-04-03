@@ -11,7 +11,7 @@ public interface ILessonRepository : IRepositoryBase
     public List<LessonDto> GetLessonsByTags(string[] tags);
     public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonByObjectId(string objectId);
-    LessonDto? GetLessonById(string lessonId);
+    LessonDto? GetLessonById(int lessonId);
     LessonDto? GetLessonByUploadId(int uploadId);
     void UpdateLesson(LessonDto lesson);
     void DeleteLessonById(int lessonId);
@@ -43,7 +43,7 @@ public class LessonRepository(IDocumentDataAccess database) : ILessonRepository
         return database.Find<LessonDto>("lesson", filter);
     }
     
-    public LessonDto? GetLessonById(string lessonId)
+    public LessonDto? GetLessonById(int lessonId)
     {
         return database.Find<LessonDto>(
                 "lesson",
