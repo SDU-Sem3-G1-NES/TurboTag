@@ -2,8 +2,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useState } from 'react'
-import { LessonClient} from './api/apiClient.ts'
-import { FileClient} from './api/apiClient.ts'
+import { LessonClient } from './api/apiClient.ts'
+import { FileClient } from './api/apiClient.ts'
 
 function App() {
   const [count, setCount] = useState(0)
