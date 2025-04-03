@@ -12,8 +12,6 @@ public class AdminController(IAdminService adminService) : ControllerBase
     [HttpPost("GetAllUsers")]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromBody] UserFilter? filter)
     {
-        //UserFilter? filter = null;
-        //filter = new UserFilter { PageNumber = 1, PageSize = 10 };
         var response = adminService.GetAllUsers(filter);
         return Ok(response);
     }
