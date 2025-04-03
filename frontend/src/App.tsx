@@ -11,10 +11,10 @@ function App() {
 
   const getTestString = (callback: () => void) => {
     console.log('getTestString')
-    adminClient.getAllUsers(new UserFilter()).then((response) => {
+    adminClient.getAllUsers().then((response) => {
       console.log('response', response)
       setTestString(JSON.stringify(response))
-      setTestString((prevTestString) => (prevTestString ?? '') + '\n\n')
+      setTestString((prevTestString) => (prevTestString ?? '') + '<br /><br />')
       callback()
     })
 
