@@ -19,7 +19,8 @@
         <PackageReference Include="Npgsql" Version="9.0.3"/>
         <PackageReference Include="NSwag.AspNetCore" Version="14.2.0"/>
         <PackageReference Include="NSwag.CodeGeneration" Version="14.3.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1"/>
+        <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
     </ItemGroup>
 
     <ItemGroup>

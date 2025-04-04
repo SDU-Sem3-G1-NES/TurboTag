@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace API.DTOs;
+namespace API.Dtos;
 
 public class UploadDto
 {

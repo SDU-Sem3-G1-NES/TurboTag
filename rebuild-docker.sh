@@ -21,7 +21,7 @@ for arg in "$@"; do
   fi
 done
 
-docker-compose down
+docker compose down
 
 for arg in "$@"; do
   if [ "$arg" == "-r" ] || [ "$arg" == "--rebuild" ]; then
