@@ -5,17 +5,17 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class RegisterController(IUserCredentialsService _userCredentialsService) : ControllerBase
+public class RegisterController(IUserCredentialsService userCredentialsService) : ControllerBase
 {
     [HttpGet("CheckIfUserExistsByEmail")]
     public ActionResult<bool> CheckIfUserExistsByEmail(string email)
     {
-        return Ok(_userCredentialsService.CheckIfUserExistsByEmail());
+        return Ok(userCredentialsService.CheckIfUserExistsByEmail());
     }
     [HttpPost("RegisterUser")]
     public ActionResult RegisterUser([FromBody] UserCredentialsDto userCredentials)
     {
-        _userCredentialsService.StoreNewUserCredentials();
+        userCredentialsService.StoreNewUserCredentials();
         return Ok();
     }
 }

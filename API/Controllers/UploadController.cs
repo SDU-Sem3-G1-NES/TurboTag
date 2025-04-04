@@ -5,12 +5,12 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UploadController(IUploadService _uploadService) : ControllerBase
+public class UploadController(IUploadService uploadService) : ControllerBase
 {
     [HttpPost("StoreUpload")]
     public ActionResult<string> StoreUpload()
     {
 
-        return Ok(_uploadService.StoreUpload());
+        return Ok(uploadService.StoreUpload());
     }
 }
