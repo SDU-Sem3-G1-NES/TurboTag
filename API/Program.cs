@@ -35,7 +35,7 @@ builder.Services.AddControllers()
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     });
-;
+
 builder.Services.AddOpenApiDocument(config =>
 {
     config.PostProcess = document =>
@@ -50,7 +50,7 @@ builder.Services.AddOpenApiDocument(config =>
             {
                 var schema = operation.Responses["200"].Content["application/json"].Schema;
 
-                if (schema?.Reference != null && schema.Reference.Id.StartsWith("PagedResult"))
+                if (schema?.Reference?.Id != null && schema.Reference.Id.StartsWith("PagedResult"))
                 {
                     var dtoTypeName = schema.Reference.Id.Replace("PagedResult", "");
 

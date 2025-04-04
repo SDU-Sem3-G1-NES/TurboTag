@@ -4,7 +4,7 @@ using API.DTOs;
 namespace API.Services;
 public interface IUploadService : IServiceBase
 {
-    IEnumerable<UploadDto> GetAllUploads(UploadFilter filter);
+    IEnumerable<UploadDto> GetAllUploads(UploadFilter? filter);
     IEnumerable<UploadDto> GetUserUploads(UserDto user, UploadFilter filter);
     IEnumerable<UploadDto> GetLibraryUploads(int libraryId, UploadFilter filter);
     UploadDto GetUploadById(int uploadId);
@@ -15,7 +15,7 @@ public interface IUploadService : IServiceBase
 }
 public class UploadService(IUploadRepository uploadRepository) : IUploadService
 {
-    public IEnumerable<UploadDto> GetAllUploads(UploadFilter filter)
+    public IEnumerable<UploadDto> GetAllUploads(UploadFilter? filter)
     {
         return uploadRepository.GetAllUploads(filter);
     }

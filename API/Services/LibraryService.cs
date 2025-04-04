@@ -5,7 +5,7 @@ namespace API.Services;
 public interface ILibraryService : IServiceBase
 {
     IEnumerable<LibraryDto> GetLibrariesByUser(UserDto user, LibraryFilter filter);
-    IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter filter);
+    IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter? filter);
     LibraryDto GetLibraryById(int libraryId);
     void CreateNewLibrary(LibraryDto library);
     void UpdateLibrary(LibraryDto library);
@@ -19,7 +19,7 @@ public class LibraryService(ILibraryRepository libraryRepository) : ILibraryServ
         return libraryRepository.GetAllLibraries(filter);
     }
     
-    public IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter filter)
+    public IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter? filter)
     {
         return libraryRepository.GetAllLibraries(filter);
     }

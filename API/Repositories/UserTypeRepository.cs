@@ -127,7 +127,7 @@ public class UserTypeRepository(ISqlDbAccess sqlDbAccess) : IUserTypeRepository
     public class UserTypeDatabase
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Permissions { get; set; }
+        public required string Name { get; set; }
+        public required string Permissions { get; set; }
     }
 }

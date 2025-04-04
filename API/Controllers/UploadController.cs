@@ -16,13 +16,13 @@ public class UploadController(IUploadService uploadService) : ControllerBase
     }
     
     [HttpPost("GetUserUploads")]
-    public ActionResult<IEnumerable<UploadDto>> GetUserUploads([FromBody] (UserDto user, UploadFilter? filter) parameters)
+    public ActionResult<IEnumerable<UploadDto>> GetUserUploads([FromBody] (UserDto user, UploadFilter filter) parameters)
     {
         return Ok(uploadService.GetUserUploads(parameters.user, parameters.filter));
     }
     
     [HttpPost("GetLibraryUploads")]
-    public ActionResult<IEnumerable<UploadDto>> GetLibraryUploads(int libraryId, [FromBody] UploadFilter? filter)
+    public ActionResult<IEnumerable<UploadDto>> GetLibraryUploads(int libraryId, [FromBody] UploadFilter filter)
     {
         return Ok(uploadService.GetLibraryUploads(libraryId, filter));
     }

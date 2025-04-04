@@ -5,7 +5,7 @@ namespace API.Services;
 
 public interface IAdminService : IServiceBase
 {
-    IEnumerable<UserDto> GetAllUsers(UserFilter filter);
+    IEnumerable<UserDto> GetAllUsers(UserFilter? filter);
     UserDto GetUserByEmail(string email);
     void CreateNewUser(UserDto user, UserCredentialsDto userCredentials);
     void UpdateUser(UserDto user);
@@ -14,7 +14,7 @@ public interface IAdminService : IServiceBase
 
 public class AdminService(IUserRepository userRepository, IUserCredentialsService userCredentialsService) : IAdminService
 {
-    public IEnumerable<UserDto> GetAllUsers(UserFilter filter)
+    public IEnumerable<UserDto> GetAllUsers(UserFilter? filter)
     {
         return userRepository.GetAllUsers(filter);
     }
