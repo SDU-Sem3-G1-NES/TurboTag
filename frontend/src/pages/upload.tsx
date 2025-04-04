@@ -2,13 +2,26 @@ import React, { useState } from 'react'
 import Tags from '../components/tags'
 import { UploadClient, UploadDto, UploadDetailsDto, FileMetadataDto } from '../api/apiClient.ts'
 import { Store } from 'react-notifications-component'
-
+import { Button, Form, Input } from 'antd';
+import { Divider, notification, Space } from 'antd';
+import type { NotificationArgsProps } from 'antd';
+import { CancelToken } from 'axios'
+  
 const Upload: React.FC = () => {
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
+
+
+  const openNotification = (placement: NotificationPlacement) => {
+    notification.info({
+      message: `Notification ${placement}`,
+      description: <Context.Consumer>{({ name }) => `Hello, ${name}!`}</Context.Consumer>,
+      placement,
+    });
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -43,67 +56,86 @@ const Upload: React.FC = () => {
     try {
       await uploadClient.storeUpload(uploadDTO)
 
-      Store.addNotification({
-        title: 'Upload successful',
-        message: 'Your lecture has been uploaded',
-        type: 'success',
-        insert: 'top',
-        container: 'top-right',
-        animationIn: ['animate__animated', 'animate__fadeIn'],
-        animationOut: ['animate__animated', 'animate__fadeOut'],
-        dismiss: {
-          duration: 2000,
-          onScreen: true
-        }
-      })
+      openNotification('topRight');
+
+      notification.success({
+        message: 'Upload successful',
+        description: 'Your lecture has been uploaded',
+        placement: 'topRight',
+        duration: 2,
+      });
+      
       console.log('Upload successful')
     } catch (error) {
-      Store.addNotification({
-        title: 'Upload failed',
-        message: 'Your lecture could not be uploaded',
-        type: 'danger',
-        insert: 'top',
-        container: 'top-right',
-        animationIn: ['animate__animated', 'animate__fadeIn'],
-        animationOut: ['animate__animated', 'animate__fadeOut'],
-        dismiss: {
-          duration: 2000,
-          onScreen: true
-        }
-      })
+      
+      notification.error({
+        message: 'Upload failed',
+        description: 'Your lecture could not be uploaded',
+        placement: 'topRight',
+        duration: 2,
+      });
+      
       console.error('Upload failed', error)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Form
+     name="basic"
+    labelCol={{ span: 8 }}
+    wrapperCol={{ span: 16 }}
+    onFinish={handleSubmit} 
+     autoComplete="off"
+    >
       <h1>Upload Lecture</h1>
+      
+      <Form.Item<string>
+      label="Title"
+      name="title"
+      rules={[{ required: true, message: 'Please input your title!' }]}>
+        <Input
+          id="title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </Form.Item>
+      
 
-      <label htmlFor="title">Title</label>
-      <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <br />
-
-      <label htmlFor="description">Description</label>
-      <input
-        id="description"
-        type="text"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <br />
-
-      <label htmlFor="file">File</label>
-      <input
-        id="file"
-        type="file"
-        onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-      />
-      <br />
+   
+      <Form.Item<string>
+      label="Description"
+      name="description"
+      rules={[{ required: true, message: 'Please input your description!' }]}>
+        <Input
+          id="description"
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </Form.Item>
+      
+      
+      <Form.Item
+      label="File"
+      name="file"
+      rules={[{ required: true, message: 'Please upload a file!' }]}>
+        < Input
+          id="file"
+          type="file"
+          onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+        />
+      </Form.Item>
+      
       <Tags tags={tags} setTags={setTags} />
-
-      <br />
-      <button type="submit">Upload</button>
-    </form>
+      
+      <br/>
+      <Form.Item label={null}>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
   )
 }
 

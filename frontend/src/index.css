@@ -16,6 +16,7 @@ html, body {
 
 .ant-layout-header {
   background-color: #001529;
+  float: left;
 }
 
 .ant-menu-horizontal {
