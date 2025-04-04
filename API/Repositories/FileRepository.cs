@@ -8,11 +8,11 @@ public interface IFileRepository : IRepositoryBase
     Task<Stream?> GetFileById(string id);
     Task DeleteFile(string id);
 }
-public class FileRepository(IFileDataAccess database) : IFileRepository 
+public class FileRepository(IMongoDataAccess database) : IFileRepository 
 {
     
     public async Task<string?> UploadFile(IFormFile file)
-    { ;
+    {
         return await database.UploadFile("fs", file);
     }
 

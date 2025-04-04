@@ -8,11 +8,11 @@ namespace API.Tests.Repositories
     public class LessonRepositoryTests
     {
         private readonly LessonRepository _repository;
-        private readonly Mock<IDocumentDataAccess> _mockDb;
+        private readonly Mock<IMongoDataAccess> _mockDb;
 
         public LessonRepositoryTests()
         {
-            _mockDb = new Mock<IDocumentDataAccess>();
+            _mockDb = new Mock<IMongoDataAccess>();
             _repository = new LessonRepository(_mockDb.Object);
         }
 

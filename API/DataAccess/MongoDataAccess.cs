@@ -4,7 +4,7 @@ using MongoDB.Driver.GridFS;
 
 namespace API.DataAccess;
 
-public class MongoDataAccess(string connectionString) : IDocumentDataAccess, IFileDataAccess
+public class MongoDataAccess(string connectionString) : IMongoDataAccess
 {
     private readonly IMongoClient _client = new MongoClient(connectionString);
 

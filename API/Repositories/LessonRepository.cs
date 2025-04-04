@@ -18,7 +18,7 @@ public interface ILessonRepository : IRepositoryBase
     void DeleteLessonByObjectId(string objectId);
 }
 
-public class LessonRepository(IDocumentDataAccess database) : ILessonRepository
+public class LessonRepository(IMongoDataAccess database) : ILessonRepository
 {
     public void AddLesson(LessonDto lesson)
     {
