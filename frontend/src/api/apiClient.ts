@@ -2313,9 +2313,10 @@ export interface IAdminClient {
 
             export interface IUploadClient {
                     /**
+             * @param body (optional) 
              * @return OK
              */
-            storeUpload(): Promise<string>;
+            storeUpload(body?: UploadDto | undefined): Promise<string>;
         }
 
     export class UploadClient extends BaseApiClient implements IUploadClient {
@@ -2331,17 +2332,22 @@ export interface IAdminClient {
     
 
         /**
+         * @param body (optional) 
          * @return OK
          */
-        storeUpload( cancelToken?: CancelToken): Promise<string> {
+        storeUpload(body?: UploadDto | undefined, cancelToken?: CancelToken): Promise<string> {
         let url_ = this.baseUrl + "/Upload/StoreUpload";
         url_ = url_.replace(/[?&]$/, "");
 
+                    const content_ = JSON.stringify(body);
+
                 let options_: AxiosRequestConfig = {
+                    data: content_,
                         method: "POST",
         url: url_,
         headers: {
-                                    "Accept": "text/plain"
+                            "Content-Type": "application/json",
+                            "Accept": "text/plain"
                 },
             cancelToken
         };
