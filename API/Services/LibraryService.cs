@@ -4,50 +4,43 @@ using API.Repositories;
 namespace API.Services;
 public interface ILibraryService : IServiceBase
 {
-    List<LibraryDto> GetUserLibrariesById();
-    LibraryDto GetUserLibraryById();
-    List<UploadDto> GetLibraryUploadsById();
-    UploadDto GetLibraryUploadById();
+    IEnumerable<LibraryDto> GetLibrariesByUser(UserDto user, LibraryFilter filter);
+    IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter filter);
+    LibraryDto GetLibraryById(int libraryId);
+    void CreateNewLibrary(LibraryDto library);
+    void UpdateLibrary(LibraryDto library);
+    void DeleteLibraryById(int libraryId);
 }
-public class LibraryService(ILibraryRepository libraryRepository, IUploadRepository uploadRepository) : ILibraryService
+public class LibraryService(ILibraryRepository libraryRepository) : ILibraryService
 {
-    /// <summary>
-    /// Method that returns a list of LibraryDTO objects that belong to a User by Id.
-    /// </summary>
-    public List<LibraryDto> GetUserLibrariesById()
+    public IEnumerable<LibraryDto> GetLibrariesByUser(UserDto user, LibraryFilter filter)
     {
-        return libraryRepository.GetAllLibraries().Items;
+        filter.LibraryIds = user.AccessibleLibraryIds;
+        return libraryRepository.GetAllLibraries(filter);
     }
-    /// <summary>
-    /// Method that returns a LibraryDTO object that belongs to a User by Id.
-    /// </summary>
-    public LibraryDto GetUserLibraryById()
+    
+    public IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter filter)
     {
-        return libraryRepository.GetLibraryById(1);
+        return libraryRepository.GetAllLibraries(filter);
     }
-    /// <summary>
-    /// Method that returns a list of UploadDTO objects that belong to a Library by Id.
-    /// </summary>
-    public List<UploadDto> GetLibraryUploadsById()
+
+    public LibraryDto GetLibraryById(int libraryId)
     {
-        var filter = new UploadFilter(
-            uploadIds: null, 
-            ownerIds: null, 
-            libraryIds: new List<int> { 1 }, 
-            uploadTypes: null,
-            dateFrom: null,
-            dateTo: null,
-            pageNumber: null,
-            pageSize: null
-        );
-        
-        return uploadRepository.GetAllUploads(filter).Items;
+        return libraryRepository.GetLibraryById(libraryId);
     }
-    /// <summary>
-    /// Method that returns an UploadDTO object that belongs to a Library by Id.
-    /// </summary>
-    public UploadDto GetLibraryUploadById()
+    
+    public void CreateNewLibrary(LibraryDto library)
     {
-        return uploadRepository.GetUploadById(1);
+        libraryRepository.AddLibrary(library);
+    }
+    
+    public void UpdateLibrary(LibraryDto library)
+    {
+        libraryRepository.UpdateLibrary(library);
+    }
+    
+    public void DeleteLibraryById(int libraryId)
+    {
+        libraryRepository.DeleteLibraryById(libraryId);
     }
 }

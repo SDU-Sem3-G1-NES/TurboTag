@@ -49,22 +49,115 @@
         }
       }
     },
-    "/Admin/GetAllContentLibraries": {
+    "/Admin/GetUserByEmail": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "operationId": "Admin_GetAllContentLibraries",
+        "operationId": "Admin_GetUserByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedResult_LibraryDto"
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/Admin/CreateNewUser": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_CreateNewUser",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Admin/UpdateUserById": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_UpdateUserById",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -92,256 +185,36 @@
         }
       }
     },
-    "/Admin/DeleteUsersById": {
-      "delete": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_DeleteUsersById",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/UpdateUserById": {
-      "put": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_UpdateUserById",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/UpdateUsersById": {
-      "put": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_UpdateUsersById",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/CreateNewUser": {
+    "/ContentLibrary/GetAllLibraries": {
       "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_CreateNewUser",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/CreateNewUsers": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_CreateNewUsers",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/ContentLibrary/GetUserLibrariesById": {
-      "get": {
         "tags": [
           "ContentLibrary"
         ],
-        "operationId": "ContentLibrary_GetUserLibrariesById",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "string"
+        "operationId": "ContentLibrary_GetAllLibraries",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryFilter"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -356,18 +229,63 @@
         }
       }
     },
-    "/ContentLibrary/GetUserLibraryId": {
+    "/ContentLibrary/GetUserLibraries": {
+      "post": {
+        "tags": [
+          "ContentLibrary"
+        ],
+        "operationId": "ContentLibrary_GetUserLibraries",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_LibraryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ContentLibrary/GetLibraryById": {
       "get": {
         "tags": [
           "ContentLibrary"
         ],
-        "operationId": "ContentLibrary_GetUserLibraryId",
+        "operationId": "ContentLibrary_GetLibraryById",
         "parameters": [
           {
             "name": "libraryId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -395,70 +313,99 @@
         }
       }
     },
-    "/ContentLibrary/GetLibraryUploadsById": {
-      "get": {
+    "/ContentLibrary/CreateNewLibrary": {
+      "post": {
         "tags": [
           "ContentLibrary"
         ],
-        "operationId": "ContentLibrary_GetLibraryUploadsById",
+        "operationId": "ContentLibrary_CreateNewLibrary",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ContentLibrary/UpdateLibraryById": {
+      "put": {
+        "tags": [
+          "ContentLibrary"
+        ],
+        "operationId": "ContentLibrary_UpdateLibraryById",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ContentLibrary/DeleteLibraryById": {
+      "delete": {
+        "tags": [
+          "ContentLibrary"
+        ],
+        "operationId": "ContentLibrary_DeleteLibraryById",
         "parameters": [
           {
             "name": "libraryId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedResult_UploadDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ContentLibrary/GetLibraryUploadById": {
-      "get": {
-        "tags": [
-          "ContentLibrary"
-        ],
-        "operationId": "ContentLibrary_GetLibraryUploadById",
-        "parameters": [
-          {
-            "name": "uploadId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadDto"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -595,52 +542,35 @@
         }
       }
     },
-    "/Register/RegisterUser": {
-      "post": {
-        "tags": [
-          "Register"
-        ],
-        "operationId": "Register_RegisterUser",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Settings/GetUserSettingsById": {
+    "/Settings/GetAllSettings": {
       "get": {
         "tags": [
           "Settings"
         ],
-        "operationId": "Settings_GetUserSettingsById",
+        "operationId": "Settings_GetAllSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_SettingsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Settings/GetSettingById": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "operationId": "Settings_GetSettingById",
         "parameters": [
           {
-            "name": "id",
+            "name": "settingId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -672,44 +602,32 @@
         }
       }
     },
-    "/Settings/UpdateUserSettingsById": {
-      "put": {
+    "/Settings/AddSetting": {
+      "post": {
         "tags": [
           "Settings"
         ],
-        "operationId": "Settings_UpdateUserSettingsById",
+        "operationId": "Settings_AddSetting",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDto"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDto"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "text/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDto"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDto"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             }
           }
@@ -721,12 +639,12 @@
         }
       }
     },
-    "/Settings/UpdateUserSettingById": {
+    "/Settings/UpdateSetting": {
       "put": {
         "tags": [
           "Settings"
         ],
-        "operationId": "Settings_UpdateUserSettingById",
+        "operationId": "Settings_UpdateSetting",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
@@ -751,6 +669,29 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Settings/DeleteSettingById": {
+      "delete": {
+        "tags": [
+          "Settings"
+        ],
+        "operationId": "Settings_DeleteSettingById",
+        "parameters": [
+          {
+            "name": "settingId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -788,12 +729,251 @@
         }
       }
     },
-    "/Upload/StoreUpload": {
+    "/Upload/GetAllUploads": {
       "post": {
         "tags": [
           "Upload"
         ],
-        "operationId": "Upload_StoreUpload",
+        "operationId": "Upload_GetAllUploads",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/GetUserUploads": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_GetUserUploads",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/GetLibraryUploads": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_GetLibraryUploads",
+        "parameters": [
+          {
+            "name": "libraryId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/GetUploadById": {
+      "get": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_GetUploadById",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/AddUpload": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_AddUpload",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/UpdateUpload": {
+      "put": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_UpdateUpload",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
@@ -824,6 +1004,29 @@
           }
         }
       }
+    },
+    "/Upload/DeleteUploadById": {
+      "delete": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_DeleteUploadById",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -842,6 +1045,37 @@
         },
         "additionalProperties": false
       },
+      "LibraryFilter": {
+        "type": "object",
+        "properties": {
+          "libraryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "libraryNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedResult_LibraryDto": {
         "type": "object",
         "properties": {
@@ -849,6 +1083,33 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LibraryDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_SettingsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingsDto"
             }
           },
           "totalCount": {
@@ -967,6 +1228,63 @@
         },
         "additionalProperties": false
       },
+      "UploadFilter": {
+        "type": "object",
+        "properties": {
+          "uploadIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "ownerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "libraryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "uploadTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "dateFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UserCredentialsDto": {
         "type": "object",
         "properties": {
@@ -1009,6 +1327,18 @@
             "nullable": true
           }
         },
+        "additionalProperties": false
+      },
+      "UserDtoLibraryFilterValueTuple": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserDtoUploadFilterValueTuple": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserDtoUserCredentialsDtoValueTuple": {
+        "type": "object",
         "additionalProperties": false
       },
       "UserFilter": {

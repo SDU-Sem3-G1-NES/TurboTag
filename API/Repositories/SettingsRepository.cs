@@ -9,7 +9,7 @@ public interface ISettingsRepository : IRepositoryBase
     SettingsDto GetSettingById(int settingId);
     List<SettingsDto> GetAllSettings();
     void UpdateSetting(SettingsDto setting);
-    void DeleteSetting(int settingId);
+    void DeleteSettingById(int settingId);
 }
 public class SettingsRepository(ISqlDbAccess sqlDbAccess) : ISettingsRepository
 {
@@ -104,7 +104,7 @@ public class SettingsRepository(ISqlDbAccess sqlDbAccess) : ISettingsRepository
             updateSql,
             parameters);
     }
-    public void DeleteSetting(int settingId)
+    public void DeleteSettingById(int settingId)
     {
         var parameters = new Dictionary<string, object>
         {

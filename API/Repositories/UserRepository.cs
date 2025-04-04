@@ -6,15 +6,15 @@ namespace API.Repositories;
 public interface IUserRepository : IRepositoryBase
 {
     int AddUser(UserDto user);
-    void AddUserCredentials(int userId, byte[] passwordHash, byte[] passwordSalt);
+    void AddUserCredentials(HashedUserCredentialsDto userCredentials);
     bool UserEmailExists(string email);
     UserDto GetUserById(int userId);
     UserDto GetUserByEmail(string email);
     public IEnumerable<UserDto> GetAllUsers(UserFilter? filter = null);
     HashedUserCredentialsDto GetUserCredentials(int userId);
     void UpdateUser(UserDto user);
-    void UpdateUserCredentials(int userId, byte[] passwordHash, byte[] passwordSalt);
-    void DeleteUser(int userId);
+    void UpdateUserCredentials(HashedUserCredentialsDto userCredentials);
+    void DeleteUserById(int userId);
 }
 
 public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
@@ -62,13 +62,13 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
         return userId;
     }
 
-    public void AddUserCredentials(int userId, byte[] passwordHash, byte[] passwordSalt)
+    public void AddUserCredentials(HashedUserCredentialsDto userCredentials)
     {
         var parameters = new Dictionary<string, object>
         {
-            { "@userId", userId },
-            { "@passwordHash", passwordHash },
-            { "@passwordSalt", passwordSalt }
+            { "@userId", userCredentials.UserId },
+            { "@passwordHash", userCredentials.PasswordHash },
+            { "@passwordSalt", userCredentials.PasswordSalt }
         };
 
         var insertSql = @"
@@ -341,13 +341,13 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             }
     }
 
-    public void UpdateUserCredentials(int userId, byte[] passwordHash, byte[] passwordSalt)
+    public void UpdateUserCredentials(HashedUserCredentialsDto userCredentials)
     {
         var parameters = new Dictionary<string, object>
         {
-            { "@userId", userId },
-            { "@passwordHash", passwordHash },
-            { "@passwordSalt", passwordSalt }
+            { "@userId", userCredentials.UserId },
+            { "@passwordHash", userCredentials.PasswordHash },
+            { "@passwordSalt", userCredentials.PasswordSalt }
         };
 
         var updateSql = @"
@@ -359,7 +359,7 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
         sqlDbAccess.ExecuteNonQuery(_databaseName, updateSql, parameters);
     }
 
-    public void DeleteUser(int userId)
+    public void DeleteUserById(int userId)
     {
         // Delete user credentials
         var deleteCredentialsSql = @"DELETE FROM user_credentials WHERE user_id = @userId";

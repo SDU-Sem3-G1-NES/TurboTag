@@ -150,7 +150,7 @@ public class SettingsRepositoryTests
         var settingId = 1;
 
         // Act
-        _settingsRepository.DeleteSetting(settingId);
+        _settingsRepository.DeleteSettingById(settingId);
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(

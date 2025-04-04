@@ -162,7 +162,7 @@ public class UserTypeRepositoryTests
         var userTypeId = 1;
 
         // Act
-        _userTypeRepository.DeleteUserType(userTypeId);
+        _userTypeRepository.DeleteUserTypeById(userTypeId);
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(

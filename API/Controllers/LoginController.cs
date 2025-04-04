@@ -11,12 +11,12 @@ public class LoginController(IUserCredentialsService userCredentialsService) : C
     [HttpGet("ValidateUserCredentials")]
     public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDto userCredentials)
     {
-        return Ok(userCredentialsService.ValidateUserCredentials());
+        return Ok(userCredentialsService.ValidateUserCredentials(userCredentials));
     }
 
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDto> GetUserDataByEmail(string email)
     {
-        return Ok(userCredentialsService.GetUserDataByEmail());
+        return Ok(userCredentialsService.GetUserByEmail(email));
     }
 }

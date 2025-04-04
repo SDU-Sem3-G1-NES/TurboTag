@@ -9,7 +9,7 @@ public interface ILibraryRepository : IRepositoryBase
     LibraryDto GetLibraryById(int libraryId);
     PagedResult<LibraryDto> GetAllLibraries(LibraryFilter? filter = null);
     void UpdateLibrary(LibraryDto library);
-    void DeleteLibrary(int libraryId);
+    void DeleteLibraryById(int libraryId);
 }
 
 public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
@@ -156,7 +156,7 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
             parameters);
     }
 
-    public void DeleteLibrary(int libraryId)
+    public void DeleteLibraryById(int libraryId)
     {
         var parameters = new Dictionary<string, object>
         {

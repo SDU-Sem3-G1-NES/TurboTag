@@ -187,7 +187,7 @@ public class LibraryRepositoryTests
         var libraryId = 1;
 
         // Act
-        _libraryRepository.DeleteLibrary(libraryId);
+        _libraryRepository.DeleteLibraryById(libraryId);
 
         // Assert
         // Verify user access deletion

@@ -5,33 +5,37 @@ namespace API.Services;
 
 public interface ISettingsService : IServiceBase
 {
-    List<SettingsDto> GetUserSettingsById();
-    void UpdateUserSettingsById();
-    void UpdateUserSettingById();
+    List<SettingsDto> GetAllSettings();
+    SettingsDto GetSettingById(int settingId);
+    void CreateNewSetting(SettingsDto setting);
+    void UpdateSetting(SettingsDto setting);
+    void DeleteSettingById(int settingId);
 }
 
 public class SettingService(ISettingsRepository settingsRepository) : ISettingsService
 {
-    /// <summary>
-    /// Method that returns a User's Settings from the database by Id.
-    /// </summary>
-    public List<SettingsDto> GetUserSettingsById()
+    public List<SettingsDto> GetAllSettings()
     {
         return settingsRepository.GetAllSettings();
     }
-    /// <summary>
-    /// Method that updates a User's Settings in the database by Id.
-    /// </summary>
-    public void UpdateUserSettingsById()
+    
+    public SettingsDto GetSettingById(int settingId)
     {
-        // Either call one by one or make a method in repository for updating all settings at once.
-        settingsRepository.UpdateSetting(new SettingsDto(1, "Mock Setting", "Mock Value"));
+        return settingsRepository.GetSettingById(settingId);
     }
-    /// <summary>
-    /// Method that updates a User's Setting in the database by Id.
-    /// </summary>
-    public void UpdateUserSettingById()
+    
+    public void CreateNewSetting(SettingsDto setting)
     {
-        settingsRepository.UpdateSetting(new SettingsDto(1, "Mock Setting", "Mock Value"));
+        settingsRepository.AddSetting(setting);
+    }
+    
+    public void UpdateSetting(SettingsDto setting)
+    {
+        settingsRepository.UpdateSetting(setting);
+    }
+    
+    public void DeleteSettingById(int settingId)
+    {
+        settingsRepository.DeleteSettingById(settingId);
     }
 }

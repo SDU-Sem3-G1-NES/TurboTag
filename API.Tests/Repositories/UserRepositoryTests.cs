@@ -66,21 +66,19 @@ public class UserRepositoryTests
     public void AddUserCredentials_ShouldCallExecuteNonQuery()
     {
         // Arrange
-        var userId = 1;
-        var passwordHash = new byte[] { 1, 2, 3 };
-        var passwordSalt = new byte[] { 4, 5, 6 };
+        var hashedUserCredentials = new HashedUserCredentialsDto(1, new byte[] { 1, 2, 3 }, new byte[] { 4, 5, 6 });
 
         // Act
-        _userRepository.AddUserCredentials(userId, passwordHash, passwordSalt);
+        _userRepository.AddUserCredentials(hashedUserCredentials);
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.Is<Dictionary<string, object>>(p =>
-                    p["@userId"].Equals(userId) &&
-                    p["@passwordHash"].Equals(passwordHash) &&
-                    p["@passwordSalt"].Equals(passwordSalt))),
+                    p["@userId"].Equals(hashedUserCredentials.UserId) &&
+                    p["@passwordHash"].Equals(hashedUserCredentials.PasswordHash) &&
+                    p["@passwordSalt"].Equals(hashedUserCredentials.PasswordSalt))),
             Times.Once);
     }
 
@@ -236,12 +234,14 @@ public class UserRepositoryTests
     public void GetAllUsers_ShouldReturnAllUsers_WhenNoFilterProvided()
     {
         // Arrange
-        var expectedUsers = new PagedResult<UserDto>
+        var expectedUsers = new List<UserDto>
         {
-            new(1, 1, "User 1", "user1@example.com", new List<int>()),
-            new(2, 2, "User 2", "user2@example.com", new List<int>())
+            new(1, 1, "User 1", "user1@example.com", new List<int> { 1 }),
+            new(2, 2, "User 2", "user2@example.com", new List<int> { 2 })
         };
 
+        // Important: Set up the library IDs inside the user objects
+        // since array_agg returns them directly in the main query
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
@@ -250,32 +250,18 @@ public class UserRepositoryTests
                 It.IsAny<Dictionary<string, object>>()))
             .Returns(expectedUsers);
 
-        foreach (var user in expectedUsers)
-        {
-            var libraryIds = new List<int> { user.Id }; // Just using user ID as library ID for testing
-            _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-                    It.IsAny<string>(),
-                    It.Is<string>(s => s.Contains("library_id")),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(user.Id))))
-                .Returns(libraryIds);
-        }
-
         // Act
-        var result = _userRepository.GetAllUsers() as PagedResult<UserDto>;
+        var result = _userRepository.GetAllUsers().ToList();
 
         // Assert
-        Assert.Equal(expectedUsers.Count(), result.Items.Count);
-        Assert.Equal(expectedUsers.Count(), result.TotalCount);
-        Assert.Equal(1, result.TotalPages);
-        for (var i = 0; i < expectedUsers.Count(); i++)
+        Assert.Equal(expectedUsers.Count, result.Count);
+        for (var i = 0; i < expectedUsers.Count; i++)
         {
-            Assert.Equal(expectedUsers[i].Id, result.Items[i].Id);
-            Assert.Equal(expectedUsers[i].UserTypeId, result.Items[i].UserTypeId);
-            Assert.Equal(expectedUsers[i].Name, result.Items[i].Name);
-            Assert.Equal(expectedUsers[i].Email, result.Items[i].Email);
-            Assert.Contains(expectedUsers[i].Id, result.Items[i].AccessibleLibraryIds);
+            Assert.Equal(expectedUsers[i].Id, result[i].Id);
+            Assert.Equal(expectedUsers[i].UserTypeId, result[i].UserTypeId);
+            Assert.Equal(expectedUsers[i].Name, result[i].Name);
+            Assert.Equal(expectedUsers[i].Email, result[i].Email);
+            Assert.Contains(expectedUsers[i].Id, result[i].AccessibleLibraryIds);
         }
     }
 
@@ -293,48 +279,40 @@ public class UserRepositoryTests
             10
         );
 
-        var expectedUsers = new PagedResult<UserDto>
+        // Include the library ID in the expected user
+        var expectedUser = new UserDto(1, 1, "Test User", "test@example.com", new List<int> { 1 });
+        var expectedUsers = new List<UserDto> { expectedUser };
+
+        var pagedResult = new PagedResult<UserDto>
         {
-            new(1, 1, "Test User", "test@example.com", new List<int>())
+            Items = expectedUsers,
+            TotalCount = expectedUsers.Count,
+            PageSize = 10,
+            CurrentPage = 1,
+            TotalPages = 1
         };
 
-        _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-                It.IsAny<string>(),
-                It.Is<string>(s => s.Contains("COUNT")),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, object>>()))
-            .Returns(new List<int> { expectedUsers.Count() });
-
+        // Return users with library IDs already populated
         _mockSqlDbAccess.Setup(db => db.GetPagedResult<UserDto>(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
-                It.IsAny<int>(),
-                It.IsAny<int>()))
-            .Returns(expectedUsers);
-
-        _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-                It.IsAny<string>(),
-                It.Is<string>(s => s.Contains("library_id")),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(expectedUsers[0].Id))))
-            .Returns(new List<int> { 1 });
+                It.Is<int>(p => p == filter.PageNumber.Value),
+                It.Is<int>(p => p == filter.PageSize.Value)))
+            .Returns(pagedResult);
 
         // Act
-        var result = _userRepository.GetAllUsers(filter) as PagedResult<UserDto>;
+        var result = _userRepository.GetAllUsers(filter);
 
         // Assert
-        Assert.Equal(expectedUsers.Count(), result.Items.Count);
-        Assert.Equal(expectedUsers.Count(), result.TotalCount);
-        Assert.Equal(1, result.TotalPages);
-        Assert.Equal(expectedUsers[0].Id, result.Items[0].Id);
-        Assert.Equal(expectedUsers[0].UserTypeId, result.Items[0].UserTypeId);
-        Assert.Equal(expectedUsers[0].Name, result.Items[0].Name);
-        Assert.Equal(expectedUsers[0].Email, result.Items[0].Email);
+        Assert.Equal(expectedUsers.Count, result.Count());
+        Assert.Equal(expectedUser.Id, result.First().Id);
+        Assert.Equal(expectedUser.UserTypeId, result.First().UserTypeId);
+        Assert.Equal(expectedUser.Name, result.First().Name);
+        Assert.Equal(expectedUser.Email, result.First().Email);
+        Assert.Contains(1, result.First().AccessibleLibraryIds);
     }
 
     [Fact]
@@ -412,21 +390,19 @@ public class UserRepositoryTests
     public void UpdateUserCredentials_ShouldCallExecuteNonQuery()
     {
         // Arrange
-        var userId = 1;
-        var passwordHash = new byte[] { 1, 2, 3 };
-        var passwordSalt = new byte[] { 4, 5, 6 };
+        var hashedUserCredentials = new HashedUserCredentialsDto(1, new byte[] { 1, 2, 3 }, new byte[] { 4, 5, 6 });
 
         // Act
-        _userRepository.UpdateUserCredentials(userId, passwordHash, passwordSalt);
+        _userRepository.UpdateUserCredentials(hashedUserCredentials);
 
         // Assert
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.Is<Dictionary<string, object>>(p =>
-                    p["@userId"].Equals(userId) &&
-                    p["@passwordHash"].Equals(passwordHash) &&
-                    p["@passwordSalt"].Equals(passwordSalt))),
+                    p["@userId"].Equals(hashedUserCredentials.UserId) &&
+                    p["@passwordHash"].Equals(hashedUserCredentials.PasswordHash) &&
+                    p["@passwordSalt"].Equals(hashedUserCredentials.PasswordSalt))),
             Times.Once);
     }
 
@@ -437,7 +413,7 @@ public class UserRepositoryTests
         var userId = 1;
 
         // Act
-        _userRepository.DeleteUser(userId);
+        _userRepository.DeleteUserById(userId);
 
         // Assert
         // Verify credentials deletion

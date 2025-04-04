@@ -10,7 +10,7 @@ public interface IUserTypeRepository : IRepositoryBase
     UserTypeDto GetUserTypeById(int userTypeId);
     List<UserTypeDto> GetAllUserTypes();
     void UpdateUserType(UserTypeDto userType);
-    void DeleteUserType(int userTypeId);
+    void DeleteUserTypeById(int userTypeId);
 }
 public class UserTypeRepository(ISqlDbAccess sqlDbAccess) : IUserTypeRepository
 {
@@ -113,7 +113,7 @@ public class UserTypeRepository(ISqlDbAccess sqlDbAccess) : IUserTypeRepository
         sqlDbAccess.ExecuteNonQuery(_databaseName, updateSql, parameters);
     }
 
-    public void DeleteUserType(int userTypeId)
+    public void DeleteUserTypeById(int userTypeId)
     {
         var parameters = new Dictionary<string, object>
         {
