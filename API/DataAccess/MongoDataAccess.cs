@@ -10,7 +10,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
 
     public List<T> Find<T>(string collectionName, string query)
     {
-        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        var database = _client.GetDatabase(GetDatabaseName());
         try
         {
             var filter = BsonDocument.Parse(query);
@@ -24,10 +24,11 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             return new List<T>();
         }
     }
+
     public void Insert<T>(string collectionName, T document)
     {
-        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
-        try 
+        var database = _client.GetDatabase(GetDatabaseName());
+        try
         {
             var collection = database.GetCollection<T>(collectionName);
             collection.InsertOne(document);
@@ -37,10 +38,11 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             Console.WriteLine(e);
         }
     }
+
     public void Replace<T>(string collectionName, string query, T document)
     {
-        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
-        try 
+        var database = _client.GetDatabase(GetDatabaseName());
+        try
         {
             var filter = BsonDocument.Parse(query);
             var collection = database.GetCollection<T>(collectionName);
@@ -51,10 +53,11 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             Console.WriteLine(e);
         }
     }
+
     public void Delete(string collectionName, string query)
     {
-        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
-        try 
+        var database = _client.GetDatabase(GetDatabaseName());
+        try
         {
             var filter = BsonDocument.Parse(query);
             var collection = database.GetCollection<BsonDocument>(collectionName);
@@ -65,10 +68,10 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             Console.WriteLine(e);
         }
     }
-    
+
     public async Task<string?> UploadFile(string bucketName, IFormFile file)
     {
-        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        var database = _client.GetDatabase(GetDatabaseName());
         try
         {
             var bucketOptions = new GridFSBucketOptions
@@ -76,12 +79,13 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
                 BucketName = bucketName
             };
             GridFSBucket bucket = new(database, bucketOptions);
-            
-            await using var stream = await bucket.OpenUploadStreamAsync(file.FileName);
-            var id = stream.Id;
-            await file.CopyToAsync(stream);
-            await stream.CloseAsync();
-            return id.ToString();
+
+            await using var uploadStream = await bucket.OpenUploadStreamAsync(file.FileName);
+            using var fileStream = file.OpenReadStream(); // This avoids buffering the full file in memory
+            await fileStream.CopyToAsync(uploadStream); // Stream directly from request -> GridFS
+            await uploadStream.CloseAsync();
+
+            return uploadStream.Id.ToString();
         }
         catch (Exception e)
         {
@@ -101,6 +105,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
                 Console.WriteLine("File not found");
                 return null;
             }
+
             return await bucket.OpenDownloadStreamAsync(fileInfo.Id);
         }
         catch (Exception e)
@@ -121,6 +126,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
                 Console.WriteLine("File not found");
                 return;
             }
+
             await bucket.DeleteAsync(fileInfo.Id);
         }
         catch (Exception e)
@@ -135,17 +141,17 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
         var fileInfo = bucket.Find(filter).FirstOrDefault();
         return fileInfo;
     }
-    
+
     private GridFSBucket GetGridFsBucketByName(string bucketName)
     {
-        IMongoDatabase database = _client.GetDatabase(GetDatabaseName());
+        var database = _client.GetDatabase(GetDatabaseName());
         var bucketOptions = new GridFSBucketOptions
         {
             BucketName = bucketName
         };
         return new GridFSBucket(database, bucketOptions);
     }
-    
+
     private string GetDatabaseName()
     {
         return "blank";
