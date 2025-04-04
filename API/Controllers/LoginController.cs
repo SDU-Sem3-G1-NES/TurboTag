@@ -6,28 +6,28 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LoginController(IUserCredentialsService _userCredentialsService) : ControllerBase
+public class LoginController(IUserCredentialsService userCredentialsService) : ControllerBase
 {
     [HttpGet("ValidateUserCredentials")]
     public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDto userCredentials)
     {
-        return Ok(_userCredentialsService.ValidateUserCredentials());
+        return Ok(userCredentialsService.ValidateUserCredentials());
     }
 
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDto> GetUserDataByEmail(string email)
     {
-        return Ok(_userCredentialsService.GetUserDataByEmail());
+        return Ok(userCredentialsService.GetUserDataByEmail());
     }
     [HttpPost("StoreUserSession")]
     public ActionResult StoreUserSession()
     {
-        _userCredentialsService.StoreUserSession();
+        userCredentialsService.StoreUserSession();
         return Ok();
     }
     [HttpGet("GetUserDataBySessionId")]
     public ActionResult GetUserDataBySessionId(string sessionId)
     {
-        return Ok(_userCredentialsService.GetUserDataBySession());
+        return Ok(userCredentialsService.GetUserDataBySession());
     }
 }

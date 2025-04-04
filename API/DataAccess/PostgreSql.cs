@@ -1,6 +1,6 @@
 namespace API.DataAccess;
 
-public class PostgreSql(string user, string password, string name, string port, string host, string connectionString) : IDbAccess
+public class PostgreSql(string user, string password, string name, string port, string host, string connectionString)
 {
     private string user { get; set; } = user;
     private string password { get; set; } = password;
