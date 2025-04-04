@@ -737,6 +737,797 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
+            export interface IFileClient {
+                    /**
+             * @param file (optional) 
+             * @return OK
+             */
+            uploadFile(file?: FileParameter | undefined): Promise<string>                    /**
+             * @param id (optional) 
+             * @return OK
+             */
+            getFileById(id?: string | undefined): Promise<FileResponse>                    /**
+             * @param id (optional) 
+             * @return OK
+             */
+            deleteFile(id?: string | undefined): Promise<void>        }
+
+    export class FileClient extends BaseApiClient implements IFileClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param file (optional) 
+         * @return OK
+         */
+        uploadFile(file?: FileParameter | undefined, cancelToken?: CancelToken): Promise<string> {        let url_ = this.baseUrl + "/File/UploadFile";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = new FormData();
+            if (file === null || file === undefined)
+                throw new Error("The parameter 'file' cannot be null.");
+            else
+                content_.append("file", file.data, file.fileName ? file.fileName : "file");
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processUploadFile(_response);
+                });
+        }
+
+    protected processUploadFile(response: AxiosResponse): Promise<string> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = resultData200 as string;
+        
+        return Promise.resolve<string>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<string>(null as any);
+}
+    
+
+        /**
+         * @param id (optional) 
+         * @return OK
+         */
+        getFileById(id?: string | undefined, cancelToken?: CancelToken): Promise<FileResponse> {        let url_ = this.baseUrl + "/File/GetFileById?";
+if (id === null)
+    throw new Error("The parameter 'id' cannot be null.");
+else if (id !== undefined)
+    url_ += "id=" + encodeURIComponent("" + id) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                            responseType: "blob",
+                method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetFileById(_response);
+                });
+        }
+
+    protected processGetFileById(response: AxiosResponse): Promise<FileResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = FileResponse.fromJS(resultData200);
+        
+        return Promise.resolve<FileResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<FileResponse>(null as any);
+}
+    
+
+        /**
+         * @param id (optional) 
+         * @return OK
+         */
+        deleteFile(id?: string | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/DeleteFile?";
+if (id === null)
+    throw new Error("The parameter 'id' cannot be null.");
+else if (id !== undefined)
+    url_ += "id=" + encodeURIComponent("" + id) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "DELETE",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processDeleteFile(_response);
+                });
+        }
+
+    protected processDeleteFile(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+        }
+
+            export interface ILessonClient {
+                    /**
+             * @return OK
+             */
+            getAllLessons(): Promise<LessonDto[]>                    /**
+             * @param tags (optional) 
+             * @return OK
+             */
+            getLessonsByTags(tags?: string[] | undefined): Promise<LessonDto[]>                    /**
+             * @param title (optional) 
+             * @return OK
+             */
+            getLessonsByTitle(title?: string | undefined): Promise<LessonDto[]>                    /**
+             * @param lessonId (optional) 
+             * @return OK
+             */
+            getLessonById(lessonId?: number | undefined): Promise<LessonDto>                    /**
+             * @param objectId (optional) 
+             * @return OK
+             */
+            getLessonByObjectId(objectId?: string | undefined): Promise<LessonDto>                    /**
+             * @param uploadId (optional) 
+             * @return OK
+             */
+            getLessonByUploadId(uploadId?: number | undefined): Promise<LessonDto>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            addLesson(body?: LessonDto | undefined): Promise<void>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            updateLesson(body?: LessonDto | undefined): Promise<void>                    /**
+             * @param lessonId (optional) 
+             * @return OK
+             */
+            deleteLessonById(lessonId?: number | undefined): Promise<void>                    /**
+             * @param objectId (optional) 
+             * @return OK
+             */
+            deleteLessonByObjectId(objectId?: string | undefined): Promise<void>        }
+
+    export class LessonClient extends BaseApiClient implements ILessonClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @return OK
+         */
+        getAllLessons( cancelToken?: CancelToken): Promise<LessonDto[]> {        let url_ = this.baseUrl + "/Lesson/GetAllLessons";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetAllLessons(_response);
+                });
+        }
+
+    protected processGetAllLessons(response: AxiosResponse): Promise<LessonDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = LessonDto[].fromJS(resultData200);
+        
+        return Promise.resolve<LessonDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<LessonDto[]>(null as any);
+}
+    
+
+        /**
+         * @param tags (optional) 
+         * @return OK
+         */
+        getLessonsByTags(tags?: string[] | undefined, cancelToken?: CancelToken): Promise<LessonDto[]> {        let url_ = this.baseUrl + "/Lesson/GetLessonsByTags?";
+if (tags === null)
+    throw new Error("The parameter 'tags' cannot be null.");
+else if (tags !== undefined)
+    tags && tags.forEach(item => { url_ += "tags=" + encodeURIComponent("" + item) + "&"; });
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetLessonsByTags(_response);
+                });
+        }
+
+    protected processGetLessonsByTags(response: AxiosResponse): Promise<LessonDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = LessonDto[].fromJS(resultData200);
+        
+        return Promise.resolve<LessonDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<LessonDto[]>(null as any);
+}
+    
+
+        /**
+         * @param title (optional) 
+         * @return OK
+         */
+        getLessonsByTitle(title?: string | undefined, cancelToken?: CancelToken): Promise<LessonDto[]> {        let url_ = this.baseUrl + "/Lesson/GetLessonsByTitle?";
+if (title === null)
+    throw new Error("The parameter 'title' cannot be null.");
+else if (title !== undefined)
+    url_ += "title=" + encodeURIComponent("" + title) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetLessonsByTitle(_response);
+                });
+        }
+
+    protected processGetLessonsByTitle(response: AxiosResponse): Promise<LessonDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = LessonDto[].fromJS(resultData200);
+        
+        return Promise.resolve<LessonDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<LessonDto[]>(null as any);
+}
+    
+
+        /**
+         * @param lessonId (optional) 
+         * @return OK
+         */
+        getLessonById(lessonId?: number | undefined, cancelToken?: CancelToken): Promise<LessonDto> {        let url_ = this.baseUrl + "/Lesson/GetLessonById?";
+if (lessonId === null)
+    throw new Error("The parameter 'lessonId' cannot be null.");
+else if (lessonId !== undefined)
+    url_ += "lessonId=" + encodeURIComponent("" + lessonId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetLessonById(_response);
+                });
+        }
+
+    protected processGetLessonById(response: AxiosResponse): Promise<LessonDto> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = LessonDto.fromJS(resultData200);
+        
+        return Promise.resolve<LessonDto>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<LessonDto>(null as any);
+}
+    
+
+        /**
+         * @param objectId (optional) 
+         * @return OK
+         */
+        getLessonByObjectId(objectId?: string | undefined, cancelToken?: CancelToken): Promise<LessonDto> {        let url_ = this.baseUrl + "/Lesson/GetLessonByObjectId?";
+if (objectId === null)
+    throw new Error("The parameter 'objectId' cannot be null.");
+else if (objectId !== undefined)
+    url_ += "objectId=" + encodeURIComponent("" + objectId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetLessonByObjectId(_response);
+                });
+        }
+
+    protected processGetLessonByObjectId(response: AxiosResponse): Promise<LessonDto> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = LessonDto.fromJS(resultData200);
+        
+        return Promise.resolve<LessonDto>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<LessonDto>(null as any);
+}
+    
+
+        /**
+         * @param uploadId (optional) 
+         * @return OK
+         */
+        getLessonByUploadId(uploadId?: number | undefined, cancelToken?: CancelToken): Promise<LessonDto> {        let url_ = this.baseUrl + "/Lesson/GetLessonByUploadId?";
+if (uploadId === null)
+    throw new Error("The parameter 'uploadId' cannot be null.");
+else if (uploadId !== undefined)
+    url_ += "uploadId=" + encodeURIComponent("" + uploadId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetLessonByUploadId(_response);
+                });
+        }
+
+    protected processGetLessonByUploadId(response: AxiosResponse): Promise<LessonDto> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = LessonDto.fromJS(resultData200);
+        
+        return Promise.resolve<LessonDto>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<LessonDto>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        addLesson(body?: LessonDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/AddLesson";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processAddLesson(_response);
+                });
+        }
+
+    protected processAddLesson(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        updateLesson(body?: LessonDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/UpdateLesson";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "PUT",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processUpdateLesson(_response);
+                });
+        }
+
+    protected processUpdateLesson(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param lessonId (optional) 
+         * @return OK
+         */
+        deleteLessonById(lessonId?: number | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/DeleteLessonById?";
+if (lessonId === null)
+    throw new Error("The parameter 'lessonId' cannot be null.");
+else if (lessonId !== undefined)
+    url_ += "lessonId=" + encodeURIComponent("" + lessonId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "DELETE",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processDeleteLessonById(_response);
+                });
+        }
+
+    protected processDeleteLessonById(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param objectId (optional) 
+         * @return OK
+         */
+        deleteLessonByObjectId(objectId?: string | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/DeleteLessonByObjectId?";
+if (objectId === null)
+    throw new Error("The parameter 'objectId' cannot be null.");
+else if (objectId !== undefined)
+    url_ += "objectId=" + encodeURIComponent("" + objectId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "DELETE",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processDeleteLessonByObjectId(_response);
+                });
+        }
+
+    protected processDeleteLessonByObjectId(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+        }
+
             export interface ILoginClient {
                     /**
              * @param body (optional) 
@@ -1784,6 +2575,199 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
+export class FileMetadataDto implements IFileMetadataDto {
+    id?: number | null;
+    fileType?: string | null;
+    fileName?: string | null;
+    fileSize?: number | null;
+    duration?: number | null;
+    date?: Date | null;
+    checkSum?: string | null;
+
+    constructor(data?: IFileMetadataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.fileType = _data["fileType"] !== undefined ? _data["fileType"] : <any>null;
+            this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
+            this.fileSize = _data["fileSize"] !== undefined ? _data["fileSize"] : <any>null;
+            this.duration = _data["duration"] !== undefined ? _data["duration"] : <any>null;
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>null;
+            this.checkSum = _data["checkSum"] !== undefined ? _data["checkSum"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): FileMetadataDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FileMetadataDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["fileType"] = this.fileType !== undefined ? this.fileType : <any>null;
+        data["fileName"] = this.fileName !== undefined ? this.fileName : <any>null;
+        data["fileSize"] = this.fileSize !== undefined ? this.fileSize : <any>null;
+        data["duration"] = this.duration !== undefined ? this.duration : <any>null;
+        data["date"] = this.date ? this.date.toISOString() : <any>null;
+        data["checkSum"] = this.checkSum !== undefined ? this.checkSum : <any>null;
+        return data;
+    }
+}
+
+export interface IFileMetadataDto {
+    id?: number | null;
+    fileType?: string | null;
+    fileName?: string | null;
+    fileSize?: number | null;
+    duration?: number | null;
+    date?: Date | null;
+    checkSum?: string | null;
+}
+
+export class LessonDetailsDto implements ILessonDetailsDto {
+    id?: number | null;
+    title?: string | null;
+    description?: string | null;
+    tags?: string[] | null;
+
+    constructor(data?: ILessonDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.title = _data["title"] !== undefined ? _data["title"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            if (Array.isArray(_data["tags"])) {
+                this.tags = [] as any;
+                for (let item of _data["tags"])
+                    this.tags!.push(item);
+            }
+            else {
+                this.tags = <any>null;
+            }
+        }
+    }
+
+    static fromJS(data: any): LessonDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LessonDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["title"] = this.title !== undefined ? this.title : <any>null;
+        data["description"] = this.description !== undefined ? this.description : <any>null;
+        if (Array.isArray(this.tags)) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ILessonDetailsDto {
+    id?: number | null;
+    title?: string | null;
+    description?: string | null;
+    tags?: string[] | null;
+}
+
+export class LessonDto implements ILessonDto {
+    mongoId?: string | null;
+    uploadId?: number[] | null;
+    lessonDetails?: LessonDetailsDto;
+    fileMetadata?: FileMetadataDto[] | null;
+    ownerId?: number | null;
+
+    constructor(data?: ILessonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.mongoId = _data["mongoId"] !== undefined ? _data["mongoId"] : <any>null;
+            if (Array.isArray(_data["uploadId"])) {
+                this.uploadId = [] as any;
+                for (let item of _data["uploadId"])
+                    this.uploadId!.push(item);
+            }
+            else {
+                this.uploadId = <any>null;
+            }
+            this.lessonDetails = _data["lessonDetails"] ? LessonDetailsDto.fromJS(_data["lessonDetails"]) : <any>null;
+            if (Array.isArray(_data["fileMetadata"])) {
+                this.fileMetadata = [] as any;
+                for (let item of _data["fileMetadata"])
+                    this.fileMetadata!.push(FileMetadataDto.fromJS(item));
+            }
+            else {
+                this.fileMetadata = <any>null;
+            }
+            this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): LessonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LessonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["mongoId"] = this.mongoId !== undefined ? this.mongoId : <any>null;
+        if (Array.isArray(this.uploadId)) {
+            data["uploadId"] = [];
+            for (let item of this.uploadId)
+                data["uploadId"].push(item);
+        }
+        data["lessonDetails"] = this.lessonDetails ? this.lessonDetails.toJSON() : <any>null;
+        if (Array.isArray(this.fileMetadata)) {
+            data["fileMetadata"] = [];
+            for (let item of this.fileMetadata)
+                data["fileMetadata"].push(item.toJSON());
+        }
+        data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        return data;
+    }
+}
+
+export interface ILessonDto {
+    mongoId?: string | null;
+    uploadId?: number[] | null;
+    lessonDetails?: LessonDetailsDto;
+    fileMetadata?: FileMetadataDto[] | null;
+    ownerId?: number | null;
+}
+
 export class LibraryDto implements ILibraryDto {
     id?: number;
     name?: string | null;
@@ -2671,6 +3655,18 @@ export interface IUserFilter {
     libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
+}
+
+export interface FileResponse {
+    data: Blob;
+    status: number;
+    fileName?: string;
+    headers?: { [name: string]: any };
 }
 
 export class SwaggerException extends Error {

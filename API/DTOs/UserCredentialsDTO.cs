@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace API.Dtos;
+namespace API.DTOs;
 
 public class UserCredentialsDto
 {
