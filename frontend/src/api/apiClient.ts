@@ -3814,6 +3814,11 @@ export interface PagedResult<T> {
   currentPage: number;
 }
 
-export function isPagedResult<T>(result: any): result is PagedResult<T> {
-  return result && Array.isArray(result.items) && typeof result.totalCount === 'number'
+export function isPagedResult<T>(result: unknown): result is PagedResult<T> {
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    Array.isArray((result as PagedResult<T>).items) &&
+    typeof (result as PagedResult<T>).totalCount === 'number'
+  );
 }
