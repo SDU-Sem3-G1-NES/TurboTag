@@ -106,26 +106,26 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
         {
             if (filter.UploadIds != null && filter.UploadIds.Any())
             {
-                var ids = string.Join(",", filter.UploadIds);
-                fromWhereSql += $" AND u.upload_id IN ({ids})";
+                parameters.Add("@uploadIds", filter.UploadIds);
+                fromWhereSql += $" AND u.upload_id = ANY(@uploadIds)";
             }
 
             if (filter.OwnerIds != null && filter.OwnerIds.Any())
             {
-                var ids = string.Join(",", filter.OwnerIds);
-                fromWhereSql += $" AND u.user_id IN ({ids})";
+                parameters.Add("@ownerIds", filter.OwnerIds);
+                fromWhereSql += $" AND u.user_id = ANY(@ownerIds)";
             }
 
             if (filter.LibraryIds != null && filter.LibraryIds.Any())
             {
-                var ids = string.Join(",", filter.LibraryIds);
-                fromWhereSql += $" AND lu.library_id IN ({ids})";
+                parameters.Add("@libraryIds", filter.LibraryIds);
+                fromWhereSql += $" AND lu.library_id = ANY(@libraryIds)";
             }
 
             if (filter.UploadTypes != null && filter.UploadTypes.Any())
             {
-                var types = string.Join("','", filter.UploadTypes);
-                fromWhereSql += $" AND u.upload_type IN ('{types}')";
+                parameters.Add("@uploadTypes", filter.UploadTypes);
+                fromWhereSql += $" AND u.upload_type = ANY(@uploadTypes)";
             }
 
             if (filter.DateFrom.HasValue)

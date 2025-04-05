@@ -225,14 +225,14 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
         {
             if (filter.UserIds != null && filter.UserIds.Any())
             {
-                var ids = string.Join(",", filter.UserIds);
-                fromWhereSql += $" AND u.user_id IN ({ids})";
+                parameters.Add("@userIds", filter.UserIds);
+                fromWhereSql += " AND u.user_id = ANY(@userIds)";
             }
 
             if (filter.UserTypeIds != null && filter.UserTypeIds.Any())
             {
-                var typeIds = string.Join(",", filter.UserTypeIds);
-                fromWhereSql += $" AND u.user_type_id IN ({typeIds})";
+                parameters.Add("@userTypeIds", filter.UserTypeIds);
+                fromWhereSql += " AND u.user_type_id = ANY(@userTypeIds)";
             }
 
             if (!string.IsNullOrEmpty(filter.Name))
@@ -248,10 +248,13 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             }
 
             if (filter.LibraryId.HasValue)
+            {
                 fromWhereSql += @" AND EXISTS (
                     SELECT 1 FROM user_library_access ula 
                     WHERE ula.user_id = u.user_id 
-                    AND ula.library_id = " + filter.LibraryId.Value + ")";
+                    AND ula.library_id = @libraryId)";
+                parameters.Add("@libraryId", filter.LibraryId.Value);
+            }
         }
 
         var orderBy = @" GROUP BY u.user_id, u.user_type_id, u.user_name, u.user_email 

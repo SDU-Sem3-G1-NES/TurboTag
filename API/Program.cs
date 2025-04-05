@@ -10,7 +10,7 @@ using NJsonSchema;
 using NSwag;
 
 var builder = WebApplication.CreateBuilder(args);
-Env.Load(".env");
+Env.Load("../.env");
 
 SqlMapper.AddTypeHandler(new GenericListHandler<int>());
 
