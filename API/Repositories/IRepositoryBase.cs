@@ -1,4 +1,3 @@
-namespace API.Repositories
-{
-    public interface IRepositoryBase { }
-}
+namespace API.Repositories;
+
+public interface IRepositoryBase { }

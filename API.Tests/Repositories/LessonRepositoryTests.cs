@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using API.DataAccess;
 using API.Repositories;
-using API.Dtos;
+using API.DTOs;
 
 namespace API.Tests.Repositories
 {

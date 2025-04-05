@@ -1,4 +1,4 @@
-using API.Dtos;
+using API.DTOs;
 using API.Repositories;
 
 namespace API.Services;

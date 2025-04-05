@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using API.Dtos;
+using API.DTOs;
 using API.Services;
 namespace API.Controllers;
 
@@ -10,12 +10,6 @@ public class RegisterController(IUserCredentialsService userCredentialsService) 
     [HttpGet("CheckIfUserExistsByEmail")]
     public ActionResult<bool> CheckIfUserExistsByEmail(string email)
     {
-        return Ok(userCredentialsService.CheckIfUserExistsByEmail());
-    }
-    [HttpPost("RegisterUser")]
-    public ActionResult RegisterUser([FromBody] UserCredentialsDto userCredentials)
-    {
-        userCredentialsService.StoreNewUserCredentials();
-        return Ok();
+        return Ok(userCredentialsService.CheckIfUserExistsByEmail(email));
     }
 }

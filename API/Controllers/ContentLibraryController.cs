@@ -1,5 +1,6 @@
-using API.Dtos;
+using API.DTOs;
 using API.Services;
+using API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -8,24 +9,42 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class ContentLibraryController(ILibraryService libraryService) : ControllerBase
 {
-    [HttpGet("GetUserLibrariesById")]
-    public ActionResult<LibraryDto[]> GetUserLibrariesById(string userId)
+    [HttpPost("GetAllLibraries")]
+    public ActionResult<IEnumerable<LibraryDto>> GetAllLibraries([FromBody] LibraryFilter? filter)
     {
-        return Ok(libraryService.GetUserLibrariesById());
+        return Ok(libraryService.GetAllLibraries(filter));
     }
-    [HttpGet("GetUserLibraryId")]
-    public ActionResult<LibraryDto> GetUserLibraryId(string libraryId)
+
+    [HttpPost("GetUserLibraries")]
+    public ActionResult<IEnumerable<LibraryDto>> GetUserLibraries([FromBody] (UserDto user, LibraryFilter filter) parameters)
     {
-        return Ok(libraryService.GetUserLibraryById());
+        return Ok(libraryService.GetLibrariesByUser(parameters.user, parameters.filter));
     }
-    [HttpGet("GetLibraryUploadsById")]
-    public ActionResult<UploadDto[]> GetLibraryUploadsById(string libraryId)
+    
+    [HttpGet("GetLibraryById")]
+    public ActionResult<LibraryDto> GetLibraryById(int libraryId)
     {
-        return Ok(libraryService.GetLibraryUploadsById());
+        return Ok(libraryService.GetLibraryById(libraryId));
     }
-    [HttpGet("GetLibraryUploadById")]
-    public ActionResult<UploadDto> GetLibraryUploadById(string uploadId)
+    
+    [HttpPost("CreateNewLibrary")]
+    public ActionResult CreateNewLibrary([FromBody] LibraryDto library)
     {
-        return Ok(libraryService.GetLibraryUploadById());
+        libraryService.CreateNewLibrary(library);
+        return Ok();
+    }
+    
+    [HttpPut("UpdateLibraryById")]
+    public ActionResult UpdateLibraryById([FromBody] LibraryDto updatedLibrary)
+    {
+        libraryService.UpdateLibrary(updatedLibrary);
+        return Ok();
+    }
+    
+    [HttpDelete("DeleteLibraryById")]
+    public ActionResult DeleteLibraryById(int libraryId)
+    {
+        libraryService.DeleteLibraryById(libraryId);
+        return Ok();
     }
 }

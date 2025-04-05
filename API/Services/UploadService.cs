@@ -1,18 +1,54 @@
 using API.Repositories;
-using API.Dtos;
+using API.DTOs;
 
 namespace API.Services;
 public interface IUploadService : IServiceBase
 {
-    string StoreUpload();
+    IEnumerable<UploadDto> GetAllUploads(UploadFilter? filter);
+    IEnumerable<UploadDto> GetUserUploads(UserDto user, UploadFilter filter);
+    IEnumerable<UploadDto> GetLibraryUploads(int libraryId, UploadFilter filter);
+    UploadDto GetUploadById(int uploadId);
+    void CreateNewUpload(UploadDto upload);
+    void UpdateUpload(UploadDto upload);
+    void DeleteUploadById(int uploadId);
+    
 }
 public class UploadService(IUploadRepository uploadRepository) : IUploadService
 {
-    /// <summary>
-    /// Method that stores an upload to the database and returns the BlobId of the upload.
-    /// </summary>
-    public string StoreUpload()
+    public IEnumerable<UploadDto> GetAllUploads(UploadFilter? filter)
     {
-        return uploadRepository.AddUpload(new UploadDto(1, 1, 1, new UploadDetailsDto(1, "Mock Description 1", "Mock Title 1", new List<string> { "Mock Tag 1" }), new FileMetadataDto(1, "mp4", "Mock FileName 1", 2.5f, 1000, new DateTime(2025,1,1), "Mock checkSum 1")));
+        return uploadRepository.GetAllUploads(filter);
+    }
+    
+    public IEnumerable<UploadDto> GetUserUploads(UserDto user, UploadFilter filter)
+    {
+        filter.OwnerIds = [user.Id];
+        return uploadRepository.GetAllUploads(filter);
+    }
+    
+    public IEnumerable<UploadDto> GetLibraryUploads(int libraryId, UploadFilter filter)
+    {
+        filter.LibraryIds = [libraryId];
+        return uploadRepository.GetAllUploads(filter);
+    }
+
+    public UploadDto GetUploadById(int uploadId)
+    {
+        return uploadRepository.GetUploadById(uploadId);
+    }
+
+    public void CreateNewUpload(UploadDto upload)
+    {
+        uploadRepository.AddUpload(upload);
+    }
+    
+    public void UpdateUpload(UploadDto upload)
+    {
+        uploadRepository.UpdateUpload(upload);
+    }
+    
+    public void DeleteUploadById(int uploadId)
+    {
+        uploadRepository.DeleteUploadById(uploadId);
     }
 }

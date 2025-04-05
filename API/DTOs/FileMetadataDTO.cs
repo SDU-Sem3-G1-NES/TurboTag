@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace API.Dtos;
+namespace API.DTOs;
 
 [BsonIgnoreExtraElements]
 public class FileMetadataDto
@@ -14,7 +14,7 @@ public class FileMetadataDto
     }
 
     [method: JsonConstructor]
-    public FileMetadataDto(int? id, string? fileType, string? fileName, float? fileSize, int? duration, DateTime? date,
+    public FileMetadataDto(string? id, string? fileType, string? fileName, float? fileSize, int? duration, DateTime? date,
         string? checkSum)
     {
         Id = id;
@@ -27,7 +27,7 @@ public class FileMetadataDto
     }
 
     [BsonElement("id")]
-    public int? Id { get; set; }
+    public string? Id { get; set; }
     [BsonElement("file_type")]
     public string? FileType { get; set; }
     [BsonElement("filename")] 

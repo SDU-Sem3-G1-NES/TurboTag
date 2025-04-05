@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS uploads (
     upload_type VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS user_libary_access (
+CREATE TABLE IF NOT EXISTS user_library_access (
     user_id INT REFERENCES "users"(user_id),
     library_id INT REFERENCES libraries(library_id),
     PRIMARY KEY (user_id, library_id)
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS library_uploads (
 CREATE TABLE IF NOT EXISTS settings (
     setting_id SERIAL PRIMARY KEY,
     setting_name VARCHAR(255) UNIQUE NOT NULL,
-    setting_value JSONB NOT NULL
+    setting_value VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_credentials (
