@@ -74,19 +74,20 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
         var countSql = "SELECT COUNT(*)";
 
         var fromWhereSql = @"FROM libraries WHERE 1=1";
+        var parameters = new Dictionary<string, object>();
 
         if (filter != null)
         {
             if (filter.LibraryIds != null && filter.LibraryIds.Any())
             {
-                var ids = string.Join(",", filter.LibraryIds);
-                fromWhereSql += $" AND library_id IN ({ids})";
+                fromWhereSql += " AND library_id = ANY(@libraryIds)";
+                parameters.Add("@libraryIds", filter.LibraryIds);
             }
 
             if (filter.LibraryNames != null && filter.LibraryNames.Any())
             {
-                var names = string.Join("','", filter.LibraryNames);
-                fromWhereSql += $" AND library_name IN ('{names}')";
+                fromWhereSql += " AND library_name = ANY(@libraryNames)";
+                parameters.Add("@libraryNames", filter.LibraryNames);
             }
         }
 
@@ -99,14 +100,14 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
                 countSql,
                 fromWhereSql,
                 "",
-                new Dictionary<string, object>()).FirstOrDefault();
+                parameters).FirstOrDefault();
 
             var pagedLibraries = sqlDbAccess.GetPagedResult<LibraryDto>(
                 _databaseName,
                 selectSql,
                 fromWhereSql,
                 orderBy,
-                new Dictionary<string, object>(),
+                parameters,
                 filter.PageNumber.Value,
                 filter.PageSize.Value).ToList();
 
@@ -125,7 +126,7 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
             selectSql,
             fromWhereSql,
             orderBy,
-            new Dictionary<string, object>()).ToList();
+            parameters).ToList();
 
         return new PagedResult<LibraryDto>
         {
