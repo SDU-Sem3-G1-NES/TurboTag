@@ -1,4 +1,4 @@
-using API.Dtos;
+using API.DTOs;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,19 +10,19 @@ namespace API.Controllers;
 public class LessonController(ILessonService lessonService) : ControllerBase
 {
     [HttpGet("GetAllLessons")]
-    public ActionResult<List<LessonDto>> GetAllLessons()
+    public ActionResult<IEnumerable<LessonDto>> GetAllLessons()
     {
         return Ok(lessonService.GetAllLessons());
     }
     
     [HttpGet("GetLessonsByTags")]
-    public ActionResult<List<LessonDto>> GetLessonsByTags([FromQuery] string[] tags)
+    public ActionResult<IEnumerable<LessonDto>> GetLessonsByTags([FromQuery] string[] tags)
     {
         return Ok(lessonService.GetLessonsByTags(tags));
     }
     
     [HttpGet("GetLessonsByTitle")]
-    public ActionResult<List<LessonDto>> GetLessonsByTitle(string title)
+    public ActionResult<IEnumerable<LessonDto>> GetLessonsByTitle(string title)
     {
         return Ok(lessonService.GetLessonsByTitle(title));
     }

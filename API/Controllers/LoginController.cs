@@ -1,4 +1,4 @@
-using API.Dtos;
+using API.DTOs;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,23 +11,12 @@ public class LoginController(IUserCredentialsService userCredentialsService) : C
     [HttpGet("ValidateUserCredentials")]
     public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDto userCredentials)
     {
-        return Ok(userCredentialsService.ValidateUserCredentials());
+        return Ok(userCredentialsService.ValidateUserCredentials(userCredentials));
     }
 
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDto> GetUserDataByEmail(string email)
     {
-        return Ok(userCredentialsService.GetUserDataByEmail());
-    }
-    [HttpPost("StoreUserSession")]
-    public ActionResult StoreUserSession()
-    {
-        userCredentialsService.StoreUserSession();
-        return Ok();
-    }
-    [HttpGet("GetUserDataBySessionId")]
-    public ActionResult GetUserDataBySessionId(string sessionId)
-    {
-        return Ok(userCredentialsService.GetUserDataBySession());
+        return Ok(userCredentialsService.GetUserByEmail(email));
     }
 }

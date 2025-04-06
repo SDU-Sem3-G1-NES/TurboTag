@@ -1,10 +1,22 @@
 using System.Text.Json.Serialization;
 
-namespace API.Dtos;
+namespace API.DTOs;
 
-[method: JsonConstructor]
-public class UserCredentialsDto(string email, string password)
+public class UserCredentialsDto
 {
-    public string Email { get; set; } = email;
-    public string Password { get; set; } = password;
+    public UserCredentialsDto()
+    {
+        Email = "";
+        Password = "";
+    }
+
+    [method: JsonConstructor]
+    public UserCredentialsDto(string email, string password)
+    {
+        Email = email;
+        Password = password;
+    }
+
+    public string Email { get; set; }
+    public string Password { get; set; }
 }

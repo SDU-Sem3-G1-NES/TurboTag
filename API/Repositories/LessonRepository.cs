@@ -1,5 +1,5 @@
 using API.DataAccess;
-using API.Dtos;
+using API.DTOs;
 using MongoDB.Bson;
 
 namespace API.Repositories;
