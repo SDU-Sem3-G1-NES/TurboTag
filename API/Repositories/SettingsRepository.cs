@@ -1,40 +1,123 @@
-using API.Dtos;
+using API.DTOs;
+using API.DataAccess;
 
-namespace API.Repositories
+namespace API.Repositories;
+
+public interface ISettingsRepository : IRepositoryBase
 {
-    public interface ISettingsRepository : IRepositoryBase
+    int AddSetting(SettingsDto setting);
+    SettingsDto GetSettingById(int settingId);
+    List<SettingsDto> GetAllSettings();
+    void UpdateSetting(SettingsDto setting);
+    void DeleteSettingById(int settingId);
+}
+public class SettingsRepository(ISqlDbAccess sqlDbAccess) : ISettingsRepository
+{
+    private readonly string _databaseName = "blank";
+    
+    public int AddSetting(SettingsDto setting)
     {
-        int AddSetting(SettingsDto setting);
-        SettingsDto GetSettingById(int settingId);
-        List<SettingsDto> GetAllSettings();
-        void UpdateSetting(SettingsDto setting);
-        void DeleteSetting(int settingId);
+        var parameters = new Dictionary<string, object>
+        {
+            { "@settingName", setting.Name },
+            { "@settingValue", setting.Value }
+        };
+
+        var insertSql = @"
+            INSERT INTO settings (setting_name, setting_value)
+            VALUES (@settingName, @settingValue);
+            SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        var settingId = sqlDbAccess.ExecuteQuery<int>(
+            _databaseName,
+            insertSql,
+            "",
+            "",
+            parameters).FirstOrDefault();
+
+        return settingId;
     }
-    public class SettingsRepository : ISettingsRepository
+    public SettingsDto GetSettingById(int settingId)
     {
-        public int AddSetting(SettingsDto setting)
+        var parameters = new Dictionary<string, object>
         {
-            return 1;
-        }
-        public SettingsDto GetSettingById(int settingId)
+            { "@settingId", settingId }
+        };
+
+        var selectSql = @"
+            SELECT
+                setting_id as Id,
+                setting_name as Name,
+                setting_value as Value
+            FROM settings
+            WHERE setting_id = @settingId";
+
+        var result = sqlDbAccess.ExecuteQuery<SettingsDto>(
+            _databaseName,
+            selectSql,
+            "",
+            "",
+            parameters).FirstOrDefault();
+
+        if (result == null)
         {
-            return new SettingsDto(settingId, "Mock Setting", "Mock Value");
+            throw new InvalidOperationException($"Setting with ID {settingId} not found");
         }
-        public List<SettingsDto> GetAllSettings()
+
+        return new SettingsDto(result.Id, result.Name, result.Value);
+    }
+    public List<SettingsDto> GetAllSettings()
+    {
+        var selectSql = @"
+            SELECT
+                setting_id as Id,
+                setting_name as Name,
+                setting_value as Value
+            FROM settings";
+
+        var results = sqlDbAccess.ExecuteQuery<SettingsDto>(
+            _databaseName,
+            selectSql,
+            "",
+            "",
+            new Dictionary<string, object>()).ToList();
+
+        return results.Select(r => new SettingsDto(r.Id, r.Name, r.Value)).ToList();
+    }
+    public void UpdateSetting(SettingsDto setting)
+    {
+        var parameters = new Dictionary<string, object>
         {
-            return new List<SettingsDto>
-            {
-                new SettingsDto(1, "Mock Setting", "Mock Value"),
-                new SettingsDto(2, "Mock Setting", "Mock Value")
-            };
-        }
-        public void UpdateSetting(SettingsDto setting)
+            { "@settingId", setting.Id },
+            { "@settingName", setting.Name },
+            { "@settingValue", setting.Value }
+        };
+
+        var updateSql = @"
+            UPDATE settings
+            SET setting_name = @settingName,
+                setting_value = @settingValue
+            WHERE setting_id = @settingId";
+
+        sqlDbAccess.ExecuteNonQuery(
+            _databaseName,
+            updateSql,
+            parameters);
+    }
+    public void DeleteSettingById(int settingId)
+    {
+        var parameters = new Dictionary<string, object>
         {
-            throw new NotImplementedException();
-        }
-        public void DeleteSetting(int settingId)
-        {
-            throw new NotImplementedException();
-        }
+            { "@settingId", settingId }
+        };
+
+        var deleteSql = @"
+            DELETE FROM settings
+            WHERE setting_id = @settingId";
+
+        sqlDbAccess.ExecuteNonQuery(
+            _databaseName,
+            deleteSql,
+            parameters);
     }
 }

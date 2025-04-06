@@ -1,4 +1,4 @@
-using API.Dtos;
+using API.DTOs;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
         
@@ -8,23 +8,36 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class SettingsController(ISettingsService settingsService) : ControllerBase
 {
-    [HttpGet("GetUserSettingsById")]
-    public ActionResult<SettingsDto> GetUserSettingsById(int id)
+    
+    [HttpGet("GetAllSettings")]
+    public ActionResult<IEnumerable<SettingsDto>> GetAllSettings()
     {
-        return Ok(settingsService.GetUserSettingsById());
+        return Ok(settingsService.GetAllSettings());
     }
-        
-    [HttpPut("UpdateUserSettingsById")]
-    public ActionResult UpdateUserSettingsById([FromBody] SettingsDto[] updatedSettings)
+    
+    [HttpGet("GetSettingById")]
+    public ActionResult<SettingsDto> GetSettingById(int settingId)
     {
-        settingsService.UpdateUserSettingsById();
+        return Ok(settingsService.GetSettingById(settingId));
+    }
+    [HttpPost("AddSetting")]
+    public ActionResult AddSetting([FromBody] SettingsDto setting)
+    {
+        settingsService.CreateNewSetting(setting);
         return Ok();
     }
-        
-    [HttpPut("UpdateUserSettingById")]
-    public ActionResult UpdateUserSettingById([FromBody] SettingsDto setting)
+    
+    [HttpPut("UpdateSetting")]
+    public ActionResult UpdateSetting([FromBody] SettingsDto updatedSetting)
     {
-        settingsService.UpdateUserSettingById();
+        settingsService.UpdateSetting(updatedSetting);
+        return Ok();
+    }
+    
+    [HttpDelete("DeleteSettingById")]
+    public ActionResult DeleteSettingById(int settingId)
+    {
+        settingsService.DeleteSettingById(settingId);
         return Ok();
     }
 }

@@ -1,4 +1,5 @@
-using API.Dtos;
+using API.DTOs;
+using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,58 +9,35 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class AdminController(IAdminService adminService) : ControllerBase
 {
-    [HttpGet("GetAllUsers")]
-    public ActionResult<UserDto[]> GetAllUsers()
+    [HttpPost("GetAllUsers")]
+    public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromBody] UserFilter? filter)
     {
-        return Ok(adminService.GetAllUsers());
-
+        return Ok(adminService.GetAllUsers(filter));
     }
-
-    [HttpGet("GetAllContentLibraries")]
-    public ActionResult<LibraryDto[]> GetAllContentLibraries()
+    [HttpGet("GetUserByEmail")]
+    public ActionResult<UserDto> GetUserByEmail(string email)
     {
-        return Ok(adminService.GetAllLibraries());
+        return Ok(adminService.GetUserByEmail(email));
     }
-
-    [HttpDelete("DeleteUserById")]
-    public ActionResult DeleteUserById(int userId)
+    
+    [HttpPost("CreateNewUser")]
+    public ActionResult CreateNewUser([FromBody] (UserDto user, UserCredentialsDto userCredentials) parameters)
     {
-        adminService.DeleteUserById();
-        return Ok();
-    }
-
-    [HttpDelete("DeleteUsersById")]
-    public ActionResult DeleteUsersById([FromBody] int[] userIds)
-    {
-        adminService.DeleteUsersByIds();
+        adminService.CreateNewUser(parameters.user, parameters.userCredentials);
         return Ok();
     }
 
     [HttpPut("UpdateUserById")]
-    public ActionResult UpdateUserById(int userId, [FromBody] UserDto updatedUser)
+    public ActionResult UpdateUserById([FromBody] UserDto updatedUser)
     {
-        adminService.UpdateUserById();
+        adminService.UpdateUser(updatedUser);
         return Ok();
     }
-
-    [HttpPut("UpdateUsersById")]
-    public ActionResult UpdateUsersById([FromBody] UserDto[] user)
+    
+    [HttpDelete("DeleteUserById")]
+    public ActionResult DeleteUserById(int userId)
     {
-        adminService.UpdateUsersByIds();
-        return Ok();
-    }
-
-    [HttpPost("CreateNewUser")]
-    public ActionResult CreateNewUser([FromBody] UserDto user)
-    {
-        adminService.CreateNewUser();
-        return Ok();
-    }
-
-    [HttpPost("CreateNewUsers")]
-    public ActionResult CreateNewUsers([FromBody] UserDto[] user)
-    {
-        adminService.CreateNewUsers();
+        adminService.DeleteUserById(userId);
         return Ok();
     }
 }
