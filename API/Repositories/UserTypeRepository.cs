@@ -26,8 +26,8 @@ public class UserTypeRepository(ISqlDbAccess sqlDbAccess) : IUserTypeRepository
 
         var insertSql = @"
             INSERT INTO user_types (user_type_name, user_type_permissions)
-            VALUES (@typeName, @typePermissions);
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            VALUES (@typeName, @typePermissions)
+            RETURNING user_type_id;";
 
         var userTypeId = sqlDbAccess.ExecuteQuery<int>(
             _databaseName,
