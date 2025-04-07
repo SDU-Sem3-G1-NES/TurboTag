@@ -1,12 +1,10 @@
-/*import React, { useState } from 'react'
+import React, { useState } from 'react'
 import Tags from '../components/tags'
-import { UploadClient, UploadDto, UploadDetailsDto, FileMetadataDto } from '../api/apiClient.ts'
-import { Store } from 'react-notifications-component'
-import { Button, Form, Input } from 'antd';
-import { Divider, notification, Space } from 'antd';
-import type { NotificationArgsProps } from 'antd';
-import { CancelToken } from 'axios'
-  
+import { UploadClient, UploadDto } from '../api/apiClient.ts'
+import { Button, Form, Input, notification } from 'antd';
+import { NotificationPlacement } from 'antd/es/notification/interface'
+import Context from '@ant-design/icons/lib/components/Context';
+
 const Upload: React.FC = () => {
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
@@ -14,47 +12,28 @@ const Upload: React.FC = () => {
   const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
 
-
   const openNotification = (placement: NotificationPlacement) => {
     notification.info({
       message: `Notification ${placement}`,
-      description: <Context.Consumer>{({ name }) => `Hello, ${name}!`}</Context.Consumer>,
+      description: <Context.Consumer>{() => `Hello, User!`}</Context.Consumer>,
       placement,
     });
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleSubmit = async () => {
     if (!file) return
-
-    const fileMetadata = new FileMetadataDto({
-      checkSum: '1234',
-      id: 1,
-      fileSize: 1000,
-      fileName: file.name,
-      fileType: file.type,
-      duration: 100,
-      date: new Date()
-    })
-
-    const uploadDetails = new UploadDetailsDto({
-      id: 1,
-      title: title,
-      description: description,
-      tags: tags
-    })
 
     const uploadDTO = new UploadDto()
     uploadDTO.init({
       id: 1,
       ownerId: 1,
+      date: new Date(),
+      type: file.type,
       libraryId: 1,
-      details: uploadDetails,
-      fileMetadata: fileMetadata
     })
 
     try {
-      await uploadClient.storeUpload(uploadDTO)
+      await uploadClient.addUpload(uploadDTO)
 
       openNotification('topRight');
 
@@ -64,35 +43,35 @@ const Upload: React.FC = () => {
         placement: 'topRight',
         duration: 2,
       });
-      
+
       console.log('Upload successful')
     } catch (error) {
-      
       notification.error({
         message: 'Upload failed',
         description: 'Your lecture could not be uploaded',
         placement: 'topRight',
         duration: 2,
       });
-      
+
       console.error('Upload failed', error)
     }
   }
 
   return (
     <Form
-     name="basic"
-    labelCol={{ span: 8 }}
-    wrapperCol={{ span: 16 }}
-    onFinish={handleSubmit} 
-     autoComplete="off"
+      name="basic"
+      labelCol={{ span: 8 }}
+      wrapperCol={{ span: 16 }}
+      onFinish={handleSubmit}
+      autoComplete="off"
     >
       <h1>Upload Lecture</h1>
-      
-      <Form.Item<string>
-      label="Title"
-      name="title"
-      rules={[{ required: true, message: 'Please input your title!' }]}>
+
+      <Form.Item
+        label="Title"
+        name="title"
+        rules={[{ required: true, message: 'Please input your title!' }]}
+      >
         <Input
           id="title"
           type="text"
@@ -100,13 +79,12 @@ const Upload: React.FC = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
       </Form.Item>
-      
 
-   
-      <Form.Item<string>
-      label="Description"
-      name="description"
-      rules={[{ required: true, message: 'Please input your description!' }]}>
+      <Form.Item
+        label="Description"
+        name="description"
+        rules={[{ required: true, message: 'Please input your description!' }]}
+      >
         <Input
           id="description"
           type="text"
@@ -114,22 +92,22 @@ const Upload: React.FC = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
       </Form.Item>
-      
-      
+
       <Form.Item
-      label="File"
-      name="file"
-      rules={[{ required: true, message: 'Please upload a file!' }]}>
-        < Input
+        label="File"
+        name="file"
+        rules={[{ required: true, message: 'Please upload a file!' }]}
+      >
+        <Input
           id="file"
           type="file"
           onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
         />
       </Form.Item>
-      
+
       <Tags tags={tags} setTags={setTags} />
-      
-      <br/>
+
+      <br />
       <Form.Item label={null}>
         <Button type="primary" htmlType="submit">
           Submit
@@ -140,4 +118,3 @@ const Upload: React.FC = () => {
 }
 
 export default Upload
-*/
