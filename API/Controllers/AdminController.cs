@@ -1,4 +1,5 @@
 using API.DTOs;
+using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,60 +7,37 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AdminController(IAdminService _adminService) : ControllerBase
+public class AdminController(IAdminService adminService) : ControllerBase
 {
-    [HttpGet("GetAllUsers")]
-    public ActionResult<UserDTO[]> GetAllUsers()
+    [HttpPost("GetAllUsers")]
+    public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromBody] UserFilter? filter)
     {
-        return Ok(_adminService.GetAllUsers());
-
+        return Ok(adminService.GetAllUsers(filter));
     }
-
-    [HttpGet("GetAllContentLibraries")]
-    public ActionResult<LibraryDTO[]> GetAllContentLibraries()
+    [HttpGet("GetUserByEmail")]
+    public ActionResult<UserDto> GetUserByEmail(string email)
     {
-        return Ok(_adminService.GetAllLibraries());
+        return Ok(adminService.GetUserByEmail(email));
     }
-
-    [HttpDelete("DeleteUserById")]
-    public ActionResult DeleteUserById(int userId)
+    
+    [HttpPost("CreateNewUser")]
+    public ActionResult CreateNewUser([FromBody] (UserDto user, UserCredentialsDto userCredentials) parameters)
     {
-        _adminService.DeleteUserById();
-        return Ok();
-    }
-
-    [HttpDelete("DeleteUsersById")]
-    public ActionResult DeleteUsersById([FromBody] int[] userIds)
-    {
-        _adminService.DeleteUsersByIds();
+        adminService.CreateNewUser(parameters.user, parameters.userCredentials);
         return Ok();
     }
 
     [HttpPut("UpdateUserById")]
-    public ActionResult UpdateUserById(int userId, [FromBody] UserDTO updatedUser)
+    public ActionResult UpdateUserById([FromBody] UserDto updatedUser)
     {
-        _adminService.UpdateUserById();
+        adminService.UpdateUser(updatedUser);
         return Ok();
     }
-
-    [HttpPut("UpdateUsersById")]
-    public ActionResult UpdateUsersById([FromBody] UserDTO[] user) //idk how to do this one
+    
+    [HttpDelete("DeleteUserById")]
+    public ActionResult DeleteUserById(int userId)
     {
-        _adminService.UpdateUsersByIds();
-        return Ok();
-    }
-
-    [HttpPost("CreateNewUser")]
-    public ActionResult CreateNewUser([FromBody] UserDTO user)
-    {
-        _adminService.CreateNewUser();
-        return Ok();
-    }
-
-    [HttpPost("CreateNewUsers")]
-    public ActionResult CreateNewUsers([FromBody] UserDTO[] user)
-    {
-        _adminService.CreateNewUsers();
+        adminService.DeleteUserById(userId);
         return Ok();
     }
 }

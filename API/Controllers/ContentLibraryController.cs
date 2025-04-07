@@ -1,56 +1,50 @@
-using System.Diagnostics;
 using API.DTOs;
+using API.Services;
+using API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ContentLibraryController : ControllerBase
+public class ContentLibraryController(ILibraryService libraryService) : ControllerBase
 {
-    [HttpGet("GetUserLibrariesById")]
-    public ActionResult<LibraryDTO[]> GetUserLibrariesById(string userId)
+    [HttpPost("GetAllLibraries")]
+    public ActionResult<IEnumerable<LibraryDto>> GetAllLibraries([FromBody] LibraryFilter? filter)
     {
-        return Ok(_mockLibraries);
+        return Ok(libraryService.GetAllLibraries(filter));
     }
-    [HttpGet("GetUserLibraryId")]
-    public ActionResult<LibraryDTO> GetUserLibraryId(string libraryId)
+
+    [HttpPost("GetUserLibraries")]
+    public ActionResult<IEnumerable<LibraryDto>> GetUserLibraries([FromBody] (UserDto user, LibraryFilter filter) parameters)
     {
-        return Ok(_mockLibraries.First());
-    }
-    [HttpGet("GetLibraryUploadsById")]
-    public ActionResult<UploadDto[]> GetLibraryUploadsById(string libraryId)
-    {
-        return Ok(_mockUploads);
-    }
-    [HttpGet("GetLibraryUploadById")]
-    public ActionResult<UploadDto> GetLibraryUploadById(string uploadId)
-    {
-        return Ok(_mockUploads.First());
+        return Ok(libraryService.GetLibrariesByUser(parameters.user, parameters.filter));
     }
     
-    private readonly List<LibraryDTO> _mockLibraries = new List<LibraryDTO>
+    [HttpGet("GetLibraryById")]
+    public ActionResult<LibraryDto> GetLibraryById(int libraryId)
     {
-        new LibraryDTO(libraryId: 1, libraryName: "Library 1")
-    };
-    private readonly List<UploadDto> _mockUploads = new List<UploadDto>
+        return Ok(libraryService.GetLibraryById(libraryId));
+    }
+    
+    [HttpPost("CreateNewLibrary")]
+    public ActionResult CreateNewLibrary([FromBody] LibraryDto library)
     {
-        new UploadDto(
-            id: 1,
-            ownerId: 1,
-            libraryId: 1,
-            details: new UploadDetailsDto(id: 1,
-                description: "Description 1",
-                title: "Title 1", 
-                tags:
-                    new List<string> { "Tag 1", "Tag 2" }),
-            fileMetadata: new FileMetadataDto(id: 1,
-                fileType: "txt",
-                fileName: "example.txt",
-                fileSize: 123.45f,
-                duration: 60,
-                date: DateTime.Now, 
-                checkSum: "abc123")
-        )
-    };
+        libraryService.CreateNewLibrary(library);
+        return Ok();
+    }
+    
+    [HttpPut("UpdateLibraryById")]
+    public ActionResult UpdateLibraryById([FromBody] LibraryDto updatedLibrary)
+    {
+        libraryService.UpdateLibrary(updatedLibrary);
+        return Ok();
+    }
+    
+    [HttpDelete("DeleteLibraryById")]
+    public ActionResult DeleteLibraryById(int libraryId)
+    {
+        libraryService.DeleteLibraryById(libraryId);
+        return Ok();
+    }
 }

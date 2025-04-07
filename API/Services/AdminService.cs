@@ -2,95 +2,41 @@ using API.DTOs;
 using API.Repositories;
 
 namespace API.Services;
+
 public interface IAdminService : IServiceBase
 {
-    List<UserDTO> GetAllUsers();
-    UserDTO GetUserById();
-    List<LibraryDTO> GetAllLibraries();
-    LibraryDTO GetLibraryById();
-    void CreateNewUser();
-    void CreateNewUsers();
-    void UpdateUserById();
-    void UpdateUsersByIds();
-    void DeleteUserById();
-    void DeleteUsersByIds();
+    IEnumerable<UserDto> GetAllUsers(UserFilter? filter);
+    UserDto GetUserByEmail(string email);
+    void CreateNewUser(UserDto user, UserCredentialsDto userCredentials);
+    void UpdateUser(UserDto user);
+    void DeleteUserById(int userId);
 }
-public class AdminService(IUserRepository _userRepository, ILibraryRepository _libraryRepository) : IAdminService
+
+public class AdminService(IUserRepository userRepository, IUserCredentialsService userCredentialsService) : IAdminService
 {
-    /// <summary>
-    /// Method that returns a list of all Users from the database.    
-    /// </summary>
-    public List<UserDTO> GetAllUsers()
+    public IEnumerable<UserDto> GetAllUsers(UserFilter? filter)
     {
-        return _userRepository.GetAllUsers();
+        return userRepository.GetAllUsers(filter);
     }
-    /// <summary>
-    /// Method that returns a User from the database by Id.
-    /// </summary>
-    public UserDTO GetUserById()
+
+    public UserDto GetUserByEmail(string email)
     {
-        return _userRepository.GetUserById(1);
+        return userRepository.GetUserByEmail(email);
     }
-    /// <summary>
-    /// Method that returns a list of all Libraries from the database.
-    /// </summary>
-    public List<LibraryDTO> GetAllLibraries()
+
+    public void CreateNewUser(UserDto user, UserCredentialsDto userCredentials)
     {
-        return _libraryRepository.GetAllLibraries();
+        int userId = userRepository.AddUser(user);
+        userCredentialsService.AddUserCredentials(userId, userCredentials);
     }
-    /// <summary>
-    /// Method that returns a Library from the database by Id.
-    /// </summary>
-    public LibraryDTO GetLibraryById()
+
+    public void UpdateUser(UserDto user)
     {
-        return _libraryRepository.GetLibraryById(1);
+        userRepository.UpdateUser(user);
     }
-    /// <summary>
-    /// Method that creates a new User in the database.
-    /// </summary>
-    public void CreateNewUser()
+
+    public void DeleteUserById(int userId)
     {
-        _userRepository.AddUser(new UserDTO(1, 1, "mock@email.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>()));
-        _userRepository.AddUserCredentials(new byte[] { 0x00, 0x01, 0x02, 0x03 }, new byte[] { 0x00, 0x01, 0x02, 0x03 });
-    }
-    /// <summary>
-    /// Method that creates multiple new Users in the database.
-    /// </summary>
-    public void CreateNewUsers()
-    {
-        // No method in repository to add multiple users, so ig call the method for each user.
-        _userRepository.AddUser(new UserDTO(1, 1, "mock@mock.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>()));
-    }
-    /// <summary>
-    /// Method that updates a User in the database by Id.
-    /// </summary>
-    public void UpdateUserById()
-    {
-        _userRepository.UpdateUser(new UserDTO(1, 1, "mock@mock.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>()));
-    }
-    /// <summary>
-    /// Method that updates multiple Users in the database by Ids.
-    /// </summary>
-    public void UpdateUsersByIds()
-    {   
-        // No method in repository to update multiple users, so ig call the method for each user.
-        _userRepository.UpdateUser(new UserDTO(1, 1, "mock@mock.com", new List<string> { "Permission1", "Permission2" }, new List<SettingsDTO>()));
-    }
-    /// <summary>
-    /// Method that deletes a User in the database by Id.
-    /// </summary>
-    public void DeleteUserById()
-    {
-        _userRepository.DeleteUser(1);
-        _userRepository.DeleteUserCredentials(new byte[] { 0x00, 0x01, 0x02, 0x03 });
-    }
-    /// <summary>
-    /// Method that deletes multiple Users in the database by Ids.
-    /// </summary>
-    public void DeleteUsersByIds()
-    {
-        // No method in repository to delete multiple users, so ig call the method for each user.
-        _userRepository.DeleteUser(1);
-        _userRepository.DeleteUserCredentials(new byte[] { 0x00, 0x01, 0x02, 0x03 });
+        userRepository.DeleteUserById(userId);
     }
 }

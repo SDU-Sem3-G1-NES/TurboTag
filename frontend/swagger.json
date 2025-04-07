@@ -6,37 +6,42 @@
   },
   "paths": {
     "/Admin/GetAllUsers": {
-      "get": {
+      "post": {
         "tags": [
           "Admin"
         ],
         "operationId": "Admin_GetAllUsers",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDTO"
-                  }
-                }
-              },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDTO"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDTO"
-                  }
+                  "$ref": "#/components/schemas/PagedResult_UserDto"
                 }
               }
             }
@@ -44,41 +49,115 @@
         }
       }
     },
-    "/Admin/GetAllContentLibraries": {
+    "/Admin/GetUserByEmail": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "operationId": "Admin_GetAllContentLibraries",
+        "operationId": "Admin_GetUserByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
-                  }
+                  "$ref": "#/components/schemas/UserDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
-                  }
+                  "$ref": "#/components/schemas/UserDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
-                  }
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/Admin/CreateNewUser": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_CreateNewUser",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Admin/UpdateUserById": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "Admin_UpdateUserById",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -106,59 +185,103 @@
         }
       }
     },
-    "/Admin/DeleteUsersById": {
-      "delete": {
+    "/ContentLibrary/GetAllLibraries": {
+      "post": {
         "tags": [
-          "Admin"
+          "ContentLibrary"
         ],
-        "operationId": "Admin_DeleteUsersById",
+        "operationId": "ContentLibrary_GetAllLibraries",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryFilter"
+              }
+            },
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
+                "$ref": "#/components/schemas/LibraryFilter"
               }
             },
             "text/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
+                "$ref": "#/components/schemas/LibraryFilter"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
+                "$ref": "#/components/schemas/LibraryFilter"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_LibraryDto"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/Admin/UpdateUserById": {
-      "put": {
+    "/ContentLibrary/GetUserLibraries": {
+      "post": {
         "tags": [
-          "Admin"
+          "ContentLibrary"
         ],
-        "operationId": "Admin_UpdateUserById",
+        "operationId": "ContentLibrary_GetUserLibraries",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_LibraryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ContentLibrary/GetLibraryById": {
+      "get": {
+        "tags": [
+          "ContentLibrary"
+        ],
+        "operationId": "ContentLibrary_GetLibraryById",
         "parameters": [
           {
-            "name": "userId",
+            "name": "libraryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -166,21 +289,56 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ContentLibrary/CreateNewLibrary": {
+      "post": {
+        "tags": [
+          "ContentLibrary"
+        ],
+        "operationId": "ContentLibrary_CreateNewLibrary",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/LibraryDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/LibraryDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDTO"
+                "$ref": "#/components/schemas/LibraryDto"
               }
             }
           }
@@ -192,36 +350,32 @@
         }
       }
     },
-    "/Admin/UpdateUsersById": {
+    "/ContentLibrary/UpdateLibraryById": {
       "put": {
         "tags": [
-          "Admin"
+          "ContentLibrary"
         ],
-        "operationId": "Admin_UpdateUsersById",
+        "operationId": "ContentLibrary_UpdateLibraryById",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryDto"
+              }
+            },
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
+                "$ref": "#/components/schemas/LibraryDto"
               }
             },
             "text/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
+                "$ref": "#/components/schemas/LibraryDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
+                "$ref": "#/components/schemas/LibraryDto"
               }
             }
           }
@@ -233,159 +387,72 @@
         }
       }
     },
-    "/Admin/CreateNewUser": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_CreateNewUser",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/CreateNewUsers": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_CreateNewUsers",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/UserDTO"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/ContentLibrary/GetUserLibrariesById": {
-      "get": {
+    "/ContentLibrary/DeleteLibraryById": {
+      "delete": {
         "tags": [
           "ContentLibrary"
         ],
-        "operationId": "ContentLibrary_GetUserLibrariesById",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LibraryDTO"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ContentLibrary/GetUserLibraryId": {
-      "get": {
-        "tags": [
-          "ContentLibrary"
-        ],
-        "operationId": "ContentLibrary_GetUserLibraryId",
+        "operationId": "ContentLibrary_DeleteLibraryById",
         "parameters": [
           {
             "name": "libraryId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/File/UploadFile": {
+      "post": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_UploadFile",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/LibraryDTO"
+                  "type": "string"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LibraryDTO"
+                  "type": "string"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LibraryDTO"
+                  "type": "string"
                 }
               }
             }
@@ -393,15 +460,15 @@
         }
       }
     },
-    "/ContentLibrary/GetLibraryUploadsById": {
+    "/File/GetFileById": {
       "get": {
         "tags": [
-          "ContentLibrary"
+          "File"
         ],
-        "operationId": "ContentLibrary_GetLibraryUploadsById",
+        "operationId": "File_GetFileById",
         "parameters": [
           {
-            "name": "libraryId",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "string"
@@ -414,26 +481,20 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UploadDto"
-                  }
+                  "type": "string",
+                  "format": "binary"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UploadDto"
-                  }
+                  "type": "string",
+                  "format": "binary"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UploadDto"
-                  }
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -441,18 +502,201 @@
         }
       }
     },
-    "/ContentLibrary/GetLibraryUploadById": {
+    "/File/DeleteFile": {
+      "delete": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_DeleteFile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Lesson/GetAllLessons": {
       "get": {
         "tags": [
-          "ContentLibrary"
+          "Lesson"
         ],
-        "operationId": "ContentLibrary_GetLibraryUploadById",
+        "operationId": "Lesson_GetAllLessons",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_LessonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Lesson/GetLessonsByTags": {
+      "get": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_GetLessonsByTags",
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_LessonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Lesson/GetLessonsByTitle": {
+      "get": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_GetLessonsByTitle",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_LessonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Lesson/GetLessonById": {
+      "get": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_GetLessonById",
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Lesson/GetLessonByObjectId": {
+      "get": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_GetLessonByObjectId",
+        "parameters": [
+          {
+            "name": "objectId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Lesson/GetLessonByUploadId": {
+      "get": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_GetLessonByUploadId",
         "parameters": [
           {
             "name": "uploadId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -462,20 +706,139 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDto"
+                  "$ref": "#/components/schemas/LessonDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDto"
+                  "$ref": "#/components/schemas/LessonDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadDto"
+                  "$ref": "#/components/schemas/LessonDto"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/Lesson/AddLesson": {
+      "post": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_AddLesson",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Lesson/UpdateLesson": {
+      "put": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_UpdateLesson",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Lesson/DeleteLessonById": {
+      "delete": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_DeleteLessonById",
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Lesson/DeleteLessonByObjectId": {
+      "delete": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_DeleteLessonByObjectId",
+        "parameters": [
+          {
+            "name": "objectId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -488,6 +851,11 @@
         "operationId": "Login_ValidateUserCredentials",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredentialsDto"
+              }
+            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UserCredentialsDto"
@@ -550,55 +918,20 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDTO"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/Login/StoreUserSession": {
-      "post": {
-        "tags": [
-          "Login"
-        ],
-        "operationId": "Login_StoreUserSession",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Login/GetUserDataBySessionId": {
-      "get": {
-        "tags": [
-          "Login"
-        ],
-        "operationId": "Login_GetUserDataBySessionId",
-        "parameters": [
-          {
-            "name": "sessionId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }
@@ -642,47 +975,35 @@
         }
       }
     },
-    "/Register/RegisterUser": {
-      "post": {
-        "tags": [
-          "Register"
-        ],
-        "operationId": "Register_RegisterUser",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCredentialsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Settings/GetUserSettingsById": {
+    "/Settings/GetAllSettings": {
       "get": {
         "tags": [
           "Settings"
         ],
-        "operationId": "Settings_GetUserSettingsById",
+        "operationId": "Settings_GetAllSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_SettingsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Settings/GetSettingById": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "operationId": "Settings_GetSettingById",
         "parameters": [
           {
-            "name": "id",
+            "name": "settingId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -696,17 +1017,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SettingsDTO"
+                  "$ref": "#/components/schemas/SettingsDto"
                 }
               }
             }
@@ -714,36 +1035,32 @@
         }
       }
     },
-    "/Settings/UpdateUserSettingsById": {
-      "put": {
+    "/Settings/AddSetting": {
+      "post": {
         "tags": [
           "Settings"
         ],
-        "operationId": "Settings_UpdateUserSettingsById",
+        "operationId": "Settings_AddSetting",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsDto"
+              }
+            },
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDTO"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "text/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDTO"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SettingsDTO"
-                }
+                "$ref": "#/components/schemas/SettingsDto"
               }
             }
           }
@@ -755,31 +1072,59 @@
         }
       }
     },
-    "/Settings/UpdateUserSettingById": {
+    "/Settings/UpdateSetting": {
       "put": {
         "tags": [
           "Settings"
         ],
-        "operationId": "Settings_UpdateUserSettingById",
+        "operationId": "Settings_UpdateSetting",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsDto"
+              }
+            },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsDTO"
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsDTO"
+                "$ref": "#/components/schemas/SettingsDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/SettingsDTO"
+                "$ref": "#/components/schemas/SettingsDto"
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Settings/DeleteSettingById": {
+      "delete": {
+        "tags": [
+          "Settings"
+        ],
+        "operationId": "Settings_DeleteSettingById",
+        "parameters": [
+          {
+            "name": "settingId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -817,14 +1162,258 @@
         }
       }
     },
-    "/Upload/StoreUpload": {
+    "/Upload/GetAllUploads": {
       "post": {
         "tags": [
           "Upload"
         ],
-        "operationId": "Upload_StoreUpload",
+        "operationId": "Upload_GetAllUploads",
         "requestBody": {
           "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/GetUserUploads": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_GetUserUploads",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUploadFilterValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/GetLibraryUploads": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_GetLibraryUploads",
+        "parameters": [
+          {
+            "name": "libraryId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/GetUploadById": {
+      "get": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_GetUploadById",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/AddUpload": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_AddUpload",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Upload/UpdateUpload": {
+      "put": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_UpdateUpload",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDto"
+              }
+            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UploadDto"
@@ -848,6 +1437,29 @@
           }
         }
       }
+    },
+    "/Upload/DeleteUploadById": {
+      "delete": {
+        "tags": [
+          "Upload"
+        ],
+        "operationId": "Upload_DeleteUploadById",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -856,8 +1468,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "nullable": true
           },
           "fileType": {
             "type": "string",
@@ -869,7 +1481,8 @@
           },
           "fileSize": {
             "type": "number",
-            "format": "float"
+            "format": "float",
+            "nullable": true
           },
           "duration": {
             "type": "integer",
@@ -878,7 +1491,8 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "checkSum": {
             "type": "string",
@@ -887,7 +1501,66 @@
         },
         "additionalProperties": false
       },
-      "LibraryDTO": {
+      "LessonDetailsDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LessonDto": {
+        "type": "object",
+        "properties": {
+          "mongoId": {
+            "type": "string",
+            "nullable": true
+          },
+          "uploadId": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "lessonDetails": {
+            "$ref": "#/components/schemas/LessonDetailsDto"
+          },
+          "fileMetadata": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileMetadataDto"
+            },
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LibraryDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -901,7 +1574,173 @@
         },
         "additionalProperties": false
       },
-      "SettingsDTO": {
+      "LibraryFilter": {
+        "type": "object",
+        "properties": {
+          "libraryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "libraryNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedResult_LessonDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_LibraryDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LibraryDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_SettingsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingsDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_UploadDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UploadDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_UserDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SettingsDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -919,31 +1758,6 @@
         },
         "additionalProperties": false
       },
-      "UploadDetailsDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "UploadDto": {
         "type": "object",
         "properties": {
@@ -955,15 +1769,74 @@
             "type": "integer",
             "format": "int32"
           },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
           "libraryId": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadFilter": {
+        "type": "object",
+        "properties": {
+          "uploadIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
           },
-          "details": {
-            "$ref": "#/components/schemas/UploadDetailsDto"
+          "ownerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
           },
-          "fileMetadata": {
-            "$ref": "#/components/schemas/FileMetadataDto"
+          "libraryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "uploadTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "dateFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dateTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -982,33 +1855,88 @@
         },
         "additionalProperties": false
       },
-      "UserDTO": {
+      "UserDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
-          "type": {
+          "userTypeId": {
             "type": "integer",
             "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
           },
           "email": {
             "type": "string",
             "nullable": true
           },
-          "permissions": {
+          "accessibleLibraryIds": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDtoLibraryFilterValueTuple": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserDtoUploadFilterValueTuple": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserDtoUserCredentialsDtoValueTuple": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserFilter": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
             },
             "nullable": true
           },
-          "settings": {
+          "userTypeIds": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SettingsDTO"
+              "type": "integer",
+              "format": "int32"
             },
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "libraryId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         },
