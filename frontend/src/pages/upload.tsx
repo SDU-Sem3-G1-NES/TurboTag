@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Tags from '../components/tags'
-import { UploadClient, UploadDto, LessonDto, LessonDetailsDto, FileMetadataDto, AddUploadRequestDto } from '../api/apiClient.ts'
+import { UploadClient, UploadDto, LessonDto, LessonDetailsDto, FileMetadataDto, AddUploadRequestDto, FileClient } from '../api/apiClient.ts'
 import { Button, Form, Input, notification } from 'antd';
 
 
@@ -11,6 +11,7 @@ const Upload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
   const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
+  const fileClient = new FileClient()
 
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
@@ -44,7 +45,11 @@ const Upload: React.FC = () => {
 
     const duration = await getFileDuration(file)
 
-    
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+
+
+
     const uploadDTO = new UploadDto()
     uploadDTO.init({
       id: 1,
@@ -91,11 +96,16 @@ const Upload: React.FC = () => {
     })
 
     try {
+
+
+      const fileId = await fileClient.uploadFile(formData);
+      
       await uploadClient.addUpload(request)
       
       notification.success({
         message: 'Upload successful',
-        description: 'Your lecture has been uploaded',
+        description: 'Your lecture and file have been uploaded successfully' +
+          '\nFile ID: ' + fileId,
         placement: 'topRight',
         duration: 2,
       });

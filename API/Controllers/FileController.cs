@@ -11,7 +11,7 @@ public class FileController(IFileService fileService) : ControllerBase
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpPost("UploadFile")]
-    public async Task<ActionResult<string>> UploadFile(IFormFile file)
+    public async Task<ActionResult<string>> UploadFile([FromForm] IFormFile file)
     {
         var fileId = await fileService.UploadFile(file);
         return Ok(fileId);
