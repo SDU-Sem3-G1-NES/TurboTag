@@ -1354,22 +1354,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             }
           }
@@ -1464,6 +1464,18 @@
   },
   "components": {
     "schemas": {
+      "AddUploadRequestDto": {
+        "type": "object",
+        "properties": {
+          "uploadDto": {
+            "$ref": "#/components/schemas/UploadDto"
+          },
+          "lessonDto": {
+            "$ref": "#/components/schemas/LessonDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "FileMetadataDto": {
         "type": "object",
         "properties": {

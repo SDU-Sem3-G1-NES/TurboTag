@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import Tags from '../components/tags'
-import { UploadClient, UploadDto } from '../api/apiClient.ts'
+import { UploadClient, UploadDto, LessonDto, LessonDetailsDto, FileMetadataDto, AddUploadRequestDto } from '../api/apiClient.ts'
 import { Button, Form, Input, notification } from 'antd';
-import { NotificationPlacement } from 'antd/es/notification/interface'
-import Context from '@ant-design/icons/lib/components/Context';
+
+
 
 const Upload: React.FC = () => {
   const [title, setTitle] = useState<string>('')
@@ -12,17 +12,39 @@ const Upload: React.FC = () => {
   const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
 
-  const openNotification = (placement: NotificationPlacement) => {
-    notification.info({
-      message: `Notification ${placement}`,
-      description: <Context.Consumer>{() => `Hello, User!`}</Context.Consumer>,
-      placement,
+  const getFileDuration = (file: File): Promise<number | null> => {
+    return new Promise((resolve, reject) => {
+      if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+        const mediaElement = document.createElement(file.type.startsWith('audio/') ? 'audio' : 'video');
+        const url = URL.createObjectURL(file);
+
+        mediaElement.src = url;
+
+        mediaElement.onloadedmetadata = () => {
+          resolve(mediaElement.duration); 
+          URL.revokeObjectURL(url);
+        };
+
+        mediaElement.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('Unable to load media file for duration calculation'));
+        };
+      } else {
+        resolve(null); 
+      }
     });
   };
+
+
+
+
 
   const handleSubmit = async () => {
     if (!file) return
 
+    const duration = await getFileDuration(file)
+
+    
     const uploadDTO = new UploadDto()
     uploadDTO.init({
       id: 1,
@@ -32,11 +54,45 @@ const Upload: React.FC = () => {
       libraryId: 1,
     })
 
+    const lessonDetailsDTO = new LessonDetailsDto()
+    lessonDetailsDTO.init({
+      title : title,
+      description : description,
+      tags : tags,
+    })
+
+    const fileMetadataArray: FileMetadataDto[] = [];
+    
+    const fileMetadataDTO = new FileMetadataDto()
+    fileMetadataDTO.init({
+      id : 1,
+      fileType : file.type,
+      fileName : file.name,
+      fileSize : file.size,
+      duration : duration,
+      date: new Date(),
+      checksum: null,
+    })
+
+    fileMetadataArray.push(fileMetadataDTO);
+    
+    const lessonDTO = new LessonDto()
+    lessonDTO.init({
+      uploadId: 1,
+      lessonDetails : lessonDetailsDTO,
+      fileMetadata : fileMetadataArray,
+      ownerId: 1,
+    })
+    
+    const request = new AddUploadRequestDto()
+    request.init({
+      uploadDto: uploadDTO,
+      lessonDto: lessonDTO,
+    })
+
     try {
-      await uploadClient.addUpload(uploadDTO)
-
-      openNotification('topRight');
-
+      await uploadClient.addUpload(request)
+      
       notification.success({
         message: 'Upload successful',
         description: 'Your lecture has been uploaded',
