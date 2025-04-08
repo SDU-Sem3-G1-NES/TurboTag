@@ -45,8 +45,10 @@ const Upload: React.FC = () => {
 
     const duration = await getFileDuration(file)
 
-    const formData = new FormData();
-    formData.append("file", file, file.name);
+    const fileParameter = {
+      data: file,
+      fileName: file.name,
+    };
 
 
 
@@ -98,7 +100,7 @@ const Upload: React.FC = () => {
     try {
 
 
-      const fileId = await fileClient.uploadFile(formData);
+      const fileId = await fileClient.uploadFile(fileParameter);
       
       await uploadClient.addUpload(request)
       
