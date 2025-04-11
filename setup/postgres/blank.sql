@@ -8,6 +8,9 @@ BEGIN
    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'blank') THEN
       PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE blank');
 END IF;
+   IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'hangfire') THEN
+      PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE hangfire');
+END IF;
 END
 $do$;
 

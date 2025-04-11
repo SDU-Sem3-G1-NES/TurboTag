@@ -12,6 +12,9 @@
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0"/>
         <PackageReference Include="Dapper" Version="2.1.66"/>
         <PackageReference Include="DotNetEnv" Version="3.1.1"/>
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.18" />
+        <PackageReference Include="Hangfire.Core" Version="1.8.18" />
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.3"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1"/>
