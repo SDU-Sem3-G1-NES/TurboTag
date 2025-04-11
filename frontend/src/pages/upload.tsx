@@ -70,20 +70,23 @@ const Upload: React.FC = () => {
       labelCol={{ span: 8 }}
       wrapperCol={{ span: 16 }}
       onFinish={handleSubmit}
-      autoComplete="off">
+      autoComplete="off"
+    >
       <h1>Upload Lecture</h1>
 
       <Form.Item<string>
         label="Title"
         name="title"
-        rules={[{ required: true, message: 'Please input your title!' }]}>
+        rules={[{ required: true, message: 'Please input your title!' }]}
+      >
         <Input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
       </Form.Item>
 
       <Form.Item<string>
         label="Description"
         name="description"
-        rules={[{ required: true, message: 'Please input your description!' }]}>
+        rules={[{ required: true, message: 'Please input your description!' }]}
+      >
         <Input
           id="description"
           type="text"
@@ -95,7 +98,8 @@ const Upload: React.FC = () => {
       <Form.Item
         label="File"
         name="file"
-        rules={[{ required: true, message: 'Please upload a file!' }]}>
+        rules={[{ required: true, message: 'Please upload a file!' }]}
+      >
         <Input
           id="file"
           type="file"
