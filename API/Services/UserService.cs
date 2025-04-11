@@ -22,7 +22,7 @@ public class UserService(IUserRepository userRepository, IUserCredentialService 
 
     public UserDto GetUserByEmail(string email)
     {
-        return userRepository.GetUserByEmail(email);
+        return userRepository.GetUserByEmail(email) ?? new UserDto();
     }
 
     public UserDto GetUserById(int id)

@@ -32,6 +32,6 @@ public class UserCredentialService(IUserRepository userRepository) : IUserCreden
 
     public UserDto GetUserByEmail(string email)
     {
-        return userRepository.GetUserByEmail(email);
+        return userRepository.GetUserByEmail(email) ?? new UserDto();
     }
 }
