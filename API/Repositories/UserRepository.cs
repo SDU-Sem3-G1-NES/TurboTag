@@ -7,9 +7,8 @@ public interface IUserRepository : IRepositoryBase
 {
     int AddUser(UserDto user);
     void AddUserCredentials(HashedUserCredentialsDto userCredentials);
-    bool UserEmailExists(string email);
     UserDto GetUserById(int userId);
-    UserDto GetUserByEmail(string email);
+    UserDto? GetUserByEmail(string email);
     public IEnumerable<UserDto> GetAllUsers(UserFilter? filter = null);
     HashedUserCredentialsDto GetUserCredentials(int userId);
     void UpdateUser(UserDto user);
@@ -78,25 +77,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
         sqlDbAccess.ExecuteNonQuery(_databaseName, insertSql, parameters);
     }
 
-    public bool UserEmailExists(string email)
-    {
-        var parameters = new Dictionary<string, object>
-        {
-            { "@email", email }
-        };
-
-        var sql = @"SELECT COUNT(1) FROM users WHERE user_email = @email";
-
-        var count = sqlDbAccess.ExecuteQuery<int>(
-            _databaseName,
-            sql,
-            "",
-            "",
-            parameters).FirstOrDefault();
-
-        return count > 0;
-    }
-
     public UserDto GetUserById(int userId)
     {
         var parameters = new Dictionary<string, object>
@@ -151,7 +131,7 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
         return user;
     }
 
-    public UserDto GetUserByEmail(string email)
+    public UserDto? GetUserByEmail(string email)
     {
         var parameters = new Dictionary<string, object>
         {
@@ -199,8 +179,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
 
             user.AccessibleLibraryIds = libraryIds;
         }
-
-        if (user == null) throw new InvalidOperationException($"User with email {email} not found");
 
         return user;
     }

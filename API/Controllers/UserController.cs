@@ -7,37 +7,44 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AdminController(IAdminService adminService) : ControllerBase
+public class UserController(IUserService userService, IUserCredentialService userCredentialService) : ControllerBase
 {
     [HttpPost("GetAllUsers")]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromBody] UserFilter? filter)
     {
-        return Ok(adminService.GetAllUsers(filter));
+        return Ok(userService.GetAllUsers(filter));
     }
+
     [HttpGet("GetUserByEmail")]
     public ActionResult<UserDto> GetUserByEmail(string email)
     {
-        return Ok(adminService.GetUserByEmail(email));
+        return Ok(userService.GetUserByEmail(email));
     }
-    
+
     [HttpPost("CreateNewUser")]
     public ActionResult CreateNewUser([FromBody] (UserDto user, UserCredentialsDto userCredentials) parameters)
     {
-        adminService.CreateNewUser(parameters.user, parameters.userCredentials);
+        userService.CreateNewUser(parameters.user, parameters.userCredentials);
         return Ok();
     }
 
     [HttpPut("UpdateUserById")]
     public ActionResult UpdateUserById([FromBody] UserDto updatedUser)
     {
-        adminService.UpdateUser(updatedUser);
+        userService.UpdateUser(updatedUser);
         return Ok();
     }
-    
+
     [HttpDelete("DeleteUserById")]
     public ActionResult DeleteUserById(int userId)
     {
-        adminService.DeleteUserById(userId);
+        userService.DeleteUserById(userId);
         return Ok();
+    }
+
+    [HttpGet("UserExists")]
+    public ActionResult<bool> UserExists(string email)
+    {
+        return Ok(userCredentialService.UserExists(email));
     }
 }
