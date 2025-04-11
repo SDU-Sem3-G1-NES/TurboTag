@@ -36,7 +36,7 @@ for arg in "$@"; do
   
   if [ "$arg" == "postgres" ] || [ "$arg" == "all" ]; then
     docker rmi turbotag-postgres || true
-    docker volume rm turbotag_postgres_data || true
+    docker volume rm turbotag_db_data || true
     rebuild=1
   fi
 done

@@ -4,6 +4,8 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Dapper;
 using DotNetEnv;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema;
@@ -86,6 +88,20 @@ builder.Services.AddOpenApiDocument(config =>
     config.DocumentProcessors.Add(new PagedResultProcessor());
 });
 
+// Add Hangfire services
+builder.Services.AddHangfire(config =>
+{
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UsePostgreSqlStorage(options =>
+        {
+            options.UseNpgsqlConnection($"Host={Env.GetString("POSTGRES_HOST")};Port={Env.GetString("POSTGRES_PORT")};Database={Env.GetString("HANGFIRE_DB")};Username={Env.GetString("POSTGRES_USER")};Password={Env.GetString("POSTGRES_PASSWORD")}");
+        });
+});
+
+// Add Hangfire server
+builder.Services.AddHangfireServer();
 
 // Configure Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -106,6 +122,7 @@ if (app.Environment.IsDevelopment())
     });
 
     app.UseDeveloperExceptionPage();
+    app.UseHangfireDashboard();
 }
 
 app.UseHttpsRedirection();
