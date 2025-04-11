@@ -2,23 +2,26 @@ using API.DTOs;
 using API.Repositories;
 
 namespace API.Services;
-public interface IUserCredentialsService : IServiceBase
+
+public interface IUserCredentialService : IServiceBase
 {
-    bool CheckIfUserExistsByEmail(string email);
+    bool UserExists(string email);
     void AddUserCredentials(int userId, UserCredentialsDto userCredentials);
     bool ValidateUserCredentials(UserCredentialsDto userCredentials);
     UserDto GetUserByEmail(string email);
 }
-public class UserCredentialsService(IUserRepository userRepository) : IUserCredentialsService
+
+public class UserCredentialService(IUserRepository userRepository) : IUserCredentialService
 {
-    public bool CheckIfUserExistsByEmail(string email)
+    public bool UserExists(string email)
     {
-        return userRepository.UserEmailExists(email);
+        var user = userRepository.GetUserByEmail(email);
+        return user != null;
     }
 
     public void AddUserCredentials(int userId, UserCredentialsDto userCredentials)
     {
-        HashedUserCredentialsDto hashedUserCredentials = new HashedUserCredentialsDto();
+        var hashedUserCredentials = new HashedUserCredentialsDto();
         userRepository.AddUserCredentials(hashedUserCredentials);
     }
 
