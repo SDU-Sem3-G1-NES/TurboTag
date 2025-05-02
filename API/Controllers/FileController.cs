@@ -1,4 +1,5 @@
 using API.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -17,7 +18,8 @@ public class FileController(IFileService fileService, IFFmpegService ffmpegServi
         
         if ((file.ContentType.StartsWith("video/") || file.Length > 0) && fileId != null)
         {
-            await ffmpegService.GetVideoAudioAndSnapshots(file, fileId);
+            var filePath = await ffmpegService.SaveFileToTemp(file, fileId);
+            BackgroundJob.Enqueue(() => ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true));
         }
 
         return Ok(fileId);

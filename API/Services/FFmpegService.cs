@@ -4,7 +4,8 @@ namespace API.Services;
 
 public interface IFFmpegService : IServiceBase
 {
-    public Task<(String, List<String>)> GetVideoAudioAndSnapshots(IFormFile video, string fileId);
+    public Task<String> SaveFileToTemp(IFormFile file, string mongoId);
+    public Task<(String, List<String>)> GetVideoAudioAndSnapshots(string videoPath, string outputId, bool deleteInputFile);
 
 }
 public class FFmpegService : IFFmpegService
@@ -16,32 +17,43 @@ public class FFmpegService : IFFmpegService
         Directory.CreateDirectory(_tempFolderPath); // Ensure the folder exists
     }
 
-    public async Task<(String, List<String>)> GetVideoAudioAndSnapshots(IFormFile video, string mongoId)
+    public async Task<(String, List<String>)> GetVideoAudioAndSnapshots(string videoPath, string outputId, bool deleteInputFile)
     {
-        var outputFolderPath = Path.Combine(_tempFolderPath, mongoId);
+        var outputFolderPath = Path.Combine(_tempFolderPath, outputId);
         Directory.CreateDirectory(outputFolderPath);
 
         var audioPath = Path.Combine(outputFolderPath, "Audio.mp3");
         var snapshotPaths = new List<string>();
 
-        var tempFilePath = Path.Combine(_tempFolderPath, $"{Guid.NewGuid()}.tmp");
-        await using (var stream = new FileStream(tempFilePath, FileMode.Create))
-        {
-            await video.CopyToAsync(stream);
-        }
+        FFMpeg.ExtractAudio(videoPath, audioPath);
 
-        FFMpeg.ExtractAudio(tempFilePath, audioPath);
-
-        var mediaInfo = await FFProbe.AnalyseAsync(tempFilePath);
+        var mediaInfo = await FFProbe.AnalyseAsync(videoPath);
         int snapshotPeriod = (int)mediaInfo.Duration.TotalSeconds/5;
 
         for (int i = 1; i <= 5; i++)
         {
-            await FFMpeg.SnapshotAsync(tempFilePath, Path.Combine(outputFolderPath, $"Snapshot-{i}.jpg"), null, TimeSpan.FromSeconds(i*snapshotPeriod));
+            await FFMpeg.SnapshotAsync(videoPath, Path.Combine(outputFolderPath, $"Snapshot-{i}.jpg"), null, TimeSpan.FromSeconds(i*snapshotPeriod));
         }
 
-        File.Delete(tempFilePath);
+        if (deleteInputFile)
+        {
+            File.Delete(videoPath);
+        }
 
         return (audioPath, snapshotPaths);
     }
+
+    public async Task<String> SaveFileToTemp(IFormFile file, string mongoId)
+    {
+        var outputFolderPath = Path.Combine(_tempFolderPath, mongoId);
+        Directory.CreateDirectory(outputFolderPath);
+
+        var tempFilePath = Path.Combine(_tempFolderPath, $"{mongoId}.tmp");
+        await using (var stream = new FileStream(tempFilePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+        return tempFilePath;
+    }
+    
 }
