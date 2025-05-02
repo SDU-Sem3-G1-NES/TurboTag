@@ -6,7 +6,7 @@ namespace API.Controllers;
 [ApiController]
 
 [Route("[controller]")]
-public class FileController(IFileService fileService) : ControllerBase
+public class FileController(IFileService fileService, IFFmpegService ffmpegService) : ControllerBase
 {
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
@@ -14,6 +14,12 @@ public class FileController(IFileService fileService) : ControllerBase
     public async Task<ActionResult<string>> UploadFile(IFormFile file)
     {
         var fileId = await fileService.UploadFile(file);
+        
+        if ((file.ContentType.StartsWith("video/") || file.Length > 0) && fileId != null)
+        {
+            await ffmpegService.GetVideoAudioAndSnapshots(file, fileId);
+        }
+
         return Ok(fileId);
     }
     [DisableRequestSizeLimit]
