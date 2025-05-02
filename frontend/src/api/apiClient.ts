@@ -750,7 +750,18 @@ url_ = url_.replace(/[?&]$/, "");
              * @param id (optional) 
              * @return OK
              */
-            deleteFile(id?: string | undefined): Promise<void>        }
+            deleteFile(id?: string | undefined): Promise<void>                    /**
+             * @param chunk (optional) 
+             * @param uploadId (optional) 
+             * @param chunkNumber (optional) 
+             * @return OK
+             */
+            uploadChunk(chunk?: FileParameter | undefined, uploadId?: string | undefined, chunkNumber?: number | undefined): Promise<void>                    /**
+             * @param uploadId (optional) 
+             * @param fileName (optional) 
+             * @return OK
+             */
+            finalizeUpload(uploadId?: string | undefined, fileName?: string | undefined): Promise<void>        }
 
     export class FileClient extends BaseApiClient implements IFileClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -775,7 +786,7 @@ url_ = url_.replace(/[?&]$/, "");
             if (file === null || file === undefined)
                 throw new Error("The parameter 'file' cannot be null.");
             else
-                content_.append("file", file.data, file.fileName ? file.fileName : "file");
+                content_.append("File", file.data, file.fileName ? file.fileName : "File");
 
                 let options_: AxiosRequestConfig = {
                     data: content_,
@@ -913,6 +924,129 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     protected processDeleteFile(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param chunk (optional) 
+         * @param uploadId (optional) 
+         * @param chunkNumber (optional) 
+         * @return OK
+         */
+        uploadChunk(chunk?: FileParameter | undefined, uploadId?: string | undefined, chunkNumber?: number | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/UploadChunk";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = new FormData();
+            if (chunk === null || chunk === undefined)
+                throw new Error("The parameter 'chunk' cannot be null.");
+            else
+                content_.append("Chunk", chunk.data, chunk.fileName ? chunk.fileName : "Chunk");
+            if (uploadId === null || uploadId === undefined)
+                throw new Error("The parameter 'uploadId' cannot be null.");
+            else
+                content_.append("UploadId", uploadId.toString());
+            if (chunkNumber === null || chunkNumber === undefined)
+                throw new Error("The parameter 'chunkNumber' cannot be null.");
+            else
+                content_.append("ChunkNumber", chunkNumber.toString());
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processUploadChunk(_response);
+                });
+        }
+
+    protected processUploadChunk(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param uploadId (optional) 
+         * @param fileName (optional) 
+         * @return OK
+         */
+        finalizeUpload(uploadId?: string | undefined, fileName?: string | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/FinalizeUpload";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = new FormData();
+            if (uploadId === null || uploadId === undefined)
+                throw new Error("The parameter 'uploadId' cannot be null.");
+            else
+                content_.append("uploadId", uploadId.toString());
+            if (fileName === null || fileName === undefined)
+                throw new Error("The parameter 'fileName' cannot be null.");
+            else
+                content_.append("fileName", fileName.toString());
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processFinalizeUpload(_response);
+                });
+        }
+
+    protected processFinalizeUpload(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {

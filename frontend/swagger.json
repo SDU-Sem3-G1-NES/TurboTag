@@ -422,14 +422,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "file": {
+                  "File": {
                     "type": "string",
                     "format": "binary"
                   }
                 }
               },
               "encoding": {
-                "file": {
+                "File": {
                   "style": "form"
                 }
               }
@@ -517,6 +517,90 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/File/UploadChunk": {
+      "post": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_UploadChunk",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Chunk": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "UploadId": {
+                    "type": "string"
+                  },
+                  "ChunkNumber": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              },
+              "encoding": {
+                "Chunk": {
+                  "style": "form"
+                },
+                "UploadId": {
+                  "style": "form"
+                },
+                "ChunkNumber": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/File/FinalizeUpload": {
+      "post": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_FinalizeUpload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uploadId": {
+                    "type": "string"
+                  },
+                  "fileName": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "uploadId": {
+                  "style": "form"
+                },
+                "fileName": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
