@@ -47,8 +47,7 @@ public class FileController(IFileService fileService) : ControllerBase
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpPost("UploadChunk")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> UploadChunk([FromForm] UploadChunkDto uploadChunkDto)
+    public async Task<IActionResult> UploadChunk([FromBody] UploadChunkDto uploadChunkDto)
     {
         try
         {
@@ -70,15 +69,12 @@ public class FileController(IFileService fileService) : ControllerBase
     #endregion
     #region FinalizeUpload
     [HttpPost("FinalizeUpload")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> FinalizeUpload(
-        [FromForm] string uploadId,
-        [FromForm] string fileName)
+    public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUploadDto)
     {
         try
         {
-            var tempDir = Path.Combine(Path.GetTempPath(), "uploads", uploadId);
-            var outputPath = Path.Combine(tempDir, fileName);
+            var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
+            var outputPath = Path.Combine(tempDir, finaliseUploadDto.FileName);
             
             using (var outputStream = new FileStream(outputPath, FileMode.Create))
             {
@@ -98,8 +94,8 @@ public class FileController(IFileService fileService) : ControllerBase
                 finalStream, 
                 0, 
                 finalStream.Length, 
-                fileName, 
-                fileName
+                finaliseUploadDto.FileName, 
+                finaliseUploadDto.FileName
             ));
 
             Directory.Delete(tempDir, true);
@@ -124,4 +120,10 @@ public class UploadChunkDto
     public IFormFile Chunk { get; set; }
     public string UploadId { get; set; }
     public int ChunkNumber { get; set; }
+}
+
+public class FinaliseUploadDto
+{
+    public string UploadId { get; set; }
+    public string FileName { get; set; }
 }

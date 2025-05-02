@@ -751,17 +751,14 @@ url_ = url_.replace(/[?&]$/, "");
              * @return OK
              */
             deleteFile(id?: string | undefined): Promise<void>                    /**
-             * @param chunk (optional) 
-             * @param uploadId (optional) 
-             * @param chunkNumber (optional) 
+             * @param body (optional) 
              * @return OK
              */
-            uploadChunk(chunk?: FileParameter | undefined, uploadId?: string | undefined, chunkNumber?: number | undefined): Promise<void>                    /**
-             * @param uploadId (optional) 
-             * @param fileName (optional) 
+            uploadChunk(body?: UploadChunkDto | undefined): Promise<void>                    /**
+             * @param body (optional) 
              * @return OK
              */
-            finalizeUpload(uploadId?: string | undefined, fileName?: string | undefined): Promise<void>        }
+            finalizeUpload(body?: FinaliseUploadDto | undefined): Promise<void>        }
 
     export class FileClient extends BaseApiClient implements IFileClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -945,34 +942,21 @@ url_ = url_.replace(/[?&]$/, "");
     
 
         /**
-         * @param chunk (optional) 
-         * @param uploadId (optional) 
-         * @param chunkNumber (optional) 
+         * @param body (optional) 
          * @return OK
          */
-        uploadChunk(chunk?: FileParameter | undefined, uploadId?: string | undefined, chunkNumber?: number | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/UploadChunk";
+        uploadChunk(body?: UploadChunkDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/UploadChunk";
 url_ = url_.replace(/[?&]$/, "");
 
-                    const content_ = new FormData();
-            if (chunk === null || chunk === undefined)
-                throw new Error("The parameter 'chunk' cannot be null.");
-            else
-                content_.append("Chunk", chunk.data, chunk.fileName ? chunk.fileName : "Chunk");
-            if (uploadId === null || uploadId === undefined)
-                throw new Error("The parameter 'uploadId' cannot be null.");
-            else
-                content_.append("UploadId", uploadId.toString());
-            if (chunkNumber === null || chunkNumber === undefined)
-                throw new Error("The parameter 'chunkNumber' cannot be null.");
-            else
-                content_.append("ChunkNumber", chunkNumber.toString());
+                    const content_ = JSON.stringify(body);
 
                 let options_: AxiosRequestConfig = {
                     data: content_,
                         method: "POST",
         url: url_,
         headers: {
-                                },
+                            "Content-Type": "application/json-patch+json",
+                        },
             cancelToken
         };
 
@@ -1009,29 +993,21 @@ url_ = url_.replace(/[?&]$/, "");
     
 
         /**
-         * @param uploadId (optional) 
-         * @param fileName (optional) 
+         * @param body (optional) 
          * @return OK
          */
-        finalizeUpload(uploadId?: string | undefined, fileName?: string | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/FinalizeUpload";
+        finalizeUpload(body?: FinaliseUploadDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/FinalizeUpload";
 url_ = url_.replace(/[?&]$/, "");
 
-                    const content_ = new FormData();
-            if (uploadId === null || uploadId === undefined)
-                throw new Error("The parameter 'uploadId' cannot be null.");
-            else
-                content_.append("uploadId", uploadId.toString());
-            if (fileName === null || fileName === undefined)
-                throw new Error("The parameter 'fileName' cannot be null.");
-            else
-                content_.append("fileName", fileName.toString());
+                    const content_ = JSON.stringify(body);
 
                 let options_: AxiosRequestConfig = {
                     data: content_,
                         method: "POST",
         url: url_,
         headers: {
-                                },
+                            "Content-Type": "application/json-patch+json",
+                        },
             cancelToken
         };
 
@@ -2833,6 +2809,46 @@ export interface IFileMetadataDto {
     checkSum?: string | null;
 }
 
+export class FinaliseUploadDto implements IFinaliseUploadDto {
+    uploadId?: string | null;
+    fileName?: string | null;
+
+    constructor(data?: IFinaliseUploadDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
+            this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): FinaliseUploadDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FinaliseUploadDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
+        data["fileName"] = this.fileName !== undefined ? this.fileName : <any>null;
+        return data;
+    }
+}
+
+export interface IFinaliseUploadDto {
+    uploadId?: string | null;
+    fileName?: string | null;
+}
+
 export class LessonDetailsDto implements ILessonDetailsDto {
     id?: number | null;
     title?: string | null;
@@ -3493,6 +3509,50 @@ export interface ISettingsDto {
     id?: number;
     name?: string | null;
     value?: string | null;
+}
+
+export class UploadChunkDto implements IUploadChunkDto {
+    chunk?: string | null;
+    uploadId?: string | null;
+    chunkNumber?: number;
+
+    constructor(data?: IUploadChunkDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.chunk = _data["chunk"] !== undefined ? _data["chunk"] : <any>null;
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
+            this.chunkNumber = _data["chunkNumber"] !== undefined ? _data["chunkNumber"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UploadChunkDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadChunkDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["chunk"] = this.chunk !== undefined ? this.chunk : <any>null;
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
+        data["chunkNumber"] = this.chunkNumber !== undefined ? this.chunkNumber : <any>null;
+        return data;
+    }
+}
+
+export interface IUploadChunkDto {
+    chunk?: string | null;
+    uploadId?: string | null;
+    chunkNumber?: number;
 }
 
 export class UploadDto implements IUploadDto {

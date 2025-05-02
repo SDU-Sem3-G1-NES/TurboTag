@@ -532,33 +532,24 @@
         "operationId": "File_UploadChunk",
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json-patch+json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "Chunk": {
-                    "type": "string",
-                    "format": "binary"
-                  },
-                  "UploadId": {
-                    "type": "string"
-                  },
-                  "ChunkNumber": {
-                    "type": "integer",
-                    "format": "int32"
-                  }
-                }
-              },
-              "encoding": {
-                "Chunk": {
-                  "style": "form"
-                },
-                "UploadId": {
-                  "style": "form"
-                },
-                "ChunkNumber": {
-                  "style": "form"
-                }
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
               }
             }
           }
@@ -578,25 +569,24 @@
         "operationId": "File_FinalizeUpload",
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json-patch+json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "uploadId": {
-                    "type": "string"
-                  },
-                  "fileName": {
-                    "type": "string"
-                  }
-                }
-              },
-              "encoding": {
-                "uploadId": {
-                  "style": "form"
-                },
-                "fileName": {
-                  "style": "form"
-                }
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
               }
             }
           }
@@ -1597,6 +1587,20 @@
         },
         "additionalProperties": false
       },
+      "FinaliseUploadDto": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LessonDetailsDto": {
         "type": "object",
         "properties": {
@@ -1850,6 +1854,25 @@
           "value": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadChunkDto": {
+        "type": "object",
+        "properties": {
+          "chunk": {
+            "type": "string",
+            "format": "binary",
+            "nullable": true
+          },
+          "uploadId": {
+            "type": "string",
+            "nullable": true
+          },
+          "chunkNumber": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

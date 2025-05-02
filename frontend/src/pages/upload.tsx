@@ -1,6 +1,15 @@
 import React, { useState } from 'react'
 import Tags from '../components/tags'
-import { UploadClient, UploadDto, LessonDto, LessonDetailsDto, FileMetadataDto, AddUploadRequestDto, FileClient } from '../api/apiClient.ts'
+import {
+  UploadClient,
+  UploadDto,
+  LessonDto,
+  LessonDetailsDto,
+  FileMetadataDto,
+  AddUploadRequestDto,
+  FileClient,
+  UploadChunkDto, FinaliseUploadDto
+} from '../api/apiClient.ts'
 import { Button, Form, Input, notification } from 'antd';
 
 
@@ -10,12 +19,12 @@ const Upload: React.FC = () => {
   const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const [tags, setTags] = useState<string[]>([])
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadId, setUploadId] = useState<string>('');
-  const [isUploading, setIsUploading] = useState(false);
+  //const [uploadProgress, setUploadProgress] = useState(0);
+  //const [uploadId, setUploadId] = useState<string>('');
+  //const [isUploading, setIsUploading] = useState(false);
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
-  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
+  const CHUNK_SIZE = 255 * 1024; // 255 KB Chunk size
   
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
@@ -41,35 +50,42 @@ const Upload: React.FC = () => {
   };
   
   const handleChunkedUpload = async (file: File) => {
-    const uploadId = uuidv4();
+    const uploadId = Date.now().toString()
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    
 
     // Upload chunks
     for (let i = 0; i < totalChunks; i++) {
       const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-      const formData = new FormData();
-      formData.append("chunk", chunk);
-      formData.append("uploadId", uploadId);
-      formData.append("chunkNumber", i.toString());
+      const uploadChunkDto = new UploadChunkDto()
+      uploadChunkDto.init({
+        chunk: chunk,
+        uploadId: uploadId,
+        chunkNumber: i.toString(),
+      })
+      
 
-      await fileClient.uploadChunk(formData);
-      setProgress(Math.round(((i + 1) / totalChunks) * 100));
+      await fileClient.uploadChunk(uploadChunkDto);
+      //setProgress(Math.round(((i + 1) / totalChunks) * 100));
     }
-
     // Finalize upload
-    const finalizeForm = new FormData();
-    finalizeForm.append("uploadId", uploadId);
-    finalizeForm.append("fileName", file.name);
-
-    const result = await fileClient.finalizeUpload(finalizeForm);
-    return result.fileId;
+    
+    const finalizeUploadDto = new FinaliseUploadDto()
+    finalizeUploadDto.init({
+      uploadId: uploadId,
+      fileName: file.name,
+    })
+    
+    await fileClient.finalizeUpload(finalizeUploadDto);
+    
+    
   };
 
 
   const handleSubmit = async () => {
     if (!file) return
 
-    const fileId = await handleChunkedUpload(file);
+    await handleChunkedUpload(file);
     
     const duration = await getFileDuration(file)
 
