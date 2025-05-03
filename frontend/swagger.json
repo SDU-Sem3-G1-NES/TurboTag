@@ -1863,7 +1863,7 @@
         "properties": {
           "chunk": {
             "type": "string",
-            "format": "binary",
+            "format": "byte",
             "nullable": true
           },
           "uploadId": {

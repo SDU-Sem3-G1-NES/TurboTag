@@ -53,11 +53,8 @@ public class FileController(IFileService fileService) : ControllerBase
         {
             var tempPath = Path.Combine(Path.GetTempPath(), "uploads", uploadChunkDto.UploadId);
             Directory.CreateDirectory(tempPath);
-
             var chunkPath = Path.Combine(tempPath, $"{uploadChunkDto.ChunkNumber}.part");
-            using var stream = new FileStream(chunkPath, FileMode.Create);
-            await uploadChunkDto.Chunk.CopyToAsync(stream);
-
+            await System.IO.File.WriteAllBytesAsync(chunkPath, uploadChunkDto.Chunk);
             return Ok();
         }
         catch (Exception ex)
@@ -69,26 +66,62 @@ public class FileController(IFileService fileService) : ControllerBase
     #endregion
     #region FinalizeUpload
     [HttpPost("FinalizeUpload")]
-    public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUploadDto)
+public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUploadDto)
+{
+    try
     {
+        var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
+        
+        // Validate directory exists
+        if (!Directory.Exists(tempDir))
+        {
+            return StatusCode(500, $"Upload directory not found for ID: {finaliseUploadDto.UploadId}");
+        }
+        
+        var outputPath = Path.Combine(tempDir, finaliseUploadDto.FileName);
+        
+        // Check how many chunks should exist
+        int totalChunks = 0;
+        while (System.IO.File.Exists(Path.Combine(tempDir, $"{totalChunks}.part")))
+        {
+            totalChunks++;
+        }
+        
+        if (totalChunks == 0)
+        {
+            return StatusCode(500, "No chunks found to combine");
+        }
+        
+        // Combine chunks with better exception handling
         try
         {
-            var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
-            var outputPath = Path.Combine(tempDir, finaliseUploadDto.FileName);
-            
             using (var outputStream = new FileStream(outputPath, FileMode.Create))
             {
-                for (int i = 0; ; i++)
+                for (int i = 0; i < totalChunks; i++)
                 {
                     var chunkPath = Path.Combine(tempDir, $"{i}.part");
-                    if (!System.IO.File.Exists(chunkPath)) break;
                     
-                    using var chunkStream = System.IO.File.OpenRead(chunkPath);
-                    await chunkStream.CopyToAsync(outputStream);
-                    System.IO.File.Delete(chunkPath);
+                    if (!System.IO.File.Exists(chunkPath))
+                    {
+                        return StatusCode(500, $"Chunk {i} missing");
+                    }
+                    
+                    // Ensure each chunk operation is wrapped in its own try-catch
+                    try
+                    {
+                        using var chunkStream = System.IO.File.OpenRead(chunkPath);
+                        await chunkStream.CopyToAsync(outputStream);
+                        // Close stream before deleting
+                        chunkStream.Close();
+                        System.IO.File.Delete(chunkPath);
+                    }
+                    catch (Exception chunkEx)
+                    {
+                        return StatusCode(500, $"Error processing chunk {i}: {chunkEx.Message}");
+                    }
                 }
             }
-
+            
             using var finalStream = System.IO.File.OpenRead(outputPath);
             var fileId = await fileService.UploadFile(new FormFile(
                 finalStream, 
@@ -97,15 +130,31 @@ public class FileController(IFileService fileService) : ControllerBase
                 finaliseUploadDto.FileName, 
                 finaliseUploadDto.FileName
             ));
-
-            Directory.Delete(tempDir, true);
+            
+            finalStream.Close();
+            
+            try
+            {
+                System.IO.File.Delete(outputPath);
+                Directory.Delete(tempDir, true);
+            }
+            catch (Exception cleanupEx)
+            {
+                Console.WriteLine($"Cleanup error: {cleanupEx.Message}");
+            }
+            
             return Ok(new { fileId });
         }
-        catch (Exception ex)
+        catch (Exception ioEx)
         {
-            return StatusCode(500, $"Finalization failed: {ex.Message}");
+            return StatusCode(500, $"IO error while combining chunks: {ioEx.Message}");
         }
     }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Finalization failed: {ex.Message}");
+    }
+}
     #endregion
     
 }
@@ -117,10 +166,11 @@ public class FormFileDto
 
 public class UploadChunkDto
 {
-    public IFormFile Chunk { get; set; }
+    public byte[] Chunk { get; set; } 
     public string UploadId { get; set; }
     public int ChunkNumber { get; set; }
 }
+
 
 public class FinaliseUploadDto
 {

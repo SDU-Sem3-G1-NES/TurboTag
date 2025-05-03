@@ -19,12 +19,13 @@ const Upload: React.FC = () => {
   const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const [tags, setTags] = useState<string[]>([])
+  // It's for progress tracking, but not implemented yet
   //const [uploadProgress, setUploadProgress] = useState(0);
   //const [uploadId, setUploadId] = useState<string>('');
   //const [isUploading, setIsUploading] = useState(false);
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
-  const CHUNK_SIZE = 255 * 1024; // 255 KB Chunk size
+  const CHUNK_SIZE = 1048576 * 3; // 3MB Chunk size
   
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
@@ -48,6 +49,17 @@ const Upload: React.FC = () => {
       }
     });
   };
+
+  const blobToBase64 = (blob: Blob) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   
   const handleChunkedUpload = async (file: File) => {
     const uploadId = Date.now().toString()
@@ -57,17 +69,22 @@ const Upload: React.FC = () => {
     // Upload chunks
     for (let i = 0; i < totalChunks; i++) {
       const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-      const uploadChunkDto = new UploadChunkDto()
+      const base64Chunk = await blobToBase64(chunk);
+
+      const uploadChunkDto = new UploadChunkDto();
       uploadChunkDto.init({
-        chunk: chunk,
+        chunk: base64Chunk, 
         uploadId: uploadId,
-        chunkNumber: i.toString(),
-      })
+        chunkNumber: i,
+      });
       
 
       await fileClient.uploadChunk(uploadChunkDto);
+      
+      // For progress tracking, you can uncomment the following line
       //setProgress(Math.round(((i + 1) / totalChunks) * 100));
     }
+    
     // Finalize upload
     
     const finalizeUploadDto = new FinaliseUploadDto()
@@ -79,7 +96,7 @@ const Upload: React.FC = () => {
     await fileClient.finalizeUpload(finalizeUploadDto);
     
     
-  };
+  }
 
 
   const handleSubmit = async () => {
