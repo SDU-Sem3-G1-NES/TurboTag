@@ -55,7 +55,7 @@ const UploadPage: React.FC = () => {
         placement: 'topRight',
         duration: 2
       })
-    } catch (error) {
+    } catch {
       notification.error({
         message: 'Upload failed',
         description: 'Your lecture could not be uploaded',
