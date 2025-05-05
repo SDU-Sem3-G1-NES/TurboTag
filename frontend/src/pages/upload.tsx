@@ -20,7 +20,7 @@ const Upload: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const uploadClient = new UploadClient();
   const fileClient = new FileClient();
-  const CHUNK_SIZE = 1048576 * 3; // 3MB Chunk size
+  const CHUNK_SIZE = 1048576 * 15; // 15MB Chunk size
 
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
@@ -98,7 +98,7 @@ const Upload: React.FC = () => {
 
       const uploadDTO = new UploadDto();
       uploadDTO.init({
-        id: Date.now(),
+        id: 0,
         ownerId: 1,
         date: new Date(),
         type: file.type,
@@ -127,7 +127,7 @@ const Upload: React.FC = () => {
       lessonDTO.init({
         uploadId: fileId,
         lessonDetails: lessonDetailsDTO,
-        fileMetadata: [fileMetadataDTO],
+        fileMetadata: fileMetadataDTO,
         ownerId: 1,
       });
 
