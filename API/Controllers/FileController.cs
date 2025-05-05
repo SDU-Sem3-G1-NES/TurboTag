@@ -16,11 +16,13 @@ public class FileController(IFileService fileService, IFFmpegService ffmpegServi
     {
         var fileId = await fileService.UploadFile(file);
         
-        if ((file.ContentType.StartsWith("video/") || file.Length > 0) && fileId != null)
+        if (fileId == null)
         {
-            var filePath = await ffmpegService.SaveFileToTemp(file, fileId);
-            BackgroundJob.Enqueue(() => ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true));
+            return StatusCode(500);
         }
+        
+        var filePath = await ffmpegService.SaveFileToTemp(file, fileId);
+        BackgroundJob.Enqueue(() => ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true));
 
         return Ok(fileId);
     }
