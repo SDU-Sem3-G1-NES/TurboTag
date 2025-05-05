@@ -6,17 +6,17 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LoginController(IUserCredentialsService userCredentialsService) : ControllerBase
+public class LoginController(IUserCredentialService userCredentialService) : ControllerBase
 {
     [HttpGet("ValidateUserCredentials")]
     public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDto userCredentials)
     {
-        return Ok(userCredentialsService.ValidateUserCredentials(userCredentials));
+        return Ok(userCredentialService.ValidateUserCredentials(userCredentials));
     }
 
     [HttpGet("GetUserDataByEmail")]
     public ActionResult<UserDto> GetUserDataByEmail(string email)
     {
-        return Ok(userCredentialsService.GetUserByEmail(email));
+        return Ok(userCredentialService.GetUserByEmail(email));
     }
 }

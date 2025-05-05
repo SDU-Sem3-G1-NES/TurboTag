@@ -2,16 +2,16 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useState } from 'react'
-import { AdminClient, UserFilter } from './api/apiClient.ts'
+import { UserClient, UserFilter } from './api/apiClient.ts'
 
 function App() {
   const [count, setCount] = useState(0)
-  const adminClient = new AdminClient()
+  const userClient = new UserClient()
   const [testString, setTestString] = useState<string | null>(null)
 
   const getTestString = (callback: () => void) => {
     console.log('getTestString')
-    adminClient.getAllUsers().then((response) => {
+    userClient.getAllUsers().then((response) => {
       console.log('response', response)
       setTestString(JSON.stringify(response))
       setTestString((prevTestString) => (prevTestString ?? '') + '<br /><br />')
@@ -23,7 +23,7 @@ function App() {
       pageNumber: 1
     })
 
-    adminClient.getAllUsers(filter).then((response) => {
+    userClient.getAllUsers(filter).then((response) => {
       console.log('response', response)
       setTestString((prevTestString) => (prevTestString ?? '') + JSON.stringify(response))
       callback()

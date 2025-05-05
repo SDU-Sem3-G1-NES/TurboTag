@@ -5,186 +5,6 @@
     "version": "1.0"
   },
   "paths": {
-    "/Admin/GetAllUsers": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_GetAllUsers",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserFilter"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserFilter"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserFilter"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserFilter"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedResult_UserDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Admin/GetUserByEmail": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_GetUserByEmail",
-        "parameters": [
-          {
-            "name": "email",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Admin/CreateNewUser": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_CreateNewUser",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/UpdateUserById": {
-      "put": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_UpdateUserById",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Admin/DeleteUserById": {
-      "delete": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "Admin_DeleteUserById",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/ContentLibrary/GetAllLibraries": {
       "post": {
         "tags": [
@@ -1010,45 +830,6 @@
         }
       }
     },
-    "/Register/CheckIfUserExistsByEmail": {
-      "get": {
-        "tags": [
-          "Register"
-        ],
-        "operationId": "Register_CheckIfUserExistsByEmail",
-        "parameters": [
-          {
-            "name": "email",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Settings/GetAllSettings": {
       "get": {
         "tags": [
@@ -1202,36 +983,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/Test": {
-      "get": {
-        "tags": [
-          "Test"
-        ],
-        "operationId": "Test_Get",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
           }
         }
       }
@@ -1531,6 +1282,225 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/User/GetAllUsers": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetAllUsers",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/User/GetUserByEmail": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetUserByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/User/CreateNewUser": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_CreateNewUser",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/User/UpdateUserById": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_UpdateUserById",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/User/DeleteUserById": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_DeleteUserById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/User/UserExists": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_UserExists",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
           }
         }
       }
