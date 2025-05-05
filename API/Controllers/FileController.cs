@@ -72,7 +72,6 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
         
-        // Validate directory exists
         if (!Directory.Exists(tempDir))
         {
             return StatusCode(500, $"Upload directory not found for ID: {finaliseUploadDto.UploadId}");
@@ -80,7 +79,6 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
         
         var outputPath = Path.Combine(tempDir, finaliseUploadDto.FileName);
         
-        // Check how many chunks should exist
         int totalChunks = 0;
         while (System.IO.File.Exists(Path.Combine(tempDir, $"{totalChunks}.part")))
         {
@@ -92,7 +90,6 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
             return StatusCode(500, "No chunks found to combine");
         }
         
-        // Combine chunks with better exception handling
         try
         {
             using (var outputStream = new FileStream(outputPath, FileMode.Create))
@@ -106,7 +103,6 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                         return StatusCode(500, $"Chunk {i} missing");
                     }
                     
-                    // Ensure each chunk operation is wrapped in its own try-catch
                     try
                     {
                         using var chunkStream = System.IO.File.OpenRead(chunkPath);
@@ -122,16 +118,10 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                 }
             }
             
-            using var finalStream = System.IO.File.OpenRead(outputPath);
-            var fileId = await fileService.UploadFile(new FormFile(
-                finalStream, 
-                0, 
-                finalStream.Length, 
-                finaliseUploadDto.FileName, 
-                finaliseUploadDto.FileName
-            ));
+            await using var finalStream = System.IO.File.OpenRead(outputPath);
+
+            var fileId = await fileService.UploadChunkedFile(finalStream, finaliseUploadDto.FileName);
             
-            finalStream.Close();
             
             try
             {

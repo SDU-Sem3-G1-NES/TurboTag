@@ -68,7 +68,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             Console.WriteLine(e);
         }
     }
-
+    
     public async Task<string?> UploadFile(string bucketName, IFormFile file)
     {
         var database = _client.GetDatabase(GetDatabaseName());
@@ -90,6 +90,40 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
         catch (Exception e)
         {
             Console.WriteLine(e);
+            return null;
+        }
+    }
+
+    public async Task<string?> UploadChunkedFile(string bucketName, Stream stream, string fileName)
+    {
+        var database = _client.GetDatabase(GetDatabaseName());
+        try
+        {
+            var bucketOptions = new GridFSBucketOptions
+            {
+                BucketName = bucketName
+            };
+            GridFSBucket bucket = new(database, bucketOptions);
+
+            // Ensure unique filename
+            var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, fileName);
+            var existingFile = bucket.Find(filter).FirstOrDefault();
+
+            string fileNameToUse = fileName;
+            if (existingFile != null)
+            {
+                fileNameToUse = $"{Path.GetFileNameWithoutExtension(fileName)}_{Guid.NewGuid()}{Path.GetExtension(fileName)}";
+            }
+
+            await using var uploadStream = await bucket.OpenUploadStreamAsync(fileNameToUse);
+            await stream.CopyToAsync(uploadStream);
+            await uploadStream.CloseAsync();
+
+            return uploadStream.Id.ToString();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error uploading file: {e.Message}");
             return null;
         }
     }
