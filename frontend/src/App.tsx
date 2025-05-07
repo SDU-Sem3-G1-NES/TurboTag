@@ -1,56 +1,53 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React from 'react'
+import { Layout, Input, Upload, Button, Typography } from 'antd'
+import { UploadOutlined, InboxOutlined } from '@ant-design/icons'
 import './App.css'
-import { useState } from 'react'
-import { UserClient, UserFilter } from './api/apiClient.ts'
+import logo from './assets/logo.png'
 
-function App() {
-  const [count, setCount] = useState(0)
-  const userClient = new UserClient()
-  const [testString, setTestString] = useState<string | null>(null)
+const { Header, Content } = Layout
+const { TextArea } = Input
+const { Dragger } = Upload
 
-  const getTestString = (callback: () => void) => {
-    console.log('getTestString')
-    userClient.getAllUsers().then((response) => {
-      console.log('response', response)
-      setTestString(JSON.stringify(response))
-      setTestString((prevTestString) => (prevTestString ?? '') + '<br /><br />')
-      callback()
-    })
-
-    const filter = new UserFilter({
-      pageSize: 10,
-      pageNumber: 1
-    })
-
-    userClient.getAllUsers(filter).then((response) => {
-      console.log('response', response)
-      setTestString((prevTestString) => (prevTestString ?? '') + JSON.stringify(response))
-      callback()
-    })
+const App: React.FC = () => {
+  const uploadProps = {
+    name: 'file',
+    multiple: false,
+    accept: '.mp4,.mov,.avi,.wmv',
+    beforeUpload: () => false
   }
 
   return (
-    <div>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-      <button onClick={() => getTestString(() => console.log('weather updated'))}>Test</button>
-      <div dangerouslySetInnerHTML={{ __html: testString ?? '' }} />
-    </div>
+    <Layout className="layout">
+      <Header className="header">
+        <img src={logo} alt="SpeedAdmin" className="logo" />
+      </Header>
+
+      <Content className="content">
+        <div className="form-container">
+          <Typography.Title level={5}>Title</Typography.Title>
+          <TextArea rows={1} maxLength={100} placeholder="Enter Title Here" />
+
+          <div className="upload-box">
+            <Dragger {...uploadProps}>
+              <p className="upload-icon">
+                <InboxOutlined style={{ fontSize: 40, color: '#1890ff' }} />
+              </p>
+              <p>Click or drag file to this area to upload</p>
+              <p className="hint">Supported file formats: mp4, mov, avi, wmv</p>
+            </Dragger>
+          </div>
+
+          <Typography.Title level={5}>Tags</Typography.Title>
+          <Input placeholder="Feel free to edit your AI generated tags" maxLength={100} />
+
+          <div className="upload-button-wrapper">
+            <Button type="primary" icon={<UploadOutlined />} className="upload-btn">
+              Upload
+            </Button>
+          </div>
+        </div>
+      </Content>
+    </Layout>
   )
 }
 
