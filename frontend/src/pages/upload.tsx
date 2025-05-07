@@ -11,9 +11,11 @@ import {
   UploadChunkDto,
   FinaliseUploadDto,
 } from '../api/apiClient.ts';
-import { Button, Form, Input, notification } from 'antd';
+import { Button, Form, Input, notification,Progress } from 'antd';
 
 const Upload: React.FC = () => {
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
@@ -63,7 +65,9 @@ const Upload: React.FC = () => {
   const handleChunkedUpload = async (file: File) => {
     const uploadId = Date.now().toString();
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
+    
+    setUploading(true);
+    
     for (let i = 0; i < totalChunks; i++) {
       const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
       const base64Chunk = await blobToBase64(chunk);
@@ -76,6 +80,8 @@ const Upload: React.FC = () => {
       });
 
       await fileClient.uploadChunk(uploadChunkDto);
+
+      setUploadProgress(Math.round(((i + 1) / totalChunks) * 100));
     }
 
     const finalizeUploadDto = new FinaliseUploadDto();
@@ -85,7 +91,8 @@ const Upload: React.FC = () => {
     });
 
     const fileId = await fileClient.finalizeUpload(finalizeUploadDto);
-
+    
+    setUploading(false);
     return fileId;
   };
 
@@ -197,9 +204,14 @@ const Upload: React.FC = () => {
 
       <br />
       <Form.Item label={null}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
+        {uploading ? (
+          <Progress percent={uploadProgress} status="active" />
+        ) : (
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        )}
+        
       </Form.Item>
     </Form>
   );
