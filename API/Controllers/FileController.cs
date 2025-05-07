@@ -102,21 +102,6 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
             return BadRequest("Invalid FileName");
         }
         
-        if (string.IsNullOrWhiteSpace(finaliseUploadDto.UploadId) || 
-            finaliseUploadDto.UploadId.Contains("..") || 
-            finaliseUploadDto.UploadId.Contains(Path.DirectorySeparatorChar) || 
-            finaliseUploadDto.UploadId.Contains(Path.AltDirectorySeparatorChar))
-        {
-            return BadRequest("Invalid UploadId");
-        }
-        
-        if (string.IsNullOrWhiteSpace(finaliseUploadDto.FileName) || 
-            finaliseUploadDto.FileName.Contains("..") || 
-            finaliseUploadDto.FileName.Contains(Path.DirectorySeparatorChar) || 
-            finaliseUploadDto.FileName.Contains(Path.AltDirectorySeparatorChar))
-        {
-            return BadRequest("Invalid FileName");
-        }
 
         var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
 
