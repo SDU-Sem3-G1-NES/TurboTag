@@ -1,4 +1,5 @@
 using API.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -6,7 +7,7 @@ namespace API.Controllers;
 [ApiController]
 
 [Route("[controller]")]
-public class FileController(IFileService fileService) : ControllerBase
+public class FileController(IFileService fileService, IFFmpegService ffmpegService) : ControllerBase
 {
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
@@ -14,6 +15,15 @@ public class FileController(IFileService fileService) : ControllerBase
     public async Task<ActionResult<string>> UploadFile(IFormFile file)
     {
         var fileId = await fileService.UploadFile(file);
+        
+        if (fileId == null)
+        {
+            return StatusCode(500);
+        }
+        
+        var filePath = await ffmpegService.SaveFileToTemp(file, fileId);
+        BackgroundJob.Enqueue(() => ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true));
+
         return Ok(fileId);
     }
     [DisableRequestSizeLimit]
