@@ -84,13 +84,47 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
 {
     try
     {
-        var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
+        // Validate UploadId
+        if (string.IsNullOrWhiteSpace(finaliseUploadDto.UploadId) || 
+            finaliseUploadDto.UploadId.Contains("..") || 
+            finaliseUploadDto.UploadId.Contains(Path.DirectorySeparatorChar) || 
+            finaliseUploadDto.UploadId.Contains(Path.AltDirectorySeparatorChar))
+        {
+            return BadRequest("Invalid UploadId");
+        }
+
+        // Validate FileName
+        if (string.IsNullOrWhiteSpace(finaliseUploadDto.FileName) || 
+            finaliseUploadDto.FileName.Contains("..") || 
+            finaliseUploadDto.FileName.Contains(Path.DirectorySeparatorChar) || 
+            finaliseUploadDto.FileName.Contains(Path.AltDirectorySeparatorChar))
+        {
+            return BadRequest("Invalid FileName");
+        }
         
+        if (string.IsNullOrWhiteSpace(finaliseUploadDto.UploadId) || 
+            finaliseUploadDto.UploadId.Contains("..") || 
+            finaliseUploadDto.UploadId.Contains(Path.DirectorySeparatorChar) || 
+            finaliseUploadDto.UploadId.Contains(Path.AltDirectorySeparatorChar))
+        {
+            return BadRequest("Invalid UploadId");
+        }
+        
+        if (string.IsNullOrWhiteSpace(finaliseUploadDto.FileName) || 
+            finaliseUploadDto.FileName.Contains("..") || 
+            finaliseUploadDto.FileName.Contains(Path.DirectorySeparatorChar) || 
+            finaliseUploadDto.FileName.Contains(Path.AltDirectorySeparatorChar))
+        {
+            return BadRequest("Invalid FileName");
+        }
+
+        var tempDir = Path.Combine(Path.GetTempPath(), "uploads", finaliseUploadDto.UploadId);
+
         if (!Directory.Exists(tempDir))
         {
             return StatusCode(500, $"Upload directory not found for ID: {finaliseUploadDto.UploadId}");
         }
-        
+
         var outputPath = Path.Combine(tempDir, finaliseUploadDto.FileName);
         
         int totalChunks = 0;
