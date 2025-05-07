@@ -2,12 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Layout, Menu } from 'antd'
 import App from './App.tsx'
-import './index.css'
 import Upload from './pages/upload.tsx'
+import './index.css'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
 import { ReactNotifications } from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
-import { Content, Header, Footer } from 'antd/es/layout/layout'
+import { Content, Footer, Header } from 'antd/es/layout/layout'
 
 const AppLayout = () => {
   const navigate = useNavigate()

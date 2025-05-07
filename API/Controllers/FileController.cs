@@ -151,19 +151,19 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
 
 public class FormFileDto
 {
-    public IFormFile File { get; set; }
+    public IFormFile? File { get; set; }
 }
 
 public class UploadChunkDto
 {
-    public byte[] Chunk { get; set; } 
-    public string UploadId { get; set; }
+    public byte[]? Chunk { get; set; } 
+    public string? UploadId { get; set; }
     public int ChunkNumber { get; set; }
 }
 
 
 public class FinaliseUploadDto
 {
-    public string UploadId { get; set; }
-    public string FileName { get; set; }
+    public string? UploadId { get; set; }
+    public string? FileName { get; set; }
 }
