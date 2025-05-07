@@ -1,22 +1,29 @@
 import React, { useState } from 'react'
 import Tags from '../components/tags'
-import { FileMetadataDto, UploadDto } from '../api/apiClient.ts'
-import { Button, Form, Input, notification } from 'antd'
+import { FileMetadataDto, UploadDto, UploadDetailsDto } from '../api/apiClient.ts'
+import { Button, Form, Input, Typography, Upload, notification } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
+import type { UploadProps } from 'antd'
 
-const Upload: React.FC = () => {
+const { TextArea } = Input
+
+const UploadPage: React.FC = () => {
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const [tags, setTags] = useState<string[]>([])
-  //const uploadClient = new UploadClient()
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleFileChange: UploadProps['beforeUpload'] = (file) => {
+    setFile(file)
+    return false // prevent auto-upload
+  }
+
+  const handleSubmit = async () => {
     if (!file) return
 
     const fileMetadata = new FileMetadataDto({
       checkSum: '1234',
-      fileSize: 1000,
+      fileSize: file.size,
       fileName: file.name,
       fileType: file.type,
       duration: 100,
@@ -40,9 +47,7 @@ const Upload: React.FC = () => {
     })
 
     try {
-      //await uploadClient.storeUpload(uploadDTO)
-
-      openNotification('topRight')
+      // await uploadClient.storeUpload(uploadDTO)
 
       notification.success({
         message: 'Upload successful',
@@ -50,73 +55,61 @@ const Upload: React.FC = () => {
         placement: 'topRight',
         duration: 2
       })
-
-      console.log('Upload successful')
-    } catch (error) {
+    } catch {
       notification.error({
         message: 'Upload failed',
         description: 'Your lecture could not be uploaded',
         placement: 'topRight',
         duration: 2
       })
-
-      console.error('Upload failed', error)
     }
   }
 
   return (
-    <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      onFinish={handleSubmit}
-      autoComplete="off"
-    >
-      <h1>Upload Lecture</h1>
+    <div className="form-container">
+      <Typography.Title level={3}>Upload Lecture</Typography.Title>
 
-      <Form.Item<string>
-        label="Title"
-        name="title"
-        rules={[{ required: true, message: 'Please input your title!' }]}
-      >
-        <Input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-      </Form.Item>
+      <Form layout="vertical" onFinish={handleSubmit}>
+        <Form.Item label="Title" required>
+          <TextArea
+            maxLength={100}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter Title Here"
+          />
+        </Form.Item>
 
-      <Form.Item<string>
-        label="Description"
-        name="description"
-        rules={[{ required: true, message: 'Please input your description!' }]}
-      >
-        <Input
-          id="description"
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </Form.Item>
+        <Form.Item label="Upload File" required>
+          <Upload.Dragger beforeUpload={handleFileChange} accept=".mp4,.mov,.avi,.wmv" maxCount={1}>
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">Click or drag file to this area to upload</p>
+            <p className="ant-upload-hint">Supported file formats: mp4, mov, avi, wmv</p>
+          </Upload.Dragger>
+        </Form.Item>
 
-      <Form.Item
-        label="File"
-        name="file"
-        rules={[{ required: true, message: 'Please upload a file!' }]}
-      >
-        <Input
-          id="file"
-          type="file"
-          onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-        />
-      </Form.Item>
+        <Form.Item label="Description">
+          <Input
+            maxLength={100}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Optional short description"
+          />
+        </Form.Item>
 
-      <Tags tags={tags} setTags={setTags} />
+        <Form.Item label="Tags">
+          <Tags tags={tags} setTags={setTags} />
+        </Form.Item>
 
-      <br />
-      <Form.Item label={null}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" icon={<UploadOutlined />}>
+            Upload
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   )
 }
 
-export default Upload
+export default UploadPage
