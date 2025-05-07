@@ -7,7 +7,7 @@ namespace API.Controllers;
 [ApiController]
 
 [Route("[controller]")]
-public class FileController(IFileService fileService, IFFmpegService ffmpegService) : ControllerBase
+public class FileController(IFileService fileService, IFFmpegService ffmpegService, IMediaProcessingService mediaProcessingService) : ControllerBase
 {
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
@@ -22,7 +22,7 @@ public class FileController(IFileService fileService, IFFmpegService ffmpegServi
         }
         
         var filePath = await ffmpegService.SaveFileToTemp(file, fileId);
-        BackgroundJob.Enqueue(() => ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true));
+        BackgroundJob.Enqueue(() => mediaProcessingService.ProcessMediaAsync(ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true).Result));
 
         return Ok(fileId);
     }

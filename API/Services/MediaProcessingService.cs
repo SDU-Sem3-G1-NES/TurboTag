@@ -1,9 +1,18 @@
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace API.Services;
 
-public class MediaProcessingService(IWhisperService whisperService, IOllamaImageAnalysisService ollamaImageAnalysisService, IFileService fileService) : IServiceBase
+public interface IMediaProcessingService : IServiceBase
 {
+    Task<string> ProcessMediaAsync((List<string> audioFilePath, List<string> imageFilePath) mediaPaths);
+    Task<string> ProcessMediaAsync(List<string> audioFilePath, List<string> imageFilePath);
+}
+
+public class MediaProcessingService(IWhisperService whisperService, IOllamaImageAnalysisService ollamaImageAnalysisService, IFileService fileService) : IMediaProcessingService
+{
+    public async Task<string> ProcessMediaAsync((List<string> audioFilePath, List<string> imageFilePath) mediaPaths) =>
+        await ProcessMediaAsync(mediaPaths.audioFilePath, mediaPaths.imageFilePath);
     public async Task<string> ProcessMediaAsync(List<string> audioFilePath, List<string> imageFilePath)
     {
         var finalDescription = new StringBuilder();
@@ -19,7 +28,7 @@ public class MediaProcessingService(IWhisperService whisperService, IOllamaImage
                 {
                     fileInfo.Description += transcription;
                     fileService.UpdateFileInfo(fileInfo);
-                    finalDescription.Append(fileInfo.Description);
+                    finalDescription.Append(transcription);
                 }
             }
             foreach (var imagePath in imageFilePath)
@@ -32,7 +41,7 @@ public class MediaProcessingService(IWhisperService whisperService, IOllamaImage
                 {
                     fileInfo.Description += imageAnalysis;
                     fileService.UpdateFileInfo(fileInfo);
-                    finalDescription.Append(fileInfo.Description);
+                    finalDescription.Append(imageAnalysis);
                 }
             }
         }

@@ -98,7 +98,7 @@ public class WhisperOptions
 {
     public string Model { get; set; } = "base";
     public string Language { get; set; }
-    public string OutputFormat { get; set; } = "txt";
+    public string OutputFormat { get; set; } = "json";
     public bool Translate { get; set; } = false;
     public int BeamSize { get; set; } = 5;
 }

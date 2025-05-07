@@ -12,12 +12,12 @@ public class OllamaImageAnalysisService(string ollamaEndpoint = "http://localhos
 {
     private readonly HttpClient _httpClient = new()
     {
-        Timeout = TimeSpan.FromMinutes(5)
+        Timeout = TimeSpan.FromMinutes(60)
     };
 
     public async Task<string> AnalyzeImageAsync(string imagePath)
     {
-        var options = new OllamaImageOptions { };
+        var options = new OllamaImageOptions();
         return await AnalyzeImageWithOptionsAsync(imagePath, options);
     }
 
@@ -61,6 +61,7 @@ public class OllamaImageAnalysisService(string ollamaEndpoint = "http://localhos
 public class OllamaImageOptions
 {
     public string Model { get; set; } = "llava";
-    public string Prompt { get; set; } = "Describe what you see in this image";
+
+    public string Prompt { get; set; } = "Describe in detail what you see in this image. The image is most likely related to music. Identify any musical instruments, people, activities, or settings, and explain how they relate to music.";
     public bool Stream { get; set; } = false;
 }
