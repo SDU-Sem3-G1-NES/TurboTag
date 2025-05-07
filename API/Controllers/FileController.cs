@@ -51,6 +51,20 @@ public class FileController(IFileService fileService) : ControllerBase
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(uploadChunkDto.UploadId) || 
+                !System.Text.RegularExpressions.Regex.IsMatch(uploadChunkDto.UploadId, @"^[a-zA-Z0-9_-]+$"))
+            {
+                return BadRequest("Invalid UploadId. Only alphanumeric characters, underscores, and hyphens are allowed.");
+            }
+            
+            if (string.IsNullOrWhiteSpace(uploadChunkDto.UploadId) || 
+                uploadChunkDto.UploadId.Contains("..") || 
+                uploadChunkDto.UploadId.Contains(Path.DirectorySeparatorChar) || 
+                uploadChunkDto.UploadId.Contains(Path.AltDirectorySeparatorChar))
+            {
+                return BadRequest("Invalid UploadId");
+            }
+            
             var tempPath = Path.Combine(Path.GetTempPath(), "uploads", uploadChunkDto.UploadId);
             Directory.CreateDirectory(tempPath);
             var chunkPath = Path.Combine(tempPath, $"{uploadChunkDto.ChunkNumber}.part");

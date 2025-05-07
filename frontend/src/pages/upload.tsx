@@ -26,24 +26,27 @@ const Upload: React.FC = () => {
 
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
-      if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
-        const mediaElement = document.createElement(file.type.startsWith('audio/') ? 'audio' : 'video');
-        const url = URL.createObjectURL(file);
-
-        mediaElement.src = url;
-
-        mediaElement.onloadedmetadata = () => {
-          resolve(mediaElement.duration);
-          URL.revokeObjectURL(url);
-        };
-
-        mediaElement.onerror = () => {
-          URL.revokeObjectURL(url);
-          reject(new Error('Unable to load media file for duration calculation'));
-        };
-      } else {
-        resolve(null);
+      if (!file.type.startsWith('audio/') && !file.type.startsWith('video/')) {
+        reject(new Error('Unsupported file type. Only audio and video files are allowed.'));
+        return;
       }
+
+      const mediaElement = document.createElement(file.type.startsWith('audio/') ? 'audio' : 'video');
+      const url = URL.createObjectURL(file);
+
+      mediaElement.src = url;
+
+      mediaElement.onloadedmetadata = () => {
+        resolve(mediaElement.duration);
+        URL.revokeObjectURL(url);
+      };
+
+      mediaElement.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Unable to load media file for duration calculation'));
+      };
+
+      resolve(null);
     });
   };
 
