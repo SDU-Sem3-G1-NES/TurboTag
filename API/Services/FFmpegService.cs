@@ -42,7 +42,7 @@ public class FFmpegService : IFFmpegService
 
                 for (int i = 0; i < 5; i++)
                 {
-                    var snapshotPath = Path.Combine(outputFolderPath, $"Snapshot-{i + 1}.jpg");
+                    var snapshotPath = Path.Combine(outputFolderPath, $"Snapshot-{i + 1}.png");
                     await FFMpeg.SnapshotAsync(videoPath, snapshotPath, null,
                         TimeSpan.FromSeconds(i * snapshotPeriod));
                     snapshotPaths.Add(snapshotPath);
