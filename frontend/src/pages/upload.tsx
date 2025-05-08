@@ -11,9 +11,11 @@ import {
   UploadChunkDto,
   FinaliseUploadDto,
 } from '../api/apiClient.ts';
-import { Button, Form, Input, notification,Progress } from 'antd';
+import { Button, Form, Input, notification,Progress,Upload, Typography,UploadProps } from 'antd';
+import { UploadOutlined } from '@ant-design/icons'
+import TextArea from 'antd/es/input/TextArea'
 
-const Upload: React.FC = () => {
+const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
@@ -23,6 +25,11 @@ const Upload: React.FC = () => {
   const uploadClient = new UploadClient();
   const fileClient = new FileClient();
   const CHUNK_SIZE = 1048576 * 15; // 15MB Chunk size
+
+  const handleFileChange: UploadProps['beforeUpload'] = (file) => {
+    setFile(file)
+    return false // prevent auto-upload
+  }
 
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
@@ -170,54 +177,55 @@ const Upload: React.FC = () => {
   };
 
   return (
-    <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      onFinish={handleSubmit}
-      autoComplete="off"
-    >
-      <h1>Upload Lecture</h1>
+    <div className="form-container">
+      <Typography.Title level={3}>Upload Lecture</Typography.Title>
 
-      <Form.Item
-        label="Title"
-        name="title"
-        rules={[{ required: true, message: 'Please input your title!' }]}
-      >
-        <Input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-      </Form.Item>
+      <Form layout="vertical" onFinish={handleSubmit}>
+        <Form.Item label="Title" required>
+          <TextArea
+            maxLength={100}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter Title Here"
+          />
+        </Form.Item>
 
-      <Form.Item
-        label="Description"
-        name="description"
-        rules={[{ required: true, message: 'Please input your description!' }]}
-      >
-        <Input id="description" type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
-      </Form.Item>
+        <Form.Item label="Upload File" required>
+          <Upload.Dragger beforeUpload={handleFileChange} accept=".mp4,.mov,.avi,.wmv" maxCount={1}>
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">Click or drag file to this area to upload</p>
+            <p className="ant-upload-hint">Supported file formats: mp4, mov, avi, wmv</p>
+          </Upload.Dragger>
+        </Form.Item>
 
-      <Form.Item
-        label="File"
-        name="file"
-        rules={[{ required: true, message: 'Please upload a file!' }]}
-      >
-        <Input id="file" type="file" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
-      </Form.Item>
+        <Form.Item label="Description">
+          <Input
+            maxLength={100}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Optional short description"
+          />
+        </Form.Item>
 
-      <Tags tags={tags} setTags={setTags} />
-
-      <br />
+        <Form.Item label="Tags">
+          <Tags tags={tags} setTags={setTags} />
+        </Form.Item>
+      
       <Form.Item label={null}>
         {uploading ? (
           <Progress percent={uploadProgress} status="active" />
         ) : (
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" icon={<UploadOutlined />}>
             Submit
           </Button>
         )}
         
       </Form.Item>
     </Form>
+</div>
   );
 };
 
-export default Upload;
+export default UploadPage;
