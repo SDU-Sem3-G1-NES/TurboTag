@@ -7,7 +7,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UploadController(IUploadService uploadService) : ControllerBase
+public class UploadController(IUploadService uploadService, ILessonService lessonService) : ControllerBase
 {
     [HttpPost("GetAllUploads")]
     public ActionResult<IEnumerable<UploadDto>> GetAllUploads([FromBody] UploadFilter? filter)
@@ -34,11 +34,20 @@ public class UploadController(IUploadService uploadService) : ControllerBase
     }
     
     [HttpPost("AddUpload")]
-    public ActionResult<int> AddUpload([FromBody] UploadDto upload)
+    public ActionResult<int> AddUpload([FromBody] AddUploadRequestDto request)
     {
-        uploadService.CreateNewUpload(upload);
-        return Ok();
+        try
+        {
+            uploadService.CreateNewUpload(request.UploadDto);
+            lessonService.AddLesson(request.LessonDto);
+            return Ok();
+        } 
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
+    
     
     [HttpPut("UpdateUpload")]
     public ActionResult UpdateUpload([FromBody] UploadDto updatedUpload)

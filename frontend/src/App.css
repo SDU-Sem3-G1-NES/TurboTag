@@ -7,9 +7,10 @@
   background: white;
   padding: 0 20px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .logo {
@@ -21,6 +22,17 @@
   padding: 40px 20px;
   display: flex;
   justify-content: center;
+}
+
+.menu-container {
+  flex: 1;
+}
+
+.logo-container {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
 }
 
 .form-container {

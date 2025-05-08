@@ -27,8 +27,8 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
 
         var insertSql = @"
             INSERT INTO uploads (user_id, upload_date, upload_type)
-            VALUES (@userId, @uploadDate, @uploadType);
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            VALUES (@userId, @uploadDate, @uploadType)
+            RETURNING upload_id;";
 
         var uploadId = sqlDbAccess.ExecuteQuery<int>(
             _databaseName,
