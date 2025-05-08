@@ -10,16 +10,17 @@ public class FileController(IFileService fileService) : ControllerBase
 {
 
     #region UploadFile
-    
+   /* 
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     [HttpPost("UploadFile")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<string>> UploadFile([FromForm] FormFileDto formFileDtofile)
     {
-        var fileId = await fileService.UploadFile(formFileDtofile.File);
+        var fileId = await _fileService.UploadFile(formFileDtofile.File);
         return Ok(fileId);
     }
+    */
     #endregion
     #region GetFileById
     [DisableRequestSizeLimit]
@@ -52,12 +53,7 @@ public class FileController(IFileService fileService) : ControllerBase
         try
         {
             if (string.IsNullOrWhiteSpace(uploadChunkDto.UploadId) || 
-                !System.Text.RegularExpressions.Regex.IsMatch(uploadChunkDto.UploadId, @"^[a-zA-Z0-9_-]+$"))
-            {
-                return BadRequest("Invalid UploadId. Only alphanumeric characters, underscores, and hyphens are allowed.");
-            }
-            
-            if (string.IsNullOrWhiteSpace(uploadChunkDto.UploadId) || 
+                !System.Text.RegularExpressions.Regex.IsMatch(uploadChunkDto.UploadId, @"^[a-zA-Z0-9_-]+$") || 
                 uploadChunkDto.UploadId.Contains("..") || 
                 uploadChunkDto.UploadId.Contains(Path.DirectorySeparatorChar) || 
                 uploadChunkDto.UploadId.Contains(Path.AltDirectorySeparatorChar))
@@ -68,6 +64,10 @@ public class FileController(IFileService fileService) : ControllerBase
             var tempPath = Path.Combine(Path.GetTempPath(), "uploads", uploadChunkDto.UploadId);
             Directory.CreateDirectory(tempPath);
             var chunkPath = Path.Combine(tempPath, $"{uploadChunkDto.ChunkNumber}.part");
+            if (uploadChunkDto.Chunk == null)
+            {
+                return BadRequest("Chunk data cannot be null.");
+            }
             await System.IO.File.WriteAllBytesAsync(chunkPath, uploadChunkDto.Chunk);
             return Ok();
         }
