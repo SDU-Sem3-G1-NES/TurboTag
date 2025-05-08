@@ -11,9 +11,9 @@ import {
   UploadChunkDto,
   FinaliseUploadDto,
 } from '../api/apiClient.ts';
-import { Button, Form, Input, notification,Progress,Upload, Typography,UploadProps } from 'antd';
-import { UploadOutlined } from '@ant-design/icons'
-import TextArea from 'antd/es/input/TextArea'
+import { Button, Form, Input, notification, Progress, Upload, UploadProps } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import TextArea from 'antd/es/input/TextArea';
 
 const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false);
@@ -27,9 +27,9 @@ const UploadPage: React.FC = () => {
   const CHUNK_SIZE = 1048576 * 15; // 15MB Chunk size
 
   const handleFileChange: UploadProps['beforeUpload'] = (file) => {
-    setFile(file)
-    return false // prevent auto-upload
-  }
+    setFile(file);
+    return false; // prevent auto-upload
+  };
 
   const getFileDuration = (file: File): Promise<number | null> => {
     return new Promise((resolve, reject) => {
@@ -52,8 +52,6 @@ const UploadPage: React.FC = () => {
         URL.revokeObjectURL(url);
         reject(new Error('Unable to load media file for duration calculation'));
       };
-
-      resolve(null);
     });
   };
 
@@ -73,11 +71,11 @@ const UploadPage: React.FC = () => {
     });
 
   const handleChunkedUpload = async (file: File) => {
-    const uploadId = Date.now().toString();
+    const uploadId = crypto.randomUUID();
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-    
+
     setUploading(true);
-    
+
     for (let i = 0; i < totalChunks; i++) {
       const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
       const base64Chunk = await blobToBase64(chunk);
@@ -101,7 +99,7 @@ const UploadPage: React.FC = () => {
     });
 
     const fileId = await fileClient.finalizeUpload(finalizeUploadDto);
-    
+
     setUploading(false);
     return fileId;
   };
@@ -135,16 +133,18 @@ const UploadPage: React.FC = () => {
         fileType: file.type,
         fileName: file.name,
         fileSize: file.size,
-        duration: duration,
+        duration: duration === null ? null : Math.round(duration),
         date: new Date(),
         checksum: null,
       });
 
+      const fileMetadataArray = Array.isArray(fileMetadataDTO) ? fileMetadataDTO : [fileMetadataDTO];
+      
       const lessonDTO = new LessonDto();
       lessonDTO.init({
         uploadId: fileId,
         lessonDetails: lessonDetailsDTO,
-        fileMetadata: fileMetadataDTO,
+        fileMetadata: fileMetadataArray,
         ownerId: 1,
       });
 
@@ -178,11 +178,13 @@ const UploadPage: React.FC = () => {
 
   return (
     <div className="form-container">
-      <Typography.Title level={3}>Upload Lecture</Typography.Title>
 
       <Form layout="vertical" onFinish={handleSubmit}>
-        <Form.Item label="Title" required>
-          <TextArea
+        <Form.Item
+          label="Title"
+          name="title" 
+          rules={[{ required: true, message: 'Please input your title!' }]}>
+          <Input
             maxLength={100}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -190,7 +192,10 @@ const UploadPage: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Upload File" required>
+        <Form.Item
+          label="Upload File"
+          name="file" 
+          rules={[{ required: true, message: 'Please upload a file!' }]}>
           <Upload.Dragger beforeUpload={handleFileChange} accept=".mp4,.mov,.avi,.wmv" maxCount={1}>
             <p className="ant-upload-drag-icon">
               <UploadOutlined />
@@ -200,31 +205,35 @@ const UploadPage: React.FC = () => {
           </Upload.Dragger>
         </Form.Item>
 
-        <Form.Item label="Description">
-          <Input
+        <Form.Item
+          label="Description"
+          name="description" 
+          rules={[{ required: true, message: 'Please input your description!' }]}>
+          <TextArea
             maxLength={100}
-            value={description}
+            value={title}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Optional short description"
           />
         </Form.Item>
 
-        <Form.Item label="Tags">
+        <Form.Item label="Tags" name="tags">
           <Tags tags={tags} setTags={setTags} />
         </Form.Item>
-      
-      <Form.Item label={null}>
-        {uploading ? (
-          <Progress percent={uploadProgress} status="active" />
-        ) : (
-          <Button type="primary" htmlType="submit" icon={<UploadOutlined />}>
-            Submit
-          </Button>
-        )}
-        
-      </Form.Item>
-    </Form>
-</div>
+
+        <Form.Item>
+          <div className="upload-button-wrapper">
+          {uploading ? (
+            <Progress percent={uploadProgress} status="active" />
+          ) : (
+            <Button type="primary" htmlType="submit" className="upload-btn" icon={<UploadOutlined />}>
+              Submit
+            </Button>
+          )}
+          </div>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
