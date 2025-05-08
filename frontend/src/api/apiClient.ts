@@ -429,6 +429,10 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface IFileClient {
                     /**
+             * @param file (optional) 
+             * @return OK
+             */
+            uploadFile(file?: FileParameter | undefined): Promise<string>                    /**
              * @param id (optional) 
              * @return OK
              */
@@ -456,6 +460,66 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     
+    
+
+        /**
+         * @param file (optional) 
+         * @return OK
+         */
+        uploadFile(file?: FileParameter | undefined, cancelToken?: CancelToken): Promise<string> {        let url_ = this.baseUrl + "/File/UploadFile";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = new FormData();
+            if (file === null || file === undefined)
+                throw new Error("The parameter 'file' cannot be null.");
+            else
+                content_.append("file", file.data, file.fileName ? file.fileName : "file");
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processUploadFile(_response);
+                });
+        }
+
+    protected processUploadFile(response: AxiosResponse): Promise<string> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = resultData200 as string;
+        
+        return Promise.resolve<string>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<string>(null as any);
+}
     
 
         /**
@@ -3839,6 +3903,11 @@ export interface IUserFilter {
     libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export interface FileResponse {
