@@ -12,7 +12,7 @@ import logo from './assets/logo.png'
 import './App.css'
 
 const AppLayout = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const items = [
     {
@@ -25,7 +25,7 @@ const AppLayout = () => {
       label: 'Upload',
       onClick: () => navigate('/upload')
     }
-  ];
+  ]
 
   return (
     <StrictMode>
@@ -45,13 +45,11 @@ const AppLayout = () => {
             <Route path="/upload" element={<Upload />} />
           </Routes>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          Group 1 Turbo Tag
-        </Footer>
+        <Footer style={{ textAlign: 'center' }}>Group 1 Turbo Tag</Footer>
       </Layout>
     </StrictMode>
-  );
-};
+  )
+}
 
 createRoot(document.getElementById('root')!).render(
   <Router>
