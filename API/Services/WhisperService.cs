@@ -37,7 +37,8 @@ public class WhisperService(string whisperPath = "whisper") : IWhisperService
             CreateNoWindow = true
         };
 
-        using var process = new Process { StartInfo = startInfo };
+        using var process = new Process();
+        process.StartInfo = startInfo;
         var output = new StringBuilder();
         var error = new StringBuilder();
 
@@ -87,6 +88,9 @@ public class WhisperService(string whisperPath = "whisper") : IWhisperService
             
         if (!string.IsNullOrEmpty(options.OutputFormat))
             args.Append($" --output_format {options.OutputFormat}");
+        
+        if (!string.IsNullOrEmpty(options.OutputDir))
+            args.Append($" --output_dir {options.OutputDir}");
             
         args.Append($" --beam_size {options.BeamSize}");
         
@@ -97,8 +101,9 @@ public class WhisperService(string whisperPath = "whisper") : IWhisperService
 public class WhisperOptions
 {
     public string Model { get; set; } = "base";
-    public string Language { get; set; }
+    public string? Language { get; set; }
     public string OutputFormat { get; set; } = "json";
+    public string OutputDir { get; set; } = Path.GetTempPath();
     public bool Translate { get; set; } = false;
     public int BeamSize { get; set; } = 5;
 }

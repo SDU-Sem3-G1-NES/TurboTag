@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace API.Services;
@@ -23,6 +22,7 @@ public class MediaProcessingService(IWhisperService whisperService, IOllamaImage
                 var transcription = await whisperService.TranscribeAsync(audioPath);
                 var fileDirectory = Path.GetDirectoryName(audioPath);
                 var objectId = Path.GetFileName(fileDirectory);
+                if (objectId == null) continue;
                 var fileInfo = fileService.GetFileInfoByObjectId(objectId);
                 if (fileInfo != null)
                 {
@@ -36,6 +36,7 @@ public class MediaProcessingService(IWhisperService whisperService, IOllamaImage
                 var imageAnalysis = await ollamaImageAnalysisService.AnalyzeImageAsync(imagePath);
                 var fileDirectory = Path.GetDirectoryName(imagePath);
                 var objectId = Path.GetFileName(fileDirectory);
+                if (objectId == null) continue;
                 var fileInfo = fileService.GetFileInfoByObjectId(objectId);
                 if (fileInfo != null)
                 {
