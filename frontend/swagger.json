@@ -344,6 +344,80 @@
         }
       }
     },
+    "/File/UploadChunk": {
+      "post": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_UploadChunk",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadChunkDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/File/FinalizeUpload": {
+      "post": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_FinalizeUpload",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/Lesson/GetAllLessons": {
       "get": {
         "tags": [
@@ -1105,22 +1179,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadDto"
+                "$ref": "#/components/schemas/AddUploadRequestDto"
               }
             }
           }
@@ -1434,6 +1508,18 @@
   },
   "components": {
     "schemas": {
+      "AddUploadRequestDto": {
+        "type": "object",
+        "properties": {
+          "uploadDto": {
+            "$ref": "#/components/schemas/UploadDto"
+          },
+          "lessonDto": {
+            "$ref": "#/components/schemas/LessonDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "FileMetadataDto": {
         "type": "object",
         "properties": {
@@ -1465,6 +1551,20 @@
             "nullable": true
           },
           "checkSum": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FinaliseUploadDto": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileName": {
             "type": "string",
             "nullable": true
           }
@@ -1724,6 +1824,25 @@
           "value": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadChunkDto": {
+        "type": "object",
+        "properties": {
+          "chunk": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "uploadId": {
+            "type": "string",
+            "nullable": true
+          },
+          "chunkNumber": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

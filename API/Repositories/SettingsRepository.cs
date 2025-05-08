@@ -25,8 +25,8 @@ public class SettingsRepository(ISqlDbAccess sqlDbAccess) : ISettingsRepository
 
         var insertSql = @"
             INSERT INTO settings (setting_name, setting_value)
-            VALUES (@settingName, @settingValue);
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            VALUES (@settingName, @settingValue)
+            RETURNING setting_id;";
 
         var settingId = sqlDbAccess.ExecuteQuery<int>(
             _databaseName,

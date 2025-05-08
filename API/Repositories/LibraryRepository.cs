@@ -25,8 +25,8 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
 
         var insertSql = @"
             INSERT INTO libraries (library_name)
-            VALUES (@libraryName);
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            VALUES (@libraryName)
+            RETURNING library_id;";
 
         var libraryId = sqlDbAccess.ExecuteQuery<int>(
             _databaseName,
