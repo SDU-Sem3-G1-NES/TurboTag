@@ -66,7 +66,45 @@
   transition: all 0.2s ease;
 }
 
-@media (max-width: 600px) {
+.title
+{
+  margin-bottom: 20px;
+}
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.user-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar {
+  border-radius: 50%;
+  outline: 2px solid rgba(0, 0, 0, 0.4);
+  margin: 0 10px;
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+}
+
+.logout-button {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.title {
+  text-align: center;
+}
+
+  @media (max-width: 600px) {
   .upload-btn {
     width: 70%;
     height: auto;
