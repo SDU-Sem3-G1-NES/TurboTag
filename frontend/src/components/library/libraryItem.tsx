@@ -16,7 +16,6 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
         <Card
             hoverable
             style={{
-                width: "40%",
                 margin: 8
             }}
         >
