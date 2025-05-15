@@ -50,7 +50,7 @@ const Library: React.FC = () => {
                     gap: '16px'
                 }}
             >
-                {filteredLessons.map((lesson: any) => (
+                {filteredLessons.map((lesson: LessonDto) => (
                     <div key={lesson.mongoId} style={{ width: '48%' }}>
                         <LibraryItem lesson={lesson} />
                     </div>
