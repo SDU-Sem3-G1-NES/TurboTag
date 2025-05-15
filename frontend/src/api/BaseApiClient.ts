@@ -31,7 +31,7 @@ export class ApiConfiguration {
   public baseUrl: string
   public instance: AxiosInstance
 
-  constructor(baseUrl: string = 'https://localhost:7275', instance?: AxiosInstance) {
+  constructor(baseUrl: string = 'http://localhost:5088', instance?: AxiosInstance) {
     this.baseUrl = baseUrl
     this.instance =
       instance ||

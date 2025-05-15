@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Layout, Menu } from 'antd'
 import App from './App.tsx'
 import Upload from './pages/upload.tsx'
+import Admin from './pages/admin.tsx'
 import './index.css'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
 import { ReactNotifications } from 'react-notifications-component'
@@ -24,6 +25,11 @@ const AppLayout = () => {
       key: 'upload',
       label: 'Upload',
       onClick: () => navigate('/upload')
+    },
+    {
+      key: 'admin',
+      label: 'Admin',
+      onClick: () => navigate('/admin')
     }
   ]
 
@@ -43,6 +49,7 @@ const AppLayout = () => {
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/upload" element={<Upload />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Group 1 Turbo Tag</Footer>

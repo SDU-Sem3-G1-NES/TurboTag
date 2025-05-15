@@ -22,9 +22,9 @@ public class UserController(IUserService userService, IUserCredentialService use
     }
 
     [HttpPost("CreateNewUser")]
-    public ActionResult CreateNewUser([FromBody] (UserDto user, UserCredentialsDto userCredentials) parameters)
+    public ActionResult CreateNewUser([FromBody] CreateUserRequest request)
     {
-        userService.CreateNewUser(parameters.user, parameters.userCredentials);
+        userService.CreateNewUser(request.User, request.Password);
         return Ok();
     }
 
@@ -46,5 +46,11 @@ public class UserController(IUserService userService, IUserCredentialService use
     public ActionResult<bool> UserExists(string email)
     {
         return Ok(userCredentialService.UserExists(email));
+    }
+    
+    public class CreateUserRequest
+    {
+        public UserDto User { get; set; }
+        public string Password { get; set; }
     }
 }

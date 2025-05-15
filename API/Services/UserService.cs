@@ -8,7 +8,7 @@ public interface IUserService : IServiceBase
     IEnumerable<UserDto> GetAllUsers(UserFilter? filter);
     UserDto GetUserByEmail(string email);
     UserDto GetUserById(int id);
-    void CreateNewUser(UserDto user, UserCredentialsDto userCredentials);
+    void CreateNewUser(UserDto user, string password);
     void UpdateUser(UserDto user);
     void DeleteUserById(int userId);
 }
@@ -30,10 +30,10 @@ public class UserService(IUserRepository userRepository, IUserCredentialService 
         return userRepository.GetUserById(id);
     }
 
-    public void CreateNewUser(UserDto user, UserCredentialsDto userCredentials)
+    public void CreateNewUser(UserDto user, string password)
     {
         var userId = userRepository.AddUser(user);
-        userCredentialService.AddUserCredentials(userId, userCredentials);
+        userCredentialService.AddUserCredentials(userId, password);
     }
 
     public void UpdateUser(UserDto user)
