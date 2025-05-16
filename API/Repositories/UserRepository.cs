@@ -31,8 +31,8 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
 
         var insertSql = @"
             INSERT INTO users (user_type_id, user_name, user_email)
-            VALUES (@userTypeId, @userName, @userEmail);
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            VALUES (@userTypeId, @userName, @userEmail)
+            RETURNING user_id;";
 
         var userId = sqlDbAccess.ExecuteQuery<int>(
             _databaseName,

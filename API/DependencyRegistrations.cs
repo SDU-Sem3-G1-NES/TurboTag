@@ -36,5 +36,11 @@ public class DependencyRegistrations : Module
         builder.RegisterType<MongoDataAccess>()
             .As<IMongoDataAccess>()
             .WithParameter("connectionString", $"mongodb://{_mongoUser}:{_mongoPass}@{_mongoHost}:{_mongoPort}");
+        builder.RegisterType<WhisperService>()
+            .As<IWhisperService>()
+            .WithParameter("whisperPath", "whisper");
+        builder.RegisterType<OllamaImageAnalysisService>()
+            .As<IOllamaImageAnalysisService>()
+            .WithParameter("ollamaEndpoint", "http://localhost:11434");
     }
 }

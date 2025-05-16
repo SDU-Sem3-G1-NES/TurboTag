@@ -440,7 +440,15 @@ url_ = url_.replace(/[?&]$/, "");
              * @param id (optional) 
              * @return OK
              */
-            deleteFile(id?: string | undefined): Promise<void>        }
+            deleteFile(id?: string | undefined): Promise<void>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            uploadChunk(body?: UploadChunkDto | undefined): Promise<void>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            finalizeUpload(body?: FinaliseUploadDto | undefined): Promise<void>        }
 
     export class FileClient extends BaseApiClient implements IFileClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -603,6 +611,108 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     protected processDeleteFile(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        uploadChunk(body?: UploadChunkDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/UploadChunk";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processUploadChunk(_response);
+                });
+        }
+
+    protected processUploadChunk(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        finalizeUpload(body?: FinaliseUploadDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/File/FinalizeUpload";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processFinalizeUpload(_response);
+                });
+        }
+
+    protected processFinalizeUpload(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -1705,7 +1815,7 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            addUpload(body?: UploadDto | undefined): Promise<number>                    /**
+            addUpload(body?: AddUploadRequestDto | undefined): Promise<number>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -1988,7 +2098,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        addUpload(body?: UploadDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Upload/AddUpload";
+        addUpload(body?: AddUploadRequestDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Upload/AddUpload";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -2514,6 +2624,46 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
+export class AddUploadRequestDto implements IAddUploadRequestDto {
+    uploadDto?: UploadDto;
+    lessonDto?: LessonDto;
+
+    constructor(data?: IAddUploadRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.uploadDto = _data["uploadDto"] ? UploadDto.fromJS(_data["uploadDto"]) : <any>null;
+            this.lessonDto = _data["lessonDto"] ? LessonDto.fromJS(_data["lessonDto"]) : <any>null;
+        }
+    }
+
+    static fromJS(data: any): AddUploadRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddUploadRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["uploadDto"] = this.uploadDto ? this.uploadDto.toJSON() : <any>null;
+        data["lessonDto"] = this.lessonDto ? this.lessonDto.toJSON() : <any>null;
+        return data;
+    }
+}
+
+export interface IAddUploadRequestDto {
+    uploadDto?: UploadDto;
+    lessonDto?: LessonDto;
+}
+
 export class FileMetadataDto implements IFileMetadataDto {
     id?: string | null;
     fileType?: string | null;
@@ -2572,6 +2722,46 @@ export interface IFileMetadataDto {
     duration?: number | null;
     date?: Date | null;
     checkSum?: string | null;
+}
+
+export class FinaliseUploadDto implements IFinaliseUploadDto {
+    uploadId?: string | null;
+    fileName?: string | null;
+
+    constructor(data?: IFinaliseUploadDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
+            this.fileName = _data["fileName"] !== undefined ? _data["fileName"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): FinaliseUploadDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FinaliseUploadDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
+        data["fileName"] = this.fileName !== undefined ? this.fileName : <any>null;
+        return data;
+    }
+}
+
+export interface IFinaliseUploadDto {
+    uploadId?: string | null;
+    fileName?: string | null;
 }
 
 export class LessonDetailsDto implements ILessonDetailsDto {
@@ -3234,6 +3424,50 @@ export interface ISettingsDto {
     id?: number;
     name?: string | null;
     value?: string | null;
+}
+
+export class UploadChunkDto implements IUploadChunkDto {
+    chunk?: string | null;
+    uploadId?: string | null;
+    chunkNumber?: number;
+
+    constructor(data?: IUploadChunkDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.chunk = _data["chunk"] !== undefined ? _data["chunk"] : <any>null;
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
+            this.chunkNumber = _data["chunkNumber"] !== undefined ? _data["chunkNumber"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UploadChunkDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadChunkDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["chunk"] = this.chunk !== undefined ? this.chunk : <any>null;
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
+        data["chunkNumber"] = this.chunkNumber !== undefined ? this.chunkNumber : <any>null;
+        return data;
+    }
+}
+
+export interface IUploadChunkDto {
+    chunk?: string | null;
+    uploadId?: string | null;
+    chunkNumber?: number;
 }
 
 export class UploadDto implements IUploadDto {

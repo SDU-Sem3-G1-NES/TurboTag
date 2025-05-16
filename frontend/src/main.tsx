@@ -8,6 +8,8 @@ import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-route
 import { ReactNotifications } from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 import { Content, Footer, Header } from 'antd/es/layout/layout'
+import logo from './assets/logo.png'
+import './App.css'
 
 const AppLayout = () => {
   const navigate = useNavigate()
@@ -27,18 +29,23 @@ const AppLayout = () => {
 
   return (
     <StrictMode>
-      <Layout>
+      <Layout className="layout">
         <ReactNotifications />
-        <Header>
-          <Menu items={items} mode="horizontal" />
+        <Header className="header">
+          <div className="menu-container">
+            <Menu items={items} mode="horizontal" />
+          </div>
+          <div className="logo-container">
+            <img src={logo} alt="SpeedAdmin" className="logo" />
+          </div>
         </Header>
-        <Content>
+        <Content className="content">
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/upload" element={<Upload />} />
           </Routes>
         </Content>
-        <Footer>Group 1 Turbo Tag</Footer>
+        <Footer style={{ textAlign: 'center' }}>Group 1 Turbo Tag</Footer>
       </Layout>
     </StrictMode>
   )
