@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { LessonClient, LessonDto } from '../api/apiClient'
-import { Flex, Input } from 'antd'
-import LibraryItem from '../components/library/libraryItem'
+import React, { useEffect, useState } from 'react';
+import { LessonClient, LessonDto } from '../api/apiClient';
+import { Input, Row, Col, Spin } from 'antd';
+import LibraryItem from '../components/library/libraryItem';
+import { LoadingOutlined } from '@ant-design/icons';
 
 const Library: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(true)
+
   const lessonClient = new LessonClient()
   const [lessons, setLessons] = useState<LessonDto[]>([])
   const [search, setSearch] = useState<string>('')
@@ -15,6 +18,10 @@ const Library: React.FC = () => {
     } catch (error) {
       console.error('Error fetching lesson data:', error)
     }
+    finally {
+        setLoading(false)
+    }
+
   }
 
   useEffect(() => {
@@ -31,31 +38,31 @@ const Library: React.FC = () => {
     )
   })
 
-  return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Input.Search
-        placeholder="Search by title, description, or tag..."
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ width: '50%', marginBottom: 24 }}
-      />
-      <Flex
-        style={{
-          width: '75%',
-          height: '100%',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          gap: '16px'
-        }}
-      >
-        {filteredLessons.map((lesson: LessonDto) => (
-          <div key={lesson.mongoId} style={{ width: '48%' }}>
-            <LibraryItem lesson={lesson} />
-          </div>
-        ))}
-      </Flex>
-    </div>
-  )
-}
+    return (
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Input.Search
+                placeholder="Search by title, description, or tag..."
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: '50%', marginBottom: 24 }}
+            />
+            {loading ? (
+                <Spin
+                    indicator={<LoadingOutlined/>}
+                    size='large'
+                    style={{ color: 'black', marginTop: 24 }}
+                />
+            ) : (
+                <Row gutter={[16, 16]} style={{ width: '75%' }}>
+                    {filteredLessons.map((lesson: LessonDto) => (
+                        <Col key={lesson.mongoId} span={12}>
+                            <LibraryItem lesson={lesson} />
+                        </Col>
+                    ))}
+                </Row>
+            )}
+        </div>
+    );
+};
+
 
 export default Library
