@@ -10,13 +10,14 @@ import 'react-notifications-component/dist/theme.css'
 import { Content, Footer, Header } from 'antd/es/layout/layout'
 import logo from './assets/logo.png'
 import './App.css'
+import Library from './pages/library.tsx'
 
 const AppLayout = () => {
   const navigate = useNavigate()
 
   const items = [
     {
-      key: 'library',
+      key: 'home',
       label: 'Home',
       onClick: () => navigate('/')
     },
@@ -24,6 +25,11 @@ const AppLayout = () => {
       key: 'upload',
       label: 'Upload',
       onClick: () => navigate('/upload')
+    },
+    {
+      key: 'library',
+      label: 'Library',
+      onClick: () => navigate('/library')
     }
   ]
 
@@ -43,6 +49,7 @@ const AppLayout = () => {
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/upload" element={<Upload />} />
+            <Route path="/library" element={<Library />} />
           </Routes>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Group 1 Turbo Tag</Footer>
