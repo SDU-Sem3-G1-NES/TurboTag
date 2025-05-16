@@ -25,13 +25,13 @@ public class AuthenticationService(string secretKey) : IAuthenticationService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.GroupSid, user.UserTypeId.ToString()),
+            new Claim(ClaimTypes.Role, user.UserTypeId.ToString())
             // Add more claims as needed for roles, etc.
         };
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(30), // Short-lived access token
+            expires: DateTime.UtcNow.AddMinutes(15), // Short-lived access token
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

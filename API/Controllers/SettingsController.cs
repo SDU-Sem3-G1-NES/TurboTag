@@ -1,9 +1,11 @@
 using API.DTOs;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
         
 namespace API.Controllers;
-        
+
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class SettingsController(ISettingsService settingsService) : ControllerBase

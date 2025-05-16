@@ -8,25 +8,21 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LoginController(IUserCredentialService userCredentialService, IAuthenticationService authenticationService, IRefreshTokenService refreshTokenService) : ControllerBase
+public class LoginController(IUserCredentialService userCredentialService, IAuthenticationService authenticationService, IRefreshTokenService refreshTokenService, IUserService userService) : ControllerBase
 {
-    [HttpGet("ValidateUserCredentials")]
-    public ActionResult<bool> ValidateUserCredentials([FromBody] UserCredentialsDto userCredentials)
+    [HttpPost("SetupUserCredentials")]
+    public ActionResult SetupUserCredentials([FromBody] UserIdPassword parameters)
     {
-        return Ok(userCredentialService.ValidateUserCredentials(userCredentials));
+        userCredentialService.SetupCredentials(parameters.UserId, parameters.Password);
+        
+        return Ok();
     }
-
-    [HttpGet("GetUserDataByEmail")]
-    public ActionResult<UserDto> GetUserDataByEmail(string email)
-    {
-        return Ok(userCredentialService.GetUserByEmail(email));
-    }
+    
     [HttpPost("login")]
     public ActionResult<SignInResponse> Login([FromBody] UserCredentialsDto userCredentials)
     {
-        // Validate user credentials
         var user = userCredentialService.GetUserByEmail(userCredentials.Email);
-        if (user.Id == 0 || !userCredentialService.ValidateUserCredentials(userCredentials)) 
+        if (user.Id == 0 || !userCredentialService.ValidateUserCredentials(user.Id, userCredentials.Password)) 
         {
             return Unauthorized("Invalid credentials");
         }
@@ -34,21 +30,17 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
         var accessToken = authenticationService.GenerateAccessToken(user);
         var refreshToken = authenticationService.GenerateRefreshToken();
         
-        // Store refresh token in memory
         refreshTokenService.Store(
             user.Id, 
             refreshToken, 
-            DateTime.UtcNow.AddMinutes(2)
+            DateTime.UtcNow.AddDays(15)
         );
         
-        var response = new SignInResponse(accessToken, refreshToken, user.Id, user.Name);
-
-        
-        return Ok(response);
+        return Ok(new SignInResponse(accessToken, refreshToken, user.Id, user.Name));
     }
 
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] TokenModel token)
+    public IActionResult RefreshToken([FromBody] TokenModel token)
         {
         if (string.IsNullOrEmpty(token.RefreshToken) || token.RefreshToken == "undefined")
         {
@@ -62,29 +54,24 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
             return BadRequest("Invalid access token");
         }
         
-        // Validate refresh token
         if (!refreshTokenService.Validate(userId, token.RefreshToken))
         {
             refreshTokenService.Remove(userId);
             return BadRequest("Invalid or expired refresh token");
         }
 
-        var user = userCredentialService.GetUserByEmail(principal.FindFirst(ClaimTypes.Email)?.Value);
-        if (user == null)
+        var user = userService.GetUserById(userId);
+        
+        if (user == new UserDto())
         {
             return BadRequest("User not found");
         }
-
-        var newToken = new TokenModel
-        {
-            AccessToken = authenticationService.GenerateAccessToken(user),
-            RefreshToken = token.RefreshToken
-        };
         
-        return Ok(newToken);
+        return Ok(new TokenModel(authenticationService.GenerateAccessToken(user), token.RefreshToken));
     }
-    [HttpPost("logout")]
+    
     [Authorize]
+    [HttpPost("logout")]
     public IActionResult Logout()
     {
         if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId))
@@ -96,6 +83,7 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
         return Ok();
     }
 }
+
 public class SignInResponse(string accessToken, string refreshToken, int userId, string name)
 {
     public string AccessToken { get; set; } = accessToken;
@@ -103,8 +91,15 @@ public class SignInResponse(string accessToken, string refreshToken, int userId,
     public int UserId { get; set; } = userId;
     public string Name { get; set; } = name;
 }
-public class TokenModel
+
+public class TokenModel(string accessToken, string refreshToken)
 {
-    public string AccessToken { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
+    public string AccessToken { get; } = accessToken;
+    public string RefreshToken { get;} = refreshToken;
+}
+
+public class UserIdPassword(int userId, string password)
+{
+    public int UserId { get; } = userId;
+    public string Password { get; } = password;
 }

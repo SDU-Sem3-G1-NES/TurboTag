@@ -1416,14 +1416,14 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface ILoginClient {
                     /**
-             * @param body (optional) 
-             * @return OK
-             */
-            validateUserCredentials(body?: UserCredentialsDto | undefined): Promise<boolean>                    /**
              * @param email (optional) 
              * @return OK
              */
             getUserDataByEmail(email?: string | undefined): Promise<UserDto>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            setupUserCredentials(body?: UserIdPassword | undefined): Promise<void>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -1446,63 +1446,6 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     
-    
-
-        /**
-         * @param body (optional) 
-         * @return OK
-         */
-        validateUserCredentials(body?: UserCredentialsDto | undefined, cancelToken?: CancelToken): Promise<boolean> {        let url_ = this.baseUrl + "/Login/ValidateUserCredentials";
-url_ = url_.replace(/[?&]$/, "");
-
-                    const content_ = JSON.stringify(body);
-
-                let options_: AxiosRequestConfig = {
-                    data: content_,
-                        method: "GET",
-        url: url_,
-        headers: {
-                            "Content-Type": "application/json-patch+json",
-                            "Accept": "text/plain"
-                },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processValidateUserCredentials(_response);
-                });
-        }
-
-    protected processValidateUserCredentials(response: AxiosResponse): Promise<boolean> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                result200 = resultData200 as boolean;
-        
-        return Promise.resolve<boolean>(result200);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<boolean>(null as any);
-}
     
 
         /**
@@ -1559,6 +1502,57 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<UserDto>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        setupUserCredentials(body?: UserIdPassword | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Login/SetupUserCredentials";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processSetupUserCredentials(_response);
+                });
+        }
+
+    protected processSetupUserCredentials(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
 }
     
 
@@ -4218,6 +4212,46 @@ export interface IUserFilter {
     libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
+}
+
+export class UserIdPassword implements IUserIdPassword {
+    userId?: number;
+    password?: string | null;
+
+    constructor(data?: IUserIdPassword) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
+            this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UserIdPassword {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserIdPassword();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
+        data["password"] = this.password !== undefined ? this.password : <any>null;
+        return data;
+    }
+}
+
+export interface IUserIdPassword {
+    userId?: number;
+    password?: string | null;
 }
 
 export interface FileParameter {

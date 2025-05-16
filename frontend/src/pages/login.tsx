@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, message } from 'antd'
 import {
   LoginClient,
   UserCredentialsDto
@@ -8,45 +8,54 @@ import { useNavigate } from 'react-router-dom'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
   const loginClient = new LoginClient();
-  const userCredentials = new UserCredentialsDto({
-    email: email,
-    password: password
-  });
-  const handleLogin = async () => {
+
+  const handleLogin = async (values: { email: string; password: string }) => {
     try {
+      setLoading(true);
+      const userCredentials = new UserCredentialsDto({
+        email: values.email,
+        password: values.password
+      });
+
       const response = await loginClient.login(userCredentials);
-      localStorage.setItem("authToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("userId", response.userId);
-      localStorage.setItem("userName", response.name);
-      navigate('/')
+      localStorage.setItem("authToken", response.accessToken ?? "undefined");
+      localStorage.setItem("refreshToken", response.refreshToken ?? "undefined");
+      localStorage.setItem("userId", response.userId?.toString() ?? "undefined");
+      localStorage.setItem("userName", response.name ?? "undefined");
+      message.success('Login successful');
+      navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
-      // Handle login error (e.g., show notification)
+      message.error('Login failed: Invalid email or password');
+    } finally {
+      setLoading(false);
     }
-    console.log('Login submitted'); 
   };
 
   return (
     <div className="centered-container">
-      <h1 className="title">Log in</h1>
       <div className="form-container">
-        <Form className="login-form" onFinish={handleLogin}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <Input type="text" maxLength={100} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <Input type="password" maxLength={100} value={password}   onChange={(e) => setPassword(e.target.value)} required />
-          </div>
+        <h2 style={{ textAlign: 'left' }}>Log in</h2>
+        <Form
+          className="login-form"
+          form={form}
+          onFinish={handleLogin}
+          layout="vertical"
+        >
+          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }]}>
+            <Input type="text" maxLength={100} />
+          </Form.Item>
+          <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Password is required' }]}>
+            <Input type="password" maxLength={100} />
+          </Form.Item>
           <div className="upload-button-wrapper">
-          <Button type="primary"
-                  htmlType="submit"
-                  className="upload-btn">Log in</Button>
+            <Button type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    className="upload-btn">Log in</Button>
           </div>
         </Form>
       </div>
