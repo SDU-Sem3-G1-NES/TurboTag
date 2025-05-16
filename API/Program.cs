@@ -1,3 +1,4 @@
+using System.Text;
 using API;
 using API.DataAccess;
 using Autofac;
@@ -6,6 +7,8 @@ using Dapper;
 using DotNetEnv;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema;
@@ -102,6 +105,29 @@ builder.Services.AddHangfire(config =>
 
 // Add Hangfire server
 builder.Services.AddHangfireServer();
+
+// Configure authentication
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(Env.GetString("JWT_SECRET_KEY"))),
+            ClockSkew = TimeSpan.FromSeconds(30) // Lowered for testing
+        };
+    });
+
+// Add authorization
+builder.Services.AddAuthorization();
 
 // Configure Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());

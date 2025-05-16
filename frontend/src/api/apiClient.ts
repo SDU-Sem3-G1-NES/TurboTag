@@ -15,7 +15,7 @@ export class ApiConfiguration {
   public baseUrl: string
   public instance: AxiosInstance
 
-  constructor(baseUrl: string = 'https://localhost:7275', instance?: AxiosInstance) {
+  constructor(baseUrl: string = 'http://localhost:5088', instance?: AxiosInstance) {
     this.baseUrl = baseUrl
     this.instance =
       instance ||
@@ -26,15 +26,77 @@ export class ApiConfiguration {
         }
       })
 
+    // Request interceptor for authentication
     this.instance.interceptors.request.use(
       (config) => {
-        // Add auth token if needed
-        // const token = localStorage.getItem("authToken");
-        // if (token) config.headers.Authorization = `Bearer ${token}`;
-        return config
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
       },
       (error) => Promise.reject(error)
-    )
+    );
+
+    // Response interceptor for handling auth errors and token refresh
+    this.instance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        // Handle unauthorized errors (401) for token refresh
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            // Attempt to refresh the token
+            const refreshToken = localStorage.getItem("refreshToken");
+            const accessToken = localStorage.getItem("authToken");
+            if (!refreshToken) {
+              // No refresh token available, redirect to login
+              this.redirectToLogin();
+              return Promise.reject(error);
+            }
+
+            // Call your token refresh endpoint
+            const response = await axios.post(`${baseUrl}/Login/refresh-token`, {
+              accessToken, refreshToken
+            });
+
+            // If successful, update stored tokens
+            localStorage.setItem("authToken", response.data.accessToken);
+            localStorage.setItem("refreshToken", response.data.refreshToken);
+
+            // Update the authorization header and retry
+            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+            return axios(originalRequest);
+          } catch (refreshError) {
+            // If refresh fails, redirect to login
+            this.redirectToLogin();
+            return Promise.reject(refreshError);
+          }
+        }
+
+        // Handle forbidden errors (403)
+        if (error.response?.status === 403) {
+          // Handle access denied - could redirect to forbidden page or show message
+          console.error("Access forbidden");
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  private redirectToLogin(): void {
+    // Clear authentication data
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+
+    // Redirect to login page - adjust based on your routing setup
+    window.location.href = "/login";
   }
 }
 
@@ -1361,7 +1423,18 @@ url_ = url_.replace(/[?&]$/, "");
              * @param email (optional) 
              * @return OK
              */
-            getUserDataByEmail(email?: string | undefined): Promise<UserDto>        }
+            getUserDataByEmail(email?: string | undefined): Promise<UserDto>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            login(body?: UserCredentialsDto | undefined): Promise<SignInResponse>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            refreshToken(body?: TokenModel | undefined): Promise<void>                    /**
+             * @return OK
+             */
+            logout(): Promise<void>        }
 
     export class LoginClient extends BaseApiClient implements ILoginClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -1486,6 +1559,160 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<UserDto>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        login(body?: UserCredentialsDto | undefined, cancelToken?: CancelToken): Promise<SignInResponse> {        let url_ = this.baseUrl + "/Login/login";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processLogin(_response);
+                });
+        }
+
+    protected processLogin(response: AxiosResponse): Promise<SignInResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = SignInResponse.fromJS(resultData200);
+        
+        return Promise.resolve<SignInResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<SignInResponse>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        refreshToken(body?: TokenModel | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Login/refresh-token";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processRefreshToken(_response);
+                });
+        }
+
+    protected processRefreshToken(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @return OK
+         */
+        logout( cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Login/logout";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "POST",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processLogout(_response);
+                });
+        }
+
+    protected processLogout(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
 }
         }
 
@@ -3426,6 +3653,94 @@ export interface ISettingsDto {
     value?: string | null;
 }
 
+export class SignInResponse implements ISignInResponse {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+    userId?: number;
+    name?: string | null;
+
+    constructor(data?: ISignInResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"] !== undefined ? _data["accessToken"] : <any>null;
+            this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
+            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): SignInResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SignInResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken !== undefined ? this.accessToken : <any>null;
+        data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
+        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        return data;
+    }
+}
+
+export interface ISignInResponse {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+    userId?: number;
+    name?: string | null;
+}
+
+export class TokenModel implements ITokenModel {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+
+    constructor(data?: ITokenModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"] !== undefined ? _data["accessToken"] : <any>null;
+            this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TokenModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new TokenModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken !== undefined ? this.accessToken : <any>null;
+        data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
+        return data;
+    }
+}
+
+export interface ITokenModel {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+}
+
 export class UploadChunkDto implements IUploadChunkDto {
     chunk?: string | null;
     uploadId?: string | null;
@@ -3955,7 +4270,6 @@ function isAxiosError(obj: any): obj is AxiosError {
 /* tslint:disable */
 
 // ReSharper disable InconsistentNaming
-
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;

@@ -13,10 +13,24 @@ import logo from './assets/logo.png'
 import avatar from './assets/avatar.png'
 import './App.css'
 import { Button } from 'antd'
+import { LogoutOutlined, LoginOutlined } from '@ant-design/icons';
+import { LoginClient } from './api/apiClient.ts'
+const loginClient = new LoginClient()
 
 const AppLayout = () => {
   const navigate = useNavigate()
-
+  
+  const handleLogout = async () => {
+    await loginClient.logout()
+    localStorage.removeItem("authToken")
+    localStorage.removeItem("refreshToken")
+    localStorage.removeItem('userId')
+    localStorage.removeItem('userName')
+    navigate('/login')
+  }
+  
+  const userName = localStorage.getItem('userName')
+  
   const items = [
     {
       key: 'library',
@@ -41,12 +55,25 @@ const AppLayout = () => {
           <div className="logo-container">
             <img src={logo} alt="SpeedAdmin" className="logo" />
           </div>
-          { 1 ? (
-          <div className="user-container"> 
-              <img src={avatar} alt="Ueser" className="user-avatar" />
-              <Button type="primary" onClick={() => navigate('/login')}className="logout-button">Log out</Button>
-          </div>
-          ) : (<a></a>)}
+          { userName ? (
+            <div className="user-container">
+              <img src={avatar} alt="User" className="user-avatar" />
+              <span className="user-name">{userName}</span>
+              <Button
+                type="text"
+                icon={<LogoutOutlined style={{ fontSize: '32px' }} />}
+                onClick={handleLogout}
+                className="logout-button"
+                title="Log out"
+              />
+            </div>
+          ) : (<Button
+            type="text"
+            icon={<LoginOutlined style={{ fontSize: '32px' }} />}
+            onClick={handleLogout}
+            className="logout-button"
+            title="Log in"
+          />) }
         </Header>
         <Content className="content">
           <Routes>

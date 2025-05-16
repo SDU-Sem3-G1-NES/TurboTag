@@ -16,6 +16,7 @@ public class DependencyRegistrations : Module
     private readonly string _postgresPassword = Env.GetString("POSTGRES_PASSWORD");
     private readonly string _postgresPort = Env.GetString("POSTGRES_PORT");
     private readonly string _postgresUser = Env.GetString("POSTGRES_USER");
+    private readonly string _secretKey = Env.GetString("JWT_SECRET_KEY");
 
     protected override void Load(ContainerBuilder builder)
     {
@@ -42,5 +43,8 @@ public class DependencyRegistrations : Module
         builder.RegisterType<OllamaImageAnalysisService>()
             .As<IOllamaImageAnalysisService>()
             .WithParameter("ollamaEndpoint", "http://localhost:11434");
+        builder.RegisterType<TokenService>()
+            .As<ITokenService>()
+            .WithParameter("secretKey", _secretKey);
     }
 }

@@ -1,6 +1,7 @@
 using API.DTOs;
 using API.Repositories;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,7 +15,7 @@ public class UserController(IUserService userService, IUserCredentialService use
     {
         return Ok(userService.GetAllUsers(filter));
     }
-
+    [Authorize]
     [HttpGet("GetUserByEmail")]
     public ActionResult<UserDto> GetUserByEmail(string email)
     {
