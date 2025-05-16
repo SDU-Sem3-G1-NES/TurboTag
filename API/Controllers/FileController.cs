@@ -173,7 +173,7 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                 Console.WriteLine($"Cleanup error: {cleanupEx.Message}");
             }
             
-            return Ok(new { fileId });
+            return Ok(fileId);
         }
         catch (Exception ioEx)
         {
