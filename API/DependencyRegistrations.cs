@@ -43,8 +43,8 @@ public class DependencyRegistrations : Module
         builder.RegisterType<OllamaImageAnalysisService>()
             .As<IOllamaImageAnalysisService>()
             .WithParameter("ollamaEndpoint", "http://localhost:11434");
-        builder.RegisterType<TokenService>()
-            .As<ITokenService>()
+        builder.RegisterType<AuthenticationService>()
+            .As<IAuthenticationService>()
             .WithParameter("secretKey", _secretKey);
     }
 }

@@ -6,14 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 using API.DTOs;
 
 namespace API.Services;
-public interface ITokenService
+public interface IAuthenticationService
 {
     string GenerateAccessToken(UserDto user);
     string GenerateRefreshToken();
     ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 }
 
-public class TokenService(string secretKey) : ITokenService
+public class AuthenticationService(string secretKey) : IAuthenticationService
 {
     public string GenerateAccessToken(UserDto user)
     {
