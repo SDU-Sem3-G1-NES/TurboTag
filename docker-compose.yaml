@@ -7,7 +7,7 @@
 #      
 #    deploy:
 #      replicas: ${COMPOSE_ENVIRONMENT:-1}
-
+  
   postgres:
     build:
       context: ./setup/postgres
@@ -50,10 +50,34 @@
     dns:
       - 8.8.8.8
       - 8.8.4.4
+        
+  content-generator:
+    build:
+      context: ./setup/python
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - turbotag
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - turbotag
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: [ "/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull gemma:2b && wait" ]
+
+
 
 volumes:
   db_data:
   mongo_data:
+  ollama_data:
     
 networks:
   turbotag:
