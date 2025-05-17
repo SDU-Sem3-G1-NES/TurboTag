@@ -42,8 +42,21 @@ def generate_content(req: GenerationRequest):
     """
     text = req.text.strip()
 
-    tag_prompt = f"Generate a comma-separated list of short, relevant tags for the following text:\n\n{text}\n\nTags:"
-    desc_prompt = f"Write a concise, clear description for the following text:\n\n{text}\n\nDescription:"
+    tag_prompt = f"""You are an API that only returns a plain, comma-separated list of relevant tags based on the input text. 
+    Do not include any introductory phrases, explanations, or formatting—just the tags.
+    
+    Input text:
+    {text}
+    
+    Output tags:"""
+    
+    desc_prompt = f"""You are an API that only returns a plain, concise, and clear description of the input text. 
+    Do not include any introductory phrases, explanations, or formatting—just the description.
+    
+    Input text:
+    {text}
+    
+    Output description:"""
 
     tags = call_ollama(tag_prompt)
     description = call_ollama(desc_prompt)
