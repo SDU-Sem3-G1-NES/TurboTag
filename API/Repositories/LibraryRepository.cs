@@ -84,10 +84,10 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
                 parameters.Add("@libraryIds", filter.LibraryIds);
             }
 
-            if (filter.LibraryNames != null && filter.LibraryNames.Any())
+            if (!string.IsNullOrEmpty(filter.LibraryName))
             {
-                fromWhereSql += " AND library_name = ANY(@libraryNames)";
-                parameters.Add("@libraryNames", filter.LibraryNames);
+                fromWhereSql += " AND library_name ILIKE @libraryName";
+                parameters.Add("@libraryName", $"%{filter.LibraryName}%");
             }
         }
 
@@ -181,12 +181,12 @@ public class LibraryRepository(ISqlDbAccess sqlDbAccess) : ILibraryRepository
 public class LibraryFilter : PaginationFilter
 {
     public LibraryFilter(List<int>? libraryIds,
-        List<string>? libraryNames,
+        string? libraryName,
         int? pageNumber,
         int? pageSize) : base(pageNumber, pageSize)
     {
         LibraryIds = libraryIds;
-        LibraryNames = libraryNames;
+        LibraryName = libraryName;
         PageSize = pageSize;
         PageNumber = pageNumber;
     }
@@ -196,7 +196,7 @@ public class LibraryFilter : PaginationFilter
     }
 
     public List<int>? LibraryIds { get; set; }
-    public List<string>? LibraryNames { get; set; }
+    public string? LibraryName { get; set; }
     public int? PageSize { get; set; }
     public int? PageNumber { get; set; }
 }

@@ -119,7 +119,7 @@ public class LibraryRepositoryTests
         // Arrange
         var filter = new LibraryFilter(
             new List<int> { 1, 2 },
-            new List<string> { "Library 1" },
+            "Library 1",
             1,
             10
         );

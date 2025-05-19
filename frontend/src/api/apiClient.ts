@@ -2266,11 +2266,11 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            createNewUser(body?: CreateUserRequest | undefined): Promise<void>                    /**
+            createNewUser(body?: UserRequest | undefined): Promise<void>                    /**
              * @param body (optional) 
              * @return OK
              */
-            updateUserById(body?: UserDto | undefined): Promise<void>                    /**
+            updateUserById(body?: UserRequest | undefined): Promise<void>                    /**
              * @param userId (optional) 
              * @return OK
              */
@@ -2418,7 +2418,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        createNewUser(body?: CreateUserRequest | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/CreateNewUser";
+        createNewUser(body?: UserRequest | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/CreateNewUser";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -2469,7 +2469,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        updateUserById(body?: UserDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/UpdateUserById";
+        updateUserById(body?: UserRequest | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/UpdateUserById";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -2858,46 +2858,6 @@ export interface IAddUploadRequestDto {
     lessonDto?: LessonDto;
 }
 
-export class CreateUserRequest implements ICreateUserRequest {
-    user?: UserDto;
-    password?: string | null;
-
-    constructor(data?: ICreateUserRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>null;
-            this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): CreateUserRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateUserRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["user"] = this.user ? this.user.toJSON() : <any>null;
-        data["password"] = this.password !== undefined ? this.password : <any>null;
-        return data;
-    }
-}
-
-export interface ICreateUserRequest {
-    user?: UserDto;
-    password?: string | null;
-}
-
 export class FileMetadataDto implements IFileMetadataDto {
     id?: string | null;
     fileType?: string | null;
@@ -3173,7 +3133,7 @@ export interface ILibraryDto {
 
 export class LibraryFilter implements ILibraryFilter {
     libraryIds?: number[] | null;
-    libraryNames?: string[] | null;
+    libraryName?: string | null;
     pageSize?: number | null;
     pageNumber?: number | null;
 
@@ -3196,14 +3156,7 @@ export class LibraryFilter implements ILibraryFilter {
             else {
                 this.libraryIds = <any>null;
             }
-            if (Array.isArray(_data["libraryNames"])) {
-                this.libraryNames = [] as any;
-                for (let item of _data["libraryNames"])
-                    this.libraryNames!.push(item);
-            }
-            else {
-                this.libraryNames = <any>null;
-            }
+            this.libraryName = _data["libraryName"] !== undefined ? _data["libraryName"] : <any>null;
             this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
             this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
         }
@@ -3223,11 +3176,7 @@ export class LibraryFilter implements ILibraryFilter {
             for (let item of this.libraryIds)
                 data["libraryIds"].push(item);
         }
-        if (Array.isArray(this.libraryNames)) {
-            data["libraryNames"] = [];
-            for (let item of this.libraryNames)
-                data["libraryNames"].push(item);
-        }
+        data["libraryName"] = this.libraryName !== undefined ? this.libraryName : <any>null;
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
         data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
         return data;
@@ -3236,7 +3185,7 @@ export class LibraryFilter implements ILibraryFilter {
 
 export interface ILibraryFilter {
     libraryIds?: number[] | null;
-    libraryNames?: string[] | null;
+    libraryName?: string | null;
     pageSize?: number | null;
     pageNumber?: number | null;
 }
@@ -4182,6 +4131,46 @@ export interface IUserFilter {
     libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
+}
+
+export class UserRequest implements IUserRequest {
+    user?: UserDto;
+    password?: string | null;
+
+    constructor(data?: IUserRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>null;
+            this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UserRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["user"] = this.user ? this.user.toJSON() : <any>null;
+        data["password"] = this.password !== undefined ? this.password : <any>null;
+        return data;
+    }
+}
+
+export interface IUserRequest {
+    user?: UserDto;
+    password?: string | null;
 }
 
 export class UserTypeDto implements IUserTypeDto {

@@ -216,7 +216,7 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             if (!string.IsNullOrEmpty(filter.Name))
             {
                 parameters.Add("@name", $"%{filter.Name}%");
-                fromWhereSql += " AND u.user_name LIKE @name";
+                fromWhereSql += " AND u.user_name ILIKE @name";
             }
 
             if (!string.IsNullOrEmpty(filter.Email))

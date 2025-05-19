@@ -10,6 +10,7 @@ public interface IUserCredentialService : IServiceBase
     void AddUserCredentials(int userId, string password);
     bool ValidateUserCredentials(UserCredentialsDto userCredentials);
     UserDto GetUserByEmail(string email);
+    void UpdateUserCredentials(int userId, string password);
 }
 
 public class UserCredentialService(IUserRepository userRepository) : IUserCredentialService
@@ -34,6 +35,12 @@ public class UserCredentialService(IUserRepository userRepository) : IUserCreden
     public UserDto GetUserByEmail(string email)
     {
         return userRepository.GetUserByEmail(email) ?? new UserDto();
+    }
+    
+    public void UpdateUserCredentials(int userId, string password)
+    {
+        var hashedUserCredentials = HashUserCredentials(userId, password);
+        userRepository.UpdateUserCredentials(hashedUserCredentials);
     }
     
     private HashedUserCredentialsDto HashUserCredentials(int userId, string password)
