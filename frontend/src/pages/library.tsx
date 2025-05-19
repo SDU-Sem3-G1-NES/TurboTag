@@ -27,7 +27,7 @@ const Library: React.FC = () => {
             .filter((id): id is number => id !== null && id !== undefined)
         )
       )
-      
+
       const userFilter = new UserFilter()
       userFilter.userIds = ownerIds
       const usersResult = await userClient.getAllUsers(userFilter)
