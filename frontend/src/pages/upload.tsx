@@ -26,6 +26,8 @@ const UploadPage: React.FC = () => {
   const fileClient = new FileClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
 
+  const ownerId = Number(localStorage.getItem('userId'))
+
   const handleFileChange: UploadProps['beforeUpload'] = (file) => {
     setFile(file)
     return false // prevent auto-upload
@@ -117,7 +119,7 @@ const UploadPage: React.FC = () => {
       const uploadDTO = new UploadDto()
       uploadDTO.init({
         id: 0,
-        ownerId: 1,
+        ownerId: ownerId,
         date: new Date(),
         type: file.type,
         libraryId: 1
@@ -149,7 +151,7 @@ const UploadPage: React.FC = () => {
         uploadId: fileId,
         lessonDetails: lessonDetailsDTO,
         fileMetadata: fileMetadataArray,
-        ownerId: 1
+        ownerId: ownerId
       })
 
       const request = new AddUploadRequestDto()

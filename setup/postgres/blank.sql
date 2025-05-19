@@ -69,6 +69,11 @@ CREATE TABLE IF NOT EXISTS user_credentials (
     PRIMARY KEY (user_id)
 );
 
+CREATE TABLE IF NOT EXISTS "refresh_tokens" (
+    user_id SERIAL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    expiry TIMESTAMP NOT NULL
+    );
 
 -- Insert default data into tables
 
