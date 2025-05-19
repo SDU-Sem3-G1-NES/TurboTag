@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { Button, Form, Input, Checkbox, Modal } from 'antd'
+import { Button, Form, Input, Checkbox, Modal, Alert } from 'antd'
 import {
   LoginClient,
   UserCredentialsDto
 } from '../api/apiClient.ts'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
 
 const LoginPage: React.FC = () => {
@@ -12,8 +12,11 @@ const LoginPage: React.FC = () => {
   const [form] = Form.useForm();
   const loginClient = new LoginClient();
   const [isModalVisible, setIsModalVisible] = useState(false)
-
   const [formError, setFormError] = useState<string | null>(null);
+  
+  if (localStorage.getItem('authToken')) {
+    return <Navigate to="/" replace />;
+  }
 
   const handleLogin = async (values: { email: string; password: string; remember: boolean; }) => {
     try {
@@ -39,42 +42,29 @@ const LoginPage: React.FC = () => {
       } else {
         setFormError('Login failed: ' + (error.message || 'Unexpected error'));
       }
-      // Do not navigate on error
     }
   };
   
   const handleForgotPassword = () => {
     setIsModalVisible(true)
   }
-
+  
   return (
     <div className="centered-container">
-      <Modal
-        title="Forgot Password?"
-        open={isModalVisible}
-        onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}
-        centered
-        footer={null}
-      >
+      <Modal title="Forgot Password?" open={isModalVisible} onOk={() => setIsModalVisible(false)} onCancel={() => setIsModalVisible(false)} centered footer={null}>
         <p>Please contact the administrator to reset your password.</p>
       </Modal>
       <div className="form-container" style={{ padding: 30, maxWidth: 350 }}>
         <h1>Log in</h1>
-        <div style={{ height: 22, color: 'red', textAlign: 'left' }}>
-          {formError}
-        </div>
-        <Form
-          className="login-form"
-          form={form}
-          onFinish={handleLogin}
-          layout="vertical"
-          validateTrigger="onSubmit">
+        {formError ? (
+          <Alert message={formError} type="error" showIcon style={{ marginBottom: 24, marginTop: 24, padding: '4px 11px' }} />
+        ) : (<div style={{ height: 22 }}></div>)}
+        <Form className="login-form" form={form} onFinish={handleLogin} layout="vertical" validateTrigger="onSubmit">
           <Form.Item name="email" rules={[{ required: true, message: 'Email is required' }, { type: 'email', message: 'Invalid email format' }]}>
-            <Input prefix={<MailOutlined/>} placeholder={'email'} maxLength={100} onChange={() => setFormError(null)} />
+            <Input prefix={<MailOutlined/>} placeholder={'email'} maxLength={100}/>
           </Form.Item>
           <Form.Item name="password" rules={[{ required: true, message: 'Password is required' }]}>
-            <Input.Password prefix={<LockOutlined/>} placeholder={'password'} maxLength={100} onChange={() => setFormError(null)} />
+            <Input.Password prefix={<LockOutlined/>} placeholder={'password'} maxLength={100}/>
           </Form.Item>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' , height: 16 }}>
             <Form.Item noStyle name="remember" valuePropName="checked" initialValue={false}>
