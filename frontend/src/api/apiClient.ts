@@ -78,7 +78,7 @@ export class ApiConfiguration {
           } catch (refreshError) {
             // If refresh fails, redirect to login
             this.redirectToLogin();
-            return Promise.reject(refreshError);z
+            return Promise.reject(refreshError);
           }
         }
 
