@@ -63,7 +63,7 @@ const AppLayout = () => {
                 type="text"
                 icon={<LogoutOutlined style={{ fontSize: '32px' }} />}
                 onClick={handleLogout}
-                className="logout-button"
+                className="auth-buttons"
                 title="Log out"
               />
             </div>
@@ -71,7 +71,7 @@ const AppLayout = () => {
             type="text"
             icon={<LoginOutlined style={{ fontSize: '32px' }} />}
             onClick={handleLogout}
-            className="logout-button"
+            className="auth-buttons"
             title="Log in"
           />) }
         </Header>

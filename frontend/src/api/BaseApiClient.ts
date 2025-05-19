@@ -60,12 +60,12 @@ export class ApiConfiguration {
         const originalRequest = error.config;
 
         // Handle unauthorized errors (401) for token refresh
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry && window.location.pathname !== "/login") {
           originalRequest._retry = true;
 
           try {
             // Attempt to refresh the token
-            const refreshToken = localStorage.getItem("refreshToken");
+            const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
             const accessToken = localStorage.getItem("authToken");
             if (!refreshToken) {
               // No refresh token available, redirect to login
@@ -79,8 +79,13 @@ export class ApiConfiguration {
             });
 
             // If successful, update stored tokens
+            if (localStorage.getItem("refreshToken")) {
+              localStorage.setItem("refreshToken", response.data.refreshToken);
+            }
+            else {
+              sessionStorage.setItem("refreshToken", response.data.refreshToken);
+            }
             localStorage.setItem("authToken", response.data.accessToken);
-            localStorage.setItem("refreshToken", response.data.refreshToken);
 
             // Update the authorization header and retry
             originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
@@ -88,7 +93,7 @@ export class ApiConfiguration {
           } catch (refreshError) {
             // If refresh fails, redirect to login
             this.redirectToLogin();
-            return Promise.reject(refreshError);
+            return Promise.reject(refreshError);z
           }
         }
 
@@ -109,6 +114,7 @@ export class ApiConfiguration {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
+    sessionStorage.removeItem("refreshToken");
 
     // Redirect to login page - adjust based on your routing setup
     window.location.href = "/login";

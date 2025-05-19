@@ -45,12 +45,12 @@ export class ApiConfiguration {
         const originalRequest = error.config;
 
         // Handle unauthorized errors (401) for token refresh
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry && window.location.pathname !== "/login") {
           originalRequest._retry = true;
 
           try {
             // Attempt to refresh the token
-            const refreshToken = localStorage.getItem("refreshToken");
+            const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
             const accessToken = localStorage.getItem("authToken");
             if (!refreshToken) {
               // No refresh token available, redirect to login
@@ -64,8 +64,13 @@ export class ApiConfiguration {
             });
 
             // If successful, update stored tokens
+            if (localStorage.getItem("refreshToken")) {
+              localStorage.setItem("refreshToken", response.data.refreshToken);
+            }
+            else {
+              sessionStorage.setItem("refreshToken", response.data.refreshToken);
+            }
             localStorage.setItem("authToken", response.data.accessToken);
-            localStorage.setItem("refreshToken", response.data.refreshToken);
 
             // Update the authorization header and retry
             originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
@@ -73,7 +78,7 @@ export class ApiConfiguration {
           } catch (refreshError) {
             // If refresh fails, redirect to login
             this.redirectToLogin();
-            return Promise.reject(refreshError);
+            return Promise.reject(refreshError);z
           }
         }
 
@@ -94,6 +99,7 @@ export class ApiConfiguration {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
+    sessionStorage.removeItem("refreshToken");
 
     // Redirect to login page - adjust based on your routing setup
     window.location.href = "/login";
@@ -1416,10 +1422,6 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface ILoginClient {
                     /**
-             * @param email (optional) 
-             * @return OK
-             */
-            getUserDataByEmail(email?: string | undefined): Promise<UserDto>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -1446,63 +1448,6 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     
-    
-
-        /**
-         * @param email (optional) 
-         * @return OK
-         */
-        getUserDataByEmail(email?: string | undefined, cancelToken?: CancelToken): Promise<UserDto> {        let url_ = this.baseUrl + "/Login/GetUserDataByEmail?";
-if (email === null)
-    throw new Error("The parameter 'email' cannot be null.");
-else if (email !== undefined)
-    url_ += "email=" + encodeURIComponent("" + email) + "&";
-url_ = url_.replace(/[?&]$/, "");
-
-                let options_: AxiosRequestConfig = {
-                        method: "GET",
-        url: url_,
-        headers: {
-                                    "Accept": "text/plain"
-                },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processGetUserDataByEmail(_response);
-                });
-        }
-
-    protected processGetUserDataByEmail(response: AxiosResponse): Promise<UserDto> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                result200 = UserDto.fromJS(resultData200);
-        
-        return Promise.resolve<UserDto>(result200);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<UserDto>(null as any);
-}
     
 
         /**

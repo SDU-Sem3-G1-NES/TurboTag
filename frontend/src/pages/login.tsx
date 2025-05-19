@@ -1,62 +1,88 @@
 import React, { useState } from 'react'
-import { Button, Form, Input, message } from 'antd'
+import { Button, Form, Input, Checkbox, Modal } from 'antd'
 import {
   LoginClient,
   UserCredentialsDto
 } from '../api/apiClient.ts'
 import { useNavigate } from 'react-router-dom'
+import { MailOutlined, LockOutlined } from '@ant-design/icons'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const loginClient = new LoginClient();
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
-  const handleLogin = async (values: { email: string; password: string }) => {
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const handleLogin = async (values: { email: string; password: string; remember: boolean; }) => {
     try {
-      setLoading(true);
       const userCredentials = new UserCredentialsDto({
         email: values.email,
         password: values.password
       });
-
+      
       const response = await loginClient.login(userCredentials);
       localStorage.setItem("authToken", response.accessToken ?? "undefined");
-      localStorage.setItem("refreshToken", response.refreshToken ?? "undefined");
+      if (values.remember) {
+        localStorage.setItem("refreshToken", response.refreshToken ?? "undefined");
+      } else {
+        sessionStorage.setItem("refreshToken", response.refreshToken ?? "undefined");
+        localStorage.removeItem("refreshToken");
+      }
       localStorage.setItem("userId", response.userId?.toString() ?? "undefined");
       localStorage.setItem("userName", response.name ?? "undefined");
-      message.success('Login successful');
       navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
-      message.error('Login failed: Invalid email or password');
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      if (error.status === 401) {
+        setFormError('Login failed: Invalid email or password');
+      } else {
+        setFormError('Login failed: ' + (error.message || 'Unexpected error'));
+      }
+      // Do not navigate on error
     }
   };
+  
+  const handleForgotPassword = () => {
+    setIsModalVisible(true)
+  }
 
   return (
     <div className="centered-container">
-      <div className="form-container">
-        <h2 style={{ textAlign: 'left' }}>Log in</h2>
+      <Modal
+        title="Forgot Password?"
+        open={isModalVisible}
+        onOk={() => setIsModalVisible(false)}
+        onCancel={() => setIsModalVisible(false)}
+        centered
+        footer={null}
+      >
+        <p>Please contact the administrator to reset your password.</p>
+      </Modal>
+      <div className="form-container" style={{ padding: 30, maxWidth: 350 }}>
+        <h1>Log in</h1>
+        <div style={{ height: 22, color: 'red', textAlign: 'left' }}>
+          {formError}
+        </div>
         <Form
           className="login-form"
           form={form}
           onFinish={handleLogin}
           layout="vertical"
-        >
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }]}>
-            <Input type="text" maxLength={100} />
+          validateTrigger="onSubmit">
+          <Form.Item name="email" rules={[{ required: true, message: 'Email is required' }, { type: 'email', message: 'Invalid email format' }]}>
+            <Input prefix={<MailOutlined/>} placeholder={'email'} maxLength={100} onChange={() => setFormError(null)} />
           </Form.Item>
-          <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Password is required' }]}>
-            <Input type="password" maxLength={100} />
+          <Form.Item name="password" rules={[{ required: true, message: 'Password is required' }]}>
+            <Input.Password prefix={<LockOutlined/>} placeholder={'password'} maxLength={100} onChange={() => setFormError(null)} />
           </Form.Item>
-          <div className="upload-button-wrapper">
-            <Button type="primary"
-                    htmlType="submit"
-                    loading={loading}
-                    className="upload-btn">Log in</Button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' , height: 16 }}>
+            <Form.Item noStyle name="remember" valuePropName="checked" initialValue={false}>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+            <Button type="link" onClick={handleForgotPassword} style={{ padding: 0, lineHeight: '22px' }}>Forgot password?</Button>
           </div>
+            <Button type="primary" htmlType="submit" style={{ width: '100%', marginTop: 24 }}>Log in</Button>
         </Form>
       </div>
     </div>

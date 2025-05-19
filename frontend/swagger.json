@@ -737,45 +737,6 @@
         }
       }
     },
-    "/Login/GetUserDataByEmail": {
-      "get": {
-        "tags": [
-          "Login"
-        ],
-        "operationId": "Login_GetUserDataByEmail",
-        "parameters": [
-          {
-            "name": "email",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Login/SetupUserCredentials": {
       "post": {
         "tags": [
