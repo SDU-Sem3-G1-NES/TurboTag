@@ -4,7 +4,7 @@ import requests
 
 app = FastAPI(
     title="Content Generator API (Ollama)",
-    description="Generates tags and descriptions using the Ollama gemma:4b model.",
+    description="Generates tags and descriptions using the Ollama gemma:2b model.",
     version="2.0.0"
 )
 

@@ -9,7 +9,9 @@ import {
   AddUploadRequestDto,
   FileClient,
   UploadChunkDto,
-  FinaliseUploadDto
+  FinaliseUploadDto, 
+  GenerationClient,
+  GenerationResult
 } from '../api/apiClient.ts'
 import { Button, Form, Input, notification, Progress, Upload, UploadProps } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
@@ -17,6 +19,7 @@ import TextArea from 'antd/es/input/TextArea'
 
 const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false)
+  const [generationg, setGenerating] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
@@ -24,6 +27,7 @@ const UploadPage: React.FC = () => {
   const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
+  const contentGenerationClient = new GenerationClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
 
   const handleFileChange: UploadProps['beforeUpload'] = (file) => {
@@ -106,6 +110,43 @@ const UploadPage: React.FC = () => {
     setUploading(false)
     return fileId
   }
+  
+  const generateContention = async (file: File) => {
+    setGenerating(true)
+    const text = "That will be from file analysis" // Placeholder for actual file analysis
+
+    const result = await contentGenerationClient.generate(text);
+
+    if (result != null){
+      const tagsList = result.tags
+        .split("\n")
+        .map(tag => tag.replace(/^- /, "").trim())
+        .filter(tag => tag !== "");
+
+      setTags(tagsList)
+      const description = result.description
+      setDescription(description)
+      
+      notification.success({
+        message: 'Content Generation successful',
+        description: 'Your lecture content has been generated successfully',
+        placement: 'topRight',
+        duration: 2
+      })
+      console.log('Content Generation successful')
+    }
+    else {
+      notification.error({
+        message: 'Content Generation failed',
+        description: 'Your lecture content could not be generated',
+        placement: 'topRight',
+        duration: 2
+      })
+      console.error('Content Generation failed')
+    }
+    
+    setGenerating(false)
+  }
 
   const handleSubmit = async () => {
     if (!file) return
@@ -179,6 +220,7 @@ const UploadPage: React.FC = () => {
       console.error('Upload failed', error)
     }
   }
+  
 
   return (
     <div className="form-container">
@@ -217,14 +259,33 @@ const UploadPage: React.FC = () => {
         >
           <TextArea
             maxLength={100}
-            value={title}
+            value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Optional short description"
+            disabled
           />
         </Form.Item>
 
         <Form.Item label="Tags" name="tags">
           <Tags tags={tags} setTags={setTags} />
+        </Form.Item>
+        
+        <Form.Item label="Content Generation" name="contentGeneration">
+          <div className="upload-button-wrapper">
+            {uploading ? (
+              <Progress status="active"/>
+            ) : (
+              <Button
+                type="primary"
+                className="upload-btn"
+                icon={<UploadOutlined />}
+                onClick={() => generateContention(file as File)}
+              >
+                Generate Content
+              </Button>
+            )
+            }
+          </div>
         </Form.Item>
 
         <Form.Item>
