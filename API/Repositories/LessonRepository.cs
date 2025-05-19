@@ -1,3 +1,4 @@
+using System.Text.Json;
 using API.DataAccess;
 using API.DTOs;
 using MongoDB.Bson;
@@ -7,7 +8,7 @@ namespace API.Repositories;
 public interface ILessonRepository : IRepositoryBase
 {
     void AddLesson(LessonDto lesson);
-    List<LessonDto> GetAllLessons();
+    List<LessonDto> GetAllLessons(LessonFilter? filter);
     public List<LessonDto> GetLessonsByTags(string[] tags);
     public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonByObjectId(string objectId);
@@ -26,9 +27,49 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
         database.Insert("lesson", lesson.ToBsonDocument());
     }
 
-    public List<LessonDto> GetAllLessons()
+    public List<LessonDto> GetAllLessons(LessonFilter? filter = null)
     {
-        return database.Find<LessonDto>("lesson", "{}");
+        var query = new List<string>();
+
+        if (filter != null)
+        {
+            if (filter.UploadIds is { Count: > 0 })
+            {
+                query.Add($"{{\"upload_id\": {{$all: [{string.Join(",", filter.UploadIds)}]}}}}");
+            }
+
+            if (!string.IsNullOrEmpty(filter.Title))
+            {
+                string escapedTitle = JsonSerializer.Serialize(filter.Title).Trim('"');
+                query.Add($"{{\"lesson_details.title\": {{$regex: \"{escapedTitle}\", $options: \"i\"}}}}");
+            }
+
+            if (filter.OwnerId != null)
+            {
+                query.Add($"{{\"owner_id\": {filter.OwnerId}}}");
+            }
+
+            if (filter.LessonId != null)
+            {
+                query.Add($"{{\"lesson_details._id\": {filter.LessonId}}}");
+            }
+
+            if (filter.Tags is { Count: > 0 })
+            {
+                var escapedTags = filter.Tags.Select(tag => JsonSerializer.Serialize(tag));
+                query.Add($"{{\"lesson_details.tags\": {{$all: [{string.Join(",", escapedTags)}]}}}}");
+            }
+        }
+        
+        string filterString = query.Count > 1 ? $"{{ \"$and\": [{string.Join(",", query)}] }}" : query.FirstOrDefault() ?? "{}";
+        
+        if (filter is { PageNumber: not null, PageSize: not null })
+        {
+            int skip = (filter.PageNumber.Value - 1) * filter.PageSize.Value;
+            return database.Find<LessonDto>("lesson", filterString, skip, filter.PageSize);
+        }
+        
+        return database.Find<LessonDto>("lesson", filterString);
     }
     
     public List<LessonDto> GetLessonsByTags(string[] tags)
@@ -90,4 +131,34 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
         }
         database.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
     }
+}
+public class LessonFilter : PaginationFilter
+{
+    public LessonFilter(List<int>? uploadIds,
+        string? title,
+        int? lessonId,
+        int? ownerId,
+        List<string>? tags,
+        int? pageNumber,
+        int? pageSize) : base(pageNumber, pageSize)
+    {
+        UploadIds = uploadIds;
+        Title = title;
+        OwnerId = ownerId;
+        Tags = tags;
+        LessonId = lessonId;
+        PageSize = pageSize;
+        PageNumber = pageNumber;
+    }
+
+    public LessonFilter()
+    {
+    }
+    public string? Title { get; set; }
+    public List<string>? Tags { get; set; }
+    public int? OwnerId { get; set; }
+    public List<int>? UploadIds { get; set; }
+    public int? LessonId { get; set; }
+    public int? PageSize { get; set; }
+    public int? PageNumber { get; set; }
 }

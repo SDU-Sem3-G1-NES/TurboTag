@@ -2,7 +2,7 @@ namespace API.DataAccess;
 
 public interface IMongoDataAccess
 {
-    List<T> Find<T>(string collectionName, string query);
+    List<T> Find<T>(string collectionName, string query, int? skip = null, int? limit = null);
     void Insert<T>(string collectionName, T document);
     void Replace<T>(string collectionName, string query, T document);
     void Delete(string collectionName, string query);
