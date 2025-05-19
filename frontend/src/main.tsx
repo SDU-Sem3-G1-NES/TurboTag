@@ -14,23 +14,23 @@ import logo from './assets/logo.png'
 import avatar from './assets/avatar.png'
 import './App.css'
 import { Button } from 'antd'
-import { LogoutOutlined, LoginOutlined } from '@ant-design/icons';
+import { LogoutOutlined, LoginOutlined } from '@ant-design/icons'
 import { LoginClient } from './api/apiClient.ts'
 
 const AppLayout = () => {
   const navigate = useNavigate()
   const loginClient = new LoginClient()
-  const userName = localStorage.getItem('userName');
-  
+  const userName = localStorage.getItem('userName')
+
   const handleLogout = async () => {
     await loginClient.logout()
-    localStorage.removeItem("authToken")
-    localStorage.removeItem("refreshToken")
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('userId')
     localStorage.removeItem('userName')
     navigate('/login')
   }
-  
+
   const items = [
     {
       key: 'library',
@@ -50,13 +50,12 @@ const AppLayout = () => {
         <ReactNotifications />
         <Header className="header">
           <div className="menu-container">
-            { userName &&
-            <Menu items={items} mode="horizontal" /> }
+            {userName && <Menu items={items} mode="horizontal" />}
           </div>
           <div className="logo-container">
             <img src={logo} alt="SpeedAdmin" className="logo" />
           </div>
-          { userName ? (
+          {userName ? (
             <div className="user-container">
               <img src={avatar} alt="User" className="user-avatar" />
               <span className="user-name">{userName}</span>
@@ -68,26 +67,34 @@ const AppLayout = () => {
                 title="Log out"
               />
             </div>
-          ) : (<Button
-            type="text"
-            icon={<LoginOutlined style={{ fontSize: '32px' }} />}
-            onClick={handleLogout}
-            className="auth-buttons"
-            title="Log in"
-          />) }
+          ) : (
+            <Button
+              type="text"
+              icon={<LoginOutlined style={{ fontSize: '32px' }} />}
+              onClick={handleLogout}
+              className="auth-buttons"
+              title="Log in"
+            />
+          )}
         </Header>
         <Content className="content">
           <Routes>
-            <Route path="/" element={
-              <ProtectedRoute>
-                <App />
-              </ProtectedRoute>
-            } />
-            <Route path="/upload" element={
-              <ProtectedRoute>
-                <Upload />
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <App />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <Upload />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
           </Routes>
         </Content>
