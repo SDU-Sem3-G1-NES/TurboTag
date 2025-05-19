@@ -6,6 +6,7 @@ import {
 } from '../api/apiClient.ts'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
+import { AxiosError } from 'axios'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
@@ -36,11 +37,12 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("userId", response.userId?.toString() ?? "undefined");
       localStorage.setItem("userName", response.name ?? "undefined");
       navigate('/');
-    } catch (error: any) {
-      if (error.status === 401) {
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
         setFormError('Login failed: Invalid email or password');
       } else {
-        setFormError('Login failed: ' + (error.message || 'Unexpected error'));
+        const msg = error instanceof Error ? error.message : 'Unexpected error';
+        setFormError('Login failed: ' + msg);
       }
     }
   };
