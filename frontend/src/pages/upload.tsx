@@ -19,7 +19,7 @@ import TextArea from 'antd/es/input/TextArea'
 
 const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false)
-  const [generationg, setGenerating] = useState<boolean>(false)
+  const [generating, setGenerating] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
@@ -118,13 +118,14 @@ const UploadPage: React.FC = () => {
     const result = await contentGenerationClient.generate(text);
 
     if (result != null){
-      const tagsList = result.tags
+      const tagsList = (result.tags ?? "")
         .split("\n")
         .map(tag => tag.replace(/^- /, "").trim())
         .filter(tag => tag !== "");
 
       setTags(tagsList)
-      const description = result.description
+      
+      const description = result.description ?? ""
       setDescription(description)
       
       notification.success({
