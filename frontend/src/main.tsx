@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Layout, Menu } from 'antd'
-import App from './App.tsx'
 import Upload from './pages/upload.tsx'
 import Login from './pages/login.tsx'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -16,6 +15,7 @@ import './App.css'
 import { Button } from 'antd'
 import { LogoutOutlined, LoginOutlined } from '@ant-design/icons'
 import { LoginClient } from './api/apiClient.ts'
+import Library from './pages/library.tsx'
 
 const AppLayout = () => {
   const navigate = useNavigate()
@@ -33,7 +33,7 @@ const AppLayout = () => {
 
   const items = [
     {
-      key: 'library',
+      key: 'home',
       label: 'Home',
       onClick: () => navigate('/')
     },
@@ -83,7 +83,7 @@ const AppLayout = () => {
               path="/"
               element={
                 <ProtectedRoute>
-                  <App />
+                  <Library />
                 </ProtectedRoute>
               }
             />
