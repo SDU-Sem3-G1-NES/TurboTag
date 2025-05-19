@@ -1,9 +1,9 @@
 import React from 'react'
 import { Card, Image, Tag, Typography } from 'antd'
-import { LessonDto } from '../../api/apiClient'
+import { LessonDtoWithOwnerName } from '../../pages/library'
 
 interface LibraryItemProps {
-  lesson: LessonDto
+  lesson: LessonDtoWithOwnerName
 }
 
 const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
@@ -52,7 +52,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
             <Typography.Text
               style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}
             >
-              {'Uploaded by ' + lesson.ownerId}
+              {'Uploaded by ' + lesson.ownerName}
             </Typography.Text>
             <Typography.Text
               style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}
@@ -66,7 +66,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
                     hour: '2-digit',
                     minute: '2-digit'
                   })
-                : 'N/A'}
+                : ' at Unknown Time'}
             </Typography.Text>
           </div>
         </div>

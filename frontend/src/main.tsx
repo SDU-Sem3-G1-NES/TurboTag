@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Layout, Menu } from 'antd'
-import App from './App.tsx'
 import Upload from './pages/upload.tsx'
 import Login from './pages/login.tsx'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -42,11 +41,6 @@ const AppLayout = () => {
       key: 'upload',
       label: 'Upload',
       onClick: () => navigate('/upload')
-    },
-    {
-      key: 'library',
-      label: 'Library',
-      onClick: () => navigate('/library')
     }
   ]
 
@@ -89,7 +83,7 @@ const AppLayout = () => {
               path="/"
               element={
                 <ProtectedRoute>
-                  <App />
+                  <Library />
                 </ProtectedRoute>
               }
             />
