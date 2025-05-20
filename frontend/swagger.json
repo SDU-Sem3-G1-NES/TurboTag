@@ -1402,6 +1402,50 @@
         }
       }
     },
+    "/User/GetUserNames": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetUserNames",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UserName"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/User/GetUserByEmail": {
       "get": {
         "tags": [
@@ -2021,6 +2065,33 @@
           }
         }
       },
+      "PagedResult_UserName": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserName"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "PagedResult_UserTypeDto": {
         "type": "object",
         "properties": {
@@ -2309,6 +2380,20 @@
             "format": "int32"
           },
           "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserName": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
             "type": "string",
             "nullable": true
           }

@@ -6,23 +6,36 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Authorize(Roles = "1")]
 [ApiController]
 [Route("[controller]")]
 public class UserController(IUserService userService, IUserCredentialService userCredentialService) : ControllerBase
 {
+    [Authorize(Roles = "1")]
     [HttpPost("GetAllUsers")]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromBody] UserFilter? filter)
     {
         return Ok(userService.GetAllUsers(filter));
     }
     
+    [Authorize]
+    [HttpPost("GetUserNames")]
+    public ActionResult<IEnumerable<UserName>> GetUserNames([FromBody] UserFilter? filter)
+    {
+        var result = userService.GetAllUsers(filter).Select(u => new UserName
+        {
+            Id = u.Id,
+            Name = u.Name
+        });
+        return Ok(result);
+    }
+    [Authorize(Roles = "1")]
     [HttpGet("GetUserByEmail")]
     public ActionResult<UserDto> GetUserByEmail(string email)
     {
         return Ok(userService.GetUserByEmail(email));
     }
 
+    [Authorize(Roles = "1")]
     [HttpPost("CreateNewUser")]
     public ActionResult CreateNewUser([FromBody] UserRequest request)
     {
@@ -30,6 +43,7 @@ public class UserController(IUserService userService, IUserCredentialService use
         return Ok();
     }
 
+    [Authorize(Roles = "1")]
     [HttpPut("UpdateUserById")]
     public ActionResult UpdateUserById([FromBody] UserRequest request)
     {
@@ -37,6 +51,7 @@ public class UserController(IUserService userService, IUserCredentialService use
         return Ok();
     }
 
+    [Authorize(Roles = "1")]
     [HttpDelete("DeleteUserById")]
     public ActionResult DeleteUserById(int userId)
     {
@@ -44,6 +59,7 @@ public class UserController(IUserService userService, IUserCredentialService use
         return Ok();
     }
 
+    [Authorize]
     [HttpGet("UserExists")]
     public ActionResult<bool> UserExists(string email)
     {
@@ -54,5 +70,11 @@ public class UserController(IUserService userService, IUserCredentialService use
     {
         public UserDto User { get; set; }
         public string? Password { get; set; }
+    }
+    
+    public class UserName
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
     }
 }

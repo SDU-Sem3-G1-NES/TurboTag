@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LessonClient, LessonDto, UserClient, UserDto, UserFilter } from '../api/apiClient'
+import { LessonClient, LessonDto, UserClient, UserDto, UserFilter, UserName } from '../api/apiClient'
 import { Input, Row, Col, Spin } from 'antd'
 import LibraryItem from '../components/library/libraryItem'
 import { LoadingOutlined } from '@ant-design/icons'
@@ -30,13 +30,13 @@ const Library: React.FC = () => {
 
       const userFilter = new UserFilter()
       userFilter.userIds = ownerIds
-      const usersResult = await userClient.getAllUsers(userFilter)
-      const usersArray: UserDto[] = Array.isArray(usersResult)
+      const usersResult = await userClient.getUserNames(userFilter)
+      const usersArray: UserName[] = Array.isArray(usersResult)
         ? usersResult
         : usersResult.items || []
 
       const lessonsWithOwnerName = lessonsArray.map((lesson: LessonDto) => {
-        const owner = usersArray.find((user: UserDto) => user.id === lesson.ownerId)
+        const owner = usersArray.find((user: UserName) => user.id === lesson.ownerId)
         const lessonWithOwnerName = Object.create(Object.getPrototypeOf(lesson))
         Object.assign(lessonWithOwnerName, lesson, { ownerName: owner?.name ?? '' })
         return lessonWithOwnerName as LessonDtoWithOwnerName
