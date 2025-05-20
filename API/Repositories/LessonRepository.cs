@@ -19,7 +19,8 @@ public interface ILessonRepository : IRepositoryBase
     void DeleteLessonById(int lessonId);
     void DeleteLessonByObjectId(string objectId);
 
-    Dictionary<string, int[]> TagOptions(TagOptionsFilter filter);
+    Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter);
+    Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter);
 }
 
 public class LessonRepository(IMongoDataAccess database) : ILessonRepository
@@ -152,57 +153,100 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
         database.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
     }
 
-    public Dictionary<string, int[]> TagOptions(TagOptionsFilter filter)
+    public Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter)
     {
-        var queryParts = new List<string>();
+        var pageNumber = filter.PageNumber ?? 1;
+        var pageSize = filter.PageSize ?? int.MaxValue;
+
+        var pipeline = new List<BsonDocument>();
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+        {
+            var regex = new BsonRegularExpression(filter.SearchText, "i");
+            pipeline.Add(new BsonDocument("$match",
+                new BsonDocument("lesson_details.tags", new BsonDocument("$regex", regex))));
+        }
+
+        pipeline.Add(new BsonDocument("$unwind", "$lesson_details.tags"));
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+        {
+            var regex = new BsonRegularExpression(filter.SearchText, "i");
+            pipeline.Add(new BsonDocument("$match",
+                new BsonDocument("lesson_details.tags", new BsonDocument("$regex", regex))));
+        }
+
+        pipeline.Add(new BsonDocument("$group", new BsonDocument
+        {
+            { "_id", "$lesson_details.tags" },
+            { "uploadIds", new BsonDocument("$addToSet", "$upload_id") }
+        }));
+
+        pipeline.Add(new BsonDocument("$sort", new BsonDocument("_id", 1)));
+
+        if (pageNumber > 1)
+            pipeline.Add(new BsonDocument("$skip", (pageNumber - 1) * pageSize));
+
+        pipeline.Add(new BsonDocument("$limit", pageSize));
+
+        var results = database.Aggregate("lesson", pipeline);
+
+        var tagUploads = new Dictionary<string, int[]>();
+
+        foreach (var doc in results)
+        {
+            var tag = doc["_id"].AsString;
+            var uploadIds = doc["uploadIds"].AsBsonArray.Select(u => u.AsInt32).ToArray();
+            tagUploads[tag] = uploadIds;
+        }
+
+        return tagUploads;
+    }
+
+
+    public Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter)
+    {
+        var matchStage = new BsonDocument();
 
         if (!string.IsNullOrEmpty(filter.SearchText))
         {
             var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
-            queryParts.Add(
-                $@"{{""lesson_details.tags"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}");
-        }
-
-        var filterString = queryParts.Count switch
-        {
-            0 => "{}",
-            1 => queryParts[0],
-            _ => $"{{ \"$and\": [{string.Join(",", queryParts)}] }}"
-        };
-
-        var lessons = database.Find<BsonDocument>("lesson", filterString);
-
-        var tagUploads = new Dictionary<string, HashSet<int>>();
-
-        foreach (var lesson in lessons)
-        {
-            if (!lesson.Contains("lesson_details") || !lesson.Contains("upload_id"))
-                continue;
-
-            var lessonDetails = lesson["lesson_details"].AsBsonDocument;
-            var uploadId = lesson["upload_id"].AsInt32;
-
-            if (!lessonDetails.Contains("tags"))
-                continue;
-
-            var tagsArray = lessonDetails["tags"].AsBsonArray;
-
-            foreach (var tagValue in tagsArray)
+            matchStage = new BsonDocument("$match", new BsonDocument("owner_name", new BsonDocument
             {
-                var tag = tagValue.AsString;
-
-                if (!string.IsNullOrEmpty(filter.SearchText) &&
-                    !tag.Contains(filter.SearchText, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                if (!tagUploads.ContainsKey(tag))
-                    tagUploads[tag] = new HashSet<int>();
-
-                tagUploads[tag].Add(uploadId);
-            }
+                { "$regex", escapedSearchText },
+                { "$options", "i" }
+            }));
         }
 
-        return tagUploads.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray());
+        var groupStage = new BsonDocument("$group", new BsonDocument
+        {
+            { "_id", "$owner_id" },
+            { "owner_name", new BsonDocument("$first", "$owner_name") }
+        });
+
+        var sortStage = new BsonDocument("$sort", new BsonDocument("owner_name", 1));
+
+        var skipStage = new BsonDocument("$skip", ((filter.PageNumber ?? 1) - 1) * (filter.PageSize ?? int.MaxValue));
+        var limitStage = new BsonDocument("$limit", filter.PageSize ?? int.MaxValue);
+
+        var pipeline = new List<BsonDocument>();
+
+        if (!matchStage.ElementCount.Equals(0))
+            pipeline.Add(matchStage);
+
+        pipeline.Add(groupStage);
+        pipeline.Add(sortStage);
+        pipeline.Add(skipStage);
+        pipeline.Add(limitStage);
+
+        var results = database.Aggregate("lesson", pipeline);
+
+        return results
+            .Where(doc => doc.Contains("_id") && doc.Contains("owner_name"))
+            .ToDictionary(
+                doc => doc["_id"].AsInt32,
+                doc => doc["owner_name"].AsString
+            );
     }
 }
 

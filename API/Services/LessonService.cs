@@ -18,7 +18,8 @@ public interface ILessonService : IServiceBase
     void DeleteLessonByObjectId(string objectId);
     void StarLesson(int lessonId, int userId);
     void UnstarLesson(int lessonId, int userId);
-    Dictionary<string, int[]> TagOptions(TagOptionsFilter filter);
+    Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter);
+    Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter);
 }
 
 internal class LessonService(
@@ -96,9 +97,14 @@ internal class LessonService(
         uploadRepository.UnstarUpload(lessonId, userId);
     }
 
-    public Dictionary<string, int[]> TagOptions(TagOptionsFilter filter)
+    public Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter)
     {
         return lessonRepository.TagOptions(filter);
+    }
+
+    public Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter)
+    {
+        return lessonRepository.UploaderOptions(filter);
     }
 
     private List<LessonDto> AddOwnersAndStars(List<LessonDto> lessons, LessonFilter? filter = null)

@@ -9,9 +9,15 @@ namespace API.Controllers;
 public class OptionsController(IOptionsProviderService optionsProviderService) : ControllerBase
 {
     [HttpGet("GetTagOptions")]
-    public ActionResult<IEnumerable<OptionDto>> GetTagOptions([FromQuery] TagOptionsFilter filter)
+    public ActionResult<IEnumerable<OptionDto>> GetTagOptions([FromQuery] BaseOptionsFilter filter)
     {
         return Ok(optionsProviderService.GetTagOptions(filter));
+    }
+
+    [HttpGet("GetUploaderOptions")]
+    public ActionResult<IEnumerable<OptionDto>> GetUploaderOptions([FromQuery] BaseOptionsFilter filter)
+    {
+        return Ok(optionsProviderService.GetUploaderOptions(filter));
     }
 }
 

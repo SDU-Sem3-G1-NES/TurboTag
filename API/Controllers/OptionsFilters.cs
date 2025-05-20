@@ -2,13 +2,13 @@ using API.DataAccess;
 
 namespace Api.Controllers;
 
-public class TagOptionsFilter : PaginationFilter
+public class BaseOptionsFilter : PaginationFilter
 {
-    public TagOptionsFilter()
+    public BaseOptionsFilter()
     {
     }
 
-    public TagOptionsFilter(int pageNumber, int pageSize, int userId, string searchText)
+    public BaseOptionsFilter(int pageNumber, int pageSize, int userId, string searchText)
     {
         PageNumber = pageNumber;
         PageSize = pageSize;

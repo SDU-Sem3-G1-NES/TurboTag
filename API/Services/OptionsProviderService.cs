@@ -6,12 +6,14 @@ namespace API.Services;
 
 public interface IOptionsProviderService : IServiceBase
 {
-    public IEnumerable<OptionDto> GetTagOptions(TagOptionsFilter filter);
+    IEnumerable<OptionDto> GetTagOptions(BaseOptionsFilter filter);
+    IEnumerable<OptionDto> GetUploaderOptions(BaseOptionsFilter filter);
 }
 
-public class OptionsProviderProviderService(ILessonService lessonService) : IOptionsProviderService
+public class OptionsProviderProviderService(ILessonService lessonService, IUserService userService)
+    : IOptionsProviderService
 {
-    public IEnumerable<OptionDto> GetTagOptions(TagOptionsFilter filter)
+    public IEnumerable<OptionDto> GetTagOptions(BaseOptionsFilter filter)
     {
         var tags = lessonService.TagOptions(filter);
         if (filter.UserId is not null)
@@ -41,6 +43,40 @@ public class OptionsProviderProviderService(ILessonService lessonService) : IOpt
             {
                 DisplayText = x.Key,
                 Value = x.Key
+            });
+    }
+
+    public IEnumerable<OptionDto> GetUploaderOptions(BaseOptionsFilter filter)
+    {
+        var uploaders = lessonService.UploaderOptions(filter);
+
+        if (filter.UserId is not null)
+        {
+            var userOwnedLessons = lessonService.GetAllLessons(new LessonFilter
+            {
+                OwnerId = filter.UserId
+            }).Select(l => l.OwnerId);
+
+            var userStarredLessons = lessonService.GetAllLessons(new LessonFilter
+            {
+                IsStarred = true,
+                UserId = filter.UserId
+            }).Select(l => l.OwnerId);
+
+            return uploaders
+                .Where(x => userOwnedLessons.Contains(x.Key) || userStarredLessons.Contains(x.Key))
+                .Select(x => new OptionDto
+                {
+                    DisplayText = x.ToString(),
+                    Value = x.ToString()
+                });
+        }
+
+        return uploaders
+            .Select(x => new OptionDto
+            {
+                DisplayText = x.ToString(),
+                Value = x.ToString()
             });
     }
 }
