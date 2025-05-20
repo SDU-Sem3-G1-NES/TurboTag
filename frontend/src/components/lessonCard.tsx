@@ -44,7 +44,8 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
           cursor: 'pointer'
         }}
         onClick={toggleStar}
-        title={isStarred ? 'Unstar this lesson' : 'Star this lesson'}>
+        title={isStarred ? 'Unstar this lesson' : 'Star this lesson'}
+      >
         {isStarred ? <StarFilled style={{ color: '#fadb14' }} /> : <StarOutlined />}
       </div>
 
@@ -75,11 +76,13 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
           </div>
           <div>
             <Typography.Text
-              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}>
+              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}
+            >
               {'Uploaded by ' + lesson.ownerName}
             </Typography.Text>
             <Typography.Text
-              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}>
+              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}
+            >
               {lesson.fileMetadata?.[0]?.date
                 ? '  at ' +
                   new Date(lesson.fileMetadata[0].date).toLocaleString('da-DK', {
