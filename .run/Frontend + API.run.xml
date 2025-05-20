@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Frontend + API" type="CompoundRunConfigurationType">
-    <toRun name="API: https" type="LaunchSettings" />
+    <toRun name="API: http" type="LaunchSettings" />
     <toRun name="Debug Frontend" type="CompoundRunConfigurationType" />
     <method v="2" />
   </configuration>

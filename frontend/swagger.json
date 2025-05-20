@@ -462,108 +462,6 @@
         }
       }
     },
-    "/Lesson/StarLesson": {
-      "post": {
-        "tags": [
-          "Lesson"
-        ],
-        "operationId": "Lesson_StarLesson",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Lesson/UnstarLesson": {
-      "post": {
-        "tags": [
-          "Lesson"
-        ],
-        "operationId": "Lesson_UnstarLesson",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/Lesson/GetLessonsByTags": {
       "get": {
         "tags": [
@@ -1353,22 +1251,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             }
           }
@@ -1823,18 +1721,6 @@
   },
   "components": {
     "schemas": {
-      "AddUploadRequestDto": {
-        "type": "object",
-        "properties": {
-          "uploadDto": {
-            "$ref": "#/components/schemas/UploadDto"
-          },
-          "lessonDto": {
-            "$ref": "#/components/schemas/LessonDto"
-          }
-        },
-        "additionalProperties": false
-      },
       "FileMetadataDto": {
         "type": "object",
         "properties": {
@@ -1921,8 +1807,7 @@
           },
           "uploadId": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "lessonDetails": {
             "$ref": "#/components/schemas/LessonDetailsDto"
@@ -1942,9 +1827,6 @@
           "ownerName": {
             "type": "string",
             "nullable": true
-          },
-          "isStarred": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -1964,11 +1846,6 @@
             "nullable": true
           },
           "ownerId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "userId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
@@ -1998,18 +1875,6 @@
           },
           "searchText": {
             "type": "string",
-            "nullable": true
-          },
-          "isStarred": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "starredLessons": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
             "nullable": true
           }
         },
