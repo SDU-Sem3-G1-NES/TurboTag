@@ -55,7 +55,8 @@ const HomePage: React.FC = () => {
         flexDirection: 'column',
         alignItems: 'center',
         overflow: 'hidden' // No scroll
-      }}>
+      }}
+    >
       <Input.Search
         placeholder="Search by title or description"
         value={search}
