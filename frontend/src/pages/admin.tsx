@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo} from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   UserClient,
   ContentLibraryClient,
@@ -8,205 +8,226 @@ import {
   LibraryDto,
   UserTypeDto,
   UserFilter,
-  LibraryFilter,
+  LibraryFilter
 } from '../api/apiClient.ts'
-import { Layout, Menu, Table, Button, Modal, notification, Form, Input, Select, MenuProps} from 'antd'
-import { UserAddOutlined, FolderAddOutlined,EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import {
+  Layout,
+  Menu,
+  Table,
+  Button,
+  Modal,
+  notification,
+  Form,
+  Input,
+  Select,
+  MenuProps
+} from 'antd'
+import { UserAddOutlined, FolderAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 const { Sider, Content } = Layout
 
 const AdminPage: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<'users' | 'libraries'>('users');
+  const [activeSection, setActiveSection] = useState<'users' | 'libraries'>('users')
 
   // Users state
-  const [users, setUsers] = useState<UserDto[]>([]);
-  const [userPage, setUserPage] = useState(1);
-  const [userTotal, setUserTotal] = useState(0);
-  const [userTypes, setUserTypes] = useState<UserTypeDto[]>([]);
-  const [userSearch, setUserSearch] = useState('');
-  const [userPageSize, setUserPageSize] = useState(10);
+  const [users, setUsers] = useState<UserDto[]>([])
+  const [userPage, setUserPage] = useState(1)
+  const [userTotal, setUserTotal] = useState(0)
+  const [userTypes, setUserTypes] = useState<UserTypeDto[]>([])
+  const [userSearch, setUserSearch] = useState('')
+  const [userPageSize, setUserPageSize] = useState(10)
 
   // Libraries state
-  const [libraries, setLibraries] = useState<LibraryDto[]>([]);
-  const [libraryPage, setLibraryPage] = useState(1);
-  const [libraryTotal, setLibraryTotal] = useState(0);
-  const [librarySearch, setLibrarySearch] = useState('');
-  const [libraryPageSize, setLibraryPageSize] = useState(10);
-  const [allLibraries, setAllLibraries] = useState<LibraryDto[]>([]);
+  const [libraries, setLibraries] = useState<LibraryDto[]>([])
+  const [libraryPage, setLibraryPage] = useState(1)
+  const [libraryTotal, setLibraryTotal] = useState(0)
+  const [librarySearch, setLibrarySearch] = useState('')
+  const [libraryPageSize, setLibraryPageSize] = useState(10)
+  const [allLibraries, setAllLibraries] = useState<LibraryDto[]>([])
 
   // Add modals
-  const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
-  const [addUserForm] = Form.useForm();
-  const [isAddLibraryModalVisible, setIsAddLibraryModalVisible] = useState(false);
-  const [addLibraryForm] = Form.useForm();
+  const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false)
+  const [addUserForm] = Form.useForm()
+  const [isAddLibraryModalVisible, setIsAddLibraryModalVisible] = useState(false)
+  const [addLibraryForm] = Form.useForm()
 
   // Edit modals
-  const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
-  const [editingUser, setEditingUser] = useState<UserDto | null>(null);
-  const [userForm] = Form.useForm();
-  const [isEditLibraryModalVisible, setIsEditLibraryModalVisible] = useState(false);
-  const [editingLibrary, setEditingLibrary] = useState<LibraryDto | null>(null);
-  const [libraryForm] = Form.useForm();
+  const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false)
+  const [editingUser, setEditingUser] = useState<UserDto | null>(null)
+  const [userForm] = Form.useForm()
+  const [isEditLibraryModalVisible, setIsEditLibraryModalVisible] = useState(false)
+  const [editingLibrary, setEditingLibrary] = useState<LibraryDto | null>(null)
+  const [libraryForm] = Form.useForm()
 
-  const userClient = new UserClient();
-  const contentLibraryClient = new ContentLibraryClient();
-  const userTypeClient = useMemo(() => new UserTypeClient(), []);
+  const userClient = new UserClient()
+  const contentLibraryClient = new ContentLibraryClient()
+  const userTypeClient = useMemo(() => new UserTypeClient(), [])
 
   useEffect(() => {
     const fetchUserTypes = async () => {
       try {
-        const types = await userTypeClient.getAllUserTypes();
-        const items = Array.isArray(types) ? types : types?.items || [];
-        setUserTypes(items);
+        const types = await userTypeClient.getAllUserTypes()
+        const items = Array.isArray(types) ? types : types?.items || []
+        setUserTypes(items)
       } catch {
         notification.error({
           message: 'Error',
           description: 'Error fetching user types',
           placement: 'topRight',
           duration: 2
-        });
+        })
       }
-    };
-    fetchUserTypes();
-  }, [userTypeClient]);
+    }
+    fetchUserTypes()
+  }, [userTypeClient])
 
   useEffect(() => {
-    fetchAllLibraries();
-  }, []);
+    fetchAllLibraries()
+  }, [])
 
   useEffect(() => {
     if (activeSection === 'users') {
-      fetchUsers(userPage, userPageSize);
+      fetchUsers(userPage, userPageSize)
     }
-  }, [activeSection, userPage, userPageSize]);
+  }, [activeSection, userPage, userPageSize])
 
   useEffect(() => {
     if (activeSection === 'libraries') {
-      fetchLibraries(libraryPage, libraryPageSize);
+      fetchLibraries(libraryPage, libraryPageSize)
     }
-  }, [activeSection, libraryPage, libraryPageSize]);
+  }, [activeSection, libraryPage, libraryPageSize])
 
   const fetchUsers = async (page = 1, pageSize = userPageSize) => {
     try {
-      const filter = new UserFilter();
-      filter.pageSize = pageSize;
-      filter.pageNumber = page;
-      if (userSearch) filter.name = userSearch;
-      const result = await userClient.getAllUsers(filter);
-      const items = Array.isArray(result) ? result : result?.items || [];
-      const total = !Array.isArray(result) && typeof result?.totalCount === 'number' ? result.totalCount : items.length;
-      setUsers(items);
-      setUserTotal(total);
+      const filter = new UserFilter()
+      filter.pageSize = pageSize
+      filter.pageNumber = page
+      if (userSearch) filter.name = userSearch
+      const result = await userClient.getAllUsers(filter)
+      const items = Array.isArray(result) ? result : result?.items || []
+      const total =
+        !Array.isArray(result) && typeof result?.totalCount === 'number'
+          ? result.totalCount
+          : items.length
+      setUsers(items)
+      setUserTotal(total)
     } catch {
       notification.error({
         message: 'Error',
         description: 'Error fetching users',
         placement: 'topRight',
         duration: 2
-      });
+      })
     }
-  };
+  }
 
   const fetchLibraries = async (page = 1, pageSize = libraryPageSize) => {
     try {
-      const filter = new LibraryFilter();
-      filter.pageSize = pageSize;
-      filter.pageNumber = page;
-      if (librarySearch) filter.libraryName = librarySearch;
-      const result = await contentLibraryClient.getAllLibraries(filter);
-      const items = Array.isArray(result) ? result : result?.items || [];
-      const total = !Array.isArray(result) && typeof result?.totalCount === 'number' ? result.totalCount : items.length;
-      setLibraries(items);
-      setLibraryTotal(total);
+      const filter = new LibraryFilter()
+      filter.pageSize = pageSize
+      filter.pageNumber = page
+      if (librarySearch) filter.libraryName = librarySearch
+      const result = await contentLibraryClient.getAllLibraries(filter)
+      const items = Array.isArray(result) ? result : result?.items || []
+      const total =
+        !Array.isArray(result) && typeof result?.totalCount === 'number'
+          ? result.totalCount
+          : items.length
+      setLibraries(items)
+      setLibraryTotal(total)
     } catch {
       notification.error({
         message: 'Error',
         description: 'Error fetching libraries',
         placement: 'topRight',
         duration: 2
-      });
+      })
     }
-  };
+  }
 
   const fetchAllLibraries = async () => {
     try {
-      const filter = new LibraryFilter();
-      const result = await contentLibraryClient.getAllLibraries(filter);
-      const items = Array.isArray(result) ? result : result?.items || [];
-      setAllLibraries(items);
+      const filter = new LibraryFilter()
+      const result = await contentLibraryClient.getAllLibraries(filter)
+      const items = Array.isArray(result) ? result : result?.items || []
+      setAllLibraries(items)
     } catch {
       notification.error({
         message: 'Error',
         description: 'Error fetching libraries',
         placement: 'topRight',
         duration: 2
-      });
+      })
     }
-  };
+  }
 
   const handleAddUser = () => {
-    addUserForm.resetFields();
-    setIsAddUserModalVisible(true);
-  };
+    addUserForm.resetFields()
+    setIsAddUserModalVisible(true)
+  }
 
   const handleAddUserSubmit = async () => {
     try {
-      const values = await addUserForm.validateFields();
+      const values = await addUserForm.validateFields()
 
-      const { password, ...userFields } = values;
-      const request = new UserRequest();
-      request.user = { ...userFields };
-      request.password = password;
+      const { password, ...userFields } = values
+      const request = new UserRequest()
+      request.user = { ...userFields }
+      request.password = password
 
       await userClient.createNewUser({
         ...request,
-        user: { ...request.user },
-      });
+        user: { ...request.user }
+      })
       notification.success({
         message: 'Success',
         description: 'User added',
         placement: 'topRight',
-        duration: 2,
-      });
+        duration: 2
+      })
 
-      setIsAddUserModalVisible(false);
-      await fetchUsers(userPage);
+      setIsAddUserModalVisible(false)
+      await fetchUsers(userPage)
     } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to add user',
         placement: 'topRight',
-        duration: 2,
-      });
+        duration: 2
+      })
     }
-  };
+  }
 
   const handleEditUser = (user: UserDto) => {
-    setEditingUser(user);
-    userForm.setFieldsValue(user);
-    setIsEditUserModalVisible(true);
-  };
+    setEditingUser(user)
+    userForm.setFieldsValue(user)
+    setIsEditUserModalVisible(true)
+  }
 
   const handleUserEditSubmit = async () => {
     try {
-      const values = await userForm.validateFields();
+      const values = await userForm.validateFields()
       if (editingUser) {
-        const { password, ...userFields } = values;
-        const request = new UserRequest();
-        request.user = Object.assign(new UserDto(), { ...editingUser, ...userFields, id: editingUser.id });
+        const { password, ...userFields } = values
+        const request = new UserRequest()
+        request.user = Object.assign(new UserDto(), {
+          ...editingUser,
+          ...userFields,
+          id: editingUser.id
+        })
         if (password && password.trim() !== '') {
-          request.password = password;
+          request.password = password
         }
-        await userClient.updateUserById(request);
+        await userClient.updateUserById(request)
         notification.success({
           message: 'Success',
           description: 'User updated',
           placement: 'topRight',
           duration: 2
-        });
-        userForm.resetFields();
-        setIsEditUserModalVisible(false);
-        await fetchUsers(userPage);
+        })
+        userForm.resetFields()
+        setIsEditUserModalVisible(false)
+        await fetchUsers(userPage)
       }
     } catch {
       notification.error({
@@ -214,9 +235,9 @@ const AdminPage: React.FC = () => {
         description: 'Failed to edit the user',
         placement: 'topRight',
         duration: 2
-      });
+      })
     }
-  };
+  }
 
   const handleDeleteUser = (userId: number) => {
     Modal.confirm({
@@ -227,75 +248,75 @@ const AdminPage: React.FC = () => {
       cancelText: 'Cancel',
       onOk: async () => {
         try {
-          await userClient.deleteUserById(userId);
+          await userClient.deleteUserById(userId)
           notification.success({
             message: 'Success',
             description: 'User deleted',
             placement: 'topRight',
             duration: 2
-          });
-          await fetchUsers(userPage);
+          })
+          await fetchUsers(userPage)
         } catch {
           notification.error({
             message: 'Error',
             description: 'Failed to delete user',
             placement: 'topRight',
             duration: 2
-          });
+          })
         }
       }
-    });
-  };
-  
+    })
+  }
+
   const handleAddLibrary = () => {
-    addLibraryForm.resetFields();
-    setIsAddLibraryModalVisible(true);
-  };
+    addLibraryForm.resetFields()
+    setIsAddLibraryModalVisible(true)
+  }
 
   const handleAddLibrarySubmit = async () => {
     try {
-      const values = await addLibraryForm.validateFields();
-      await contentLibraryClient.createNewLibrary(values);
+      const values = await addLibraryForm.validateFields()
+      await contentLibraryClient.createNewLibrary(values)
       notification.success({
         message: 'Success',
         description: 'Library added',
         placement: 'topRight',
         duration: 2
-      });
-      setIsAddLibraryModalVisible(false);
-      await fetchLibraries(libraryPage);
-      await fetchAllLibraries();
+      })
+      setIsAddLibraryModalVisible(false)
+      await fetchLibraries(libraryPage)
+      await fetchAllLibraries()
     } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to add library',
         placement: 'topRight',
         duration: 2
-      });
+      })
     }
-  };
+  }
 
   const handleEditLibrary = (library: LibraryDto) => {
-    setEditingLibrary(library);
-    libraryForm.setFieldsValue(library);
-    setIsEditLibraryModalVisible(true);
-  };
+    setEditingLibrary(library)
+    libraryForm.setFieldsValue(library)
+    setIsEditLibraryModalVisible(true)
+  }
 
   const handleLibraryEditSubmit = async () => {
     try {
-      const values = await libraryForm.validateFields();
+      const values = await libraryForm.validateFields()
       if (editingLibrary) {
-        const updatedLibrary = { ...editingLibrary, ...values };
-        await contentLibraryClient.updateLibraryById(updatedLibrary);
+        const updatedLibrary = { ...editingLibrary, ...values }
+        await contentLibraryClient.updateLibraryById(updatedLibrary)
         notification.success({
           message: 'Success',
           description: 'Library updated',
           placement: 'topRight',
           duration: 2
-        });
-        setIsEditLibraryModalVisible(false);
-        await fetchLibraries(libraryPage);
-        await fetchAllLibraries();
+        })
+        setIsEditLibraryModalVisible(false)
+        await fetchLibraries(libraryPage)
+        await fetchAllLibraries()
       }
     } catch {
       notification.error({
@@ -303,9 +324,9 @@ const AdminPage: React.FC = () => {
         description: 'Failed to edit the library',
         placement: 'topRight',
         duration: 2
-      });
+      })
     }
-  };
+  }
 
   const handleDeleteLibrary = (libraryId: number) => {
     Modal.confirm({
@@ -316,31 +337,31 @@ const AdminPage: React.FC = () => {
       cancelText: 'Cancel',
       onOk: async () => {
         try {
-          await contentLibraryClient.deleteLibraryById(libraryId);
+          await contentLibraryClient.deleteLibraryById(libraryId)
           notification.success({
             message: 'Success',
             description: 'Library deleted',
             placement: 'topRight',
             duration: 2
-          });
-          await fetchLibraries(libraryPage);
-          await fetchAllLibraries();
+          })
+          await fetchLibraries(libraryPage)
+          await fetchAllLibraries()
         } catch {
           notification.error({
             message: 'Error',
             description: 'Failed to delete library',
             placement: 'topRight',
             duration: 2
-          });
+          })
         }
       }
-    });
-  };
+    })
+  }
 
   const menuItems: MenuProps['items'] = [
     { key: 'users', label: 'Users' },
     { key: 'libraries', label: 'Libraries' }
-  ];
+  ]
 
   const userColumns: ColumnType<UserDto>[] = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
@@ -349,7 +370,7 @@ const AdminPage: React.FC = () => {
     {
       key: 'actions',
       align: 'right',
-      render: (_: unknown, record: UserDto) => (
+      render: (_: unknown, record: UserDto) =>
         Number(record.userTypeId) === 1 ? null : (
           <>
             <Button
@@ -366,11 +387,10 @@ const AdminPage: React.FC = () => {
               onClick={() => record.id !== undefined && handleDeleteUser(record.id)}
             />
           </>
-        )
-      ),
+        ),
       width: 120
     }
-  ];
+  ]
 
   const libraryColumns: ColumnType<LibraryDto>[] = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
@@ -397,7 +417,7 @@ const AdminPage: React.FC = () => {
       ),
       width: 120
     }
-  ];
+  ]
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -427,7 +447,7 @@ const AdminPage: React.FC = () => {
               <Input.Search
                 placeholder="Search users by name"
                 value={userSearch}
-                onChange={e => setUserSearch(e.target.value)}
+                onChange={(e) => setUserSearch(e.target.value)}
                 onSearch={() => fetchUsers(1)}
                 style={{ width: 400, marginBottom: 16 }}
                 allowClear
@@ -444,10 +464,10 @@ const AdminPage: React.FC = () => {
                   pageSizeOptions: ['10', '20', '50', '100'],
                   onChange: (page, pageSize) => {
                     if (pageSize !== userPageSize) {
-                      setUserPage(1);
-                      setUserPageSize(pageSize);
+                      setUserPage(1)
+                      setUserPageSize(pageSize)
                     } else {
-                      setUserPage(page);
+                      setUserPage(page)
                     }
                   }
                 }}
@@ -460,34 +480,50 @@ const AdminPage: React.FC = () => {
                 okText="Add"
               >
                 <Form form={addUserForm} layout="vertical">
-                  <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Name is required' }]}>
+                  <Form.Item
+                    name="name"
+                    label="Name"
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
-                  <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }, { type: 'email', message: 'Please enter a valid email address' }]}>
+                  <Form.Item
+                    name="email"
+                    label="Email"
+                    rules={[
+                      { required: true, message: 'Email is required' },
+                      { type: 'email', message: 'Please enter a valid email address' }
+                    ]}
+                  >
                     <Input />
                   </Form.Item>
-                  <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Password is required' }]}>
+                  <Form.Item
+                    name="password"
+                    label="Password"
+                    rules={[{ required: true, message: 'Password is required' }]}
+                  >
                     <Input.Password />
                   </Form.Item>
-                  <Form.Item name="userTypeId" label="User Type" rules={[{ required: true, message: 'User type is required' }]}>
+                  <Form.Item
+                    name="userTypeId"
+                    label="User Type"
+                    rules={[{ required: true, message: 'User type is required' }]}
+                  >
                     <Select placeholder="Select user type">
-                      {userTypes.map(type => (
+                      {userTypes.map((type) => (
                         <Select.Option key={type.id} value={type.id}>
                           {type.name}
                         </Select.Option>
                       ))}
                     </Select>
                   </Form.Item>
-                  <Form.Item
-                    name="accessibleLibraryIds"
-                    label="Accessible Libraries"
-                  >
+                  <Form.Item name="accessibleLibraryIds" label="Accessible Libraries">
                     <Select
                       mode="multiple"
                       placeholder="Select accessible libraries"
                       optionFilterProp="children"
                     >
-                      {allLibraries.map(lib => (
+                      {allLibraries.map((lib) => (
                         <Select.Option key={lib.id} value={lib.id}>
                           {lib.name}
                         </Select.Option>
@@ -500,41 +536,53 @@ const AdminPage: React.FC = () => {
                 title="Edit User"
                 open={isEditUserModalVisible}
                 onCancel={() => {
-                  userForm.resetFields();
-                  setIsEditUserModalVisible(false);
+                  userForm.resetFields()
+                  setIsEditUserModalVisible(false)
                 }}
                 onOk={handleUserEditSubmit}
                 okText="Save"
               >
                 <Form form={userForm} layout="vertical">
-                  <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Name is required' }]}>
+                  <Form.Item
+                    name="name"
+                    label="Name"
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
-                  <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }, { type: 'email', message: 'Please enter a valid email address' }]}>
+                  <Form.Item
+                    name="email"
+                    label="Email"
+                    rules={[
+                      { required: true, message: 'Email is required' },
+                      { type: 'email', message: 'Please enter a valid email address' }
+                    ]}
+                  >
                     <Input />
                   </Form.Item>
                   <Form.Item name="password" label="Password" rules={[]}>
                     <Input.Password placeholder="Leave blank to keep current password" />
                   </Form.Item>
-                  <Form.Item name="userTypeId" label="User Type" rules={[{ required: true, message: 'User type is required' }]}>
+                  <Form.Item
+                    name="userTypeId"
+                    label="User Type"
+                    rules={[{ required: true, message: 'User type is required' }]}
+                  >
                     <Select placeholder="Select user type">
-                      {userTypes.map(type => (
+                      {userTypes.map((type) => (
                         <Select.Option key={type.id} value={type.id}>
                           {type.name}
                         </Select.Option>
                       ))}
                     </Select>
                   </Form.Item>
-                  <Form.Item
-                    name="accessibleLibraryIds"
-                    label="Accessible Libraries"
-                  >
+                  <Form.Item name="accessibleLibraryIds" label="Accessible Libraries">
                     <Select
                       mode="multiple"
                       placeholder="Select accessible libraries"
                       optionFilterProp="children"
                     >
-                      {allLibraries.map(lib => (
+                      {allLibraries.map((lib) => (
                         <Select.Option key={lib.id} value={lib.id}>
                           {lib.name}
                         </Select.Option>
@@ -560,7 +608,7 @@ const AdminPage: React.FC = () => {
               <Input.Search
                 placeholder="Search libraries by name"
                 value={librarySearch}
-                onChange={e => setLibrarySearch(e.target.value)}
+                onChange={(e) => setLibrarySearch(e.target.value)}
                 onSearch={() => fetchLibraries(1)}
                 style={{ width: 400, marginBottom: 16 }}
                 allowClear
@@ -577,10 +625,10 @@ const AdminPage: React.FC = () => {
                   pageSizeOptions: ['10', '20', '50', '100'],
                   onChange: (page, pageSize) => {
                     if (pageSize !== libraryPageSize) {
-                      setLibraryPage(1);
-                      setLibraryPageSize(pageSize);
+                      setLibraryPage(1)
+                      setLibraryPageSize(pageSize)
                     } else {
-                      setLibraryPage(page);
+                      setLibraryPage(page)
                     }
                   }
                 }}
@@ -593,7 +641,11 @@ const AdminPage: React.FC = () => {
                 okText="Add"
               >
                 <Form form={addLibraryForm} layout="vertical">
-                  <Form.Item name="name" label="Name" rules={[{ required: true , message: 'Name is required' }]}>
+                  <Form.Item
+                    name="name"
+                    label="Name"
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
                 </Form>
@@ -606,7 +658,11 @@ const AdminPage: React.FC = () => {
                 okText="Save"
               >
                 <Form form={libraryForm} layout="vertical">
-                  <Form.Item name="name" label="Name" rules={[{ required: true , message: 'Name is required' }]}>
+                  <Form.Item
+                    name="name"
+                    label="Name"
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
                 </Form>
@@ -616,7 +672,7 @@ const AdminPage: React.FC = () => {
         </Content>
       </Layout>
     </Layout>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage
