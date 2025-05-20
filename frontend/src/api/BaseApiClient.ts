@@ -100,6 +100,7 @@ export class ApiConfiguration {
         // Handle forbidden errors (403)
         if (error.response?.status === 403) {
           // Handle access denied - could redirect to forbidden page or show message
+          window.location.href = "/forbidden";
           console.error("Access forbidden");
         }
 

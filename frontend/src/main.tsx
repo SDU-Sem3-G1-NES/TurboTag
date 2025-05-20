@@ -17,6 +17,7 @@ import { Button } from 'antd'
 import { LogoutOutlined, LoginOutlined } from '@ant-design/icons'
 import { LoginClient } from './api/apiClient.ts'
 import Library from './pages/library.tsx'
+import Forbidden from './pages/forbidden.tsx'
 
 const AppLayout = () => {
   const navigate = useNavigate()
@@ -110,6 +111,7 @@ const AppLayout = () => {
               }
             />
             <Route path="/login" element={<Login />} />
+            <Route path="/forbidden" element={<Forbidden />} />
           </Routes>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Group 1 Turbo Tag</Footer>
