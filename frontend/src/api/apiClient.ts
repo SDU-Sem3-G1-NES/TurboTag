@@ -2111,7 +2111,7 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            addUpload(body?: AddUploadRequestDto | undefined): Promise<number>                    /**
+            addUpload(body?: UploadDto | undefined): Promise<number>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -2394,7 +2394,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        addUpload(body?: AddUploadRequestDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Upload/AddUpload";
+        addUpload(body?: UploadDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Upload/AddUpload";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -3182,46 +3182,6 @@ url_ = url_.replace(/[?&]$/, "");
     return Promise.resolve<void>(null as any);
 }
         }
-
-export class AddUploadRequestDto implements IAddUploadRequestDto {
-    uploadDto?: UploadDto;
-    lessonDto?: LessonDto;
-
-    constructor(data?: IAddUploadRequestDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.uploadDto = _data["uploadDto"] ? UploadDto.fromJS(_data["uploadDto"]) : <any>null;
-            this.lessonDto = _data["lessonDto"] ? LessonDto.fromJS(_data["lessonDto"]) : <any>null;
-        }
-    }
-
-    static fromJS(data: any): AddUploadRequestDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AddUploadRequestDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["uploadDto"] = this.uploadDto ? this.uploadDto.toJSON() : <any>null;
-        data["lessonDto"] = this.lessonDto ? this.lessonDto.toJSON() : <any>null;
-        return data;
-    }
-}
-
-export interface IAddUploadRequestDto {
-    uploadDto?: UploadDto;
-    lessonDto?: LessonDto;
-}
 
 export class FileMetadataDto implements IFileMetadataDto {
     id?: string | null;
