@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { LessonClient, LessonDto, UserClient, UserDto, UserFilter, UserName } from '../api/apiClient'
-import { Input, Row, Col, Spin } from 'antd'
+import { LessonClient, LessonDto, UserClient, UserFilter, UserName } from '../api/apiClient'
+import { Col, Input, Row, Spin } from 'antd'
 import LibraryItem from '../components/library/libraryItem'
 import { LoadingOutlined } from '@ant-design/icons'
 
 export interface LessonDtoWithOwnerName extends LessonDto {
   ownerName: string
 }
+
 const Library: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true)
 
