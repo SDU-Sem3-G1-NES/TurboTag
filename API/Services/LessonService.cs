@@ -6,7 +6,7 @@ namespace API.Services;
 public interface ILessonService : IServiceBase
 {
     void AddLesson(LessonDto lesson);
-    List<LessonDto> GetAllLessons();
+    List<LessonDto> GetAllLessons(LessonFilter? filter);
     public List<LessonDto> GetLessonsByTags(string[] tags);
     public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonById(int lessonId);
@@ -23,9 +23,9 @@ public class LessonService(ILessonRepository lessonRepository) : ILessonService
         lessonRepository.AddLesson(lesson);
     }
     
-    public List<LessonDto> GetAllLessons()
+    public List<LessonDto> GetAllLessons(LessonFilter? filter)
     {
-        return lessonRepository.GetAllLessons();
+        return lessonRepository.GetAllLessons(filter);
     }
     
     public List<LessonDto> GetLessonsByTags(string[] tags)

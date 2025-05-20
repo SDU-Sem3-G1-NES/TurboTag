@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Layout, Menu } from 'antd'
 import Upload from './pages/upload.tsx'
 import Login from './pages/login.tsx'
+import Admin from './pages/admin.tsx'
 import ProtectedRoute from './components/ProtectedRoute'
 import './index.css'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
@@ -16,11 +17,13 @@ import { Button } from 'antd'
 import { LogoutOutlined, LoginOutlined } from '@ant-design/icons'
 import { LoginClient } from './api/apiClient.ts'
 import Library from './pages/library.tsx'
+import Forbidden from './pages/forbidden.tsx'
 
 const AppLayout = () => {
   const navigate = useNavigate()
   const loginClient = new LoginClient()
   const userName = localStorage.getItem('userName')
+  const userType = localStorage.getItem('userType')
 
   const handleLogout = async () => {
     await loginClient.logout()
@@ -28,6 +31,7 @@ const AppLayout = () => {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('userId')
     localStorage.removeItem('userName')
+    localStorage.removeItem('userType')
     navigate('/login')
   }
 
@@ -41,7 +45,16 @@ const AppLayout = () => {
       key: 'upload',
       label: 'Upload',
       onClick: () => navigate('/upload')
-    }
+    },
+    ...(userType === 'speedadmin'
+      ? [
+          {
+            key: 'admin',
+            label: 'Admin',
+            onClick: () => navigate('/admin')
+          }
+        ]
+      : [])
   ]
 
   return (
@@ -95,7 +108,16 @@ const AppLayout = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
+            <Route path="/forbidden" element={<Forbidden />} />
           </Routes>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Group 1 Turbo Tag</Footer>

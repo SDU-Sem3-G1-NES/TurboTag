@@ -8,15 +8,21 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
 {
     private readonly IMongoClient _client = new MongoClient(connectionString);
 
-    public List<T> Find<T>(string collectionName, string query)
+    public List<T> Find<T>(string collectionName, string query, int? skip = null, int? limit = null)
     {
         var database = _client.GetDatabase(GetDatabaseName());
         try
         {
             var filter = BsonDocument.Parse(query);
             var collection = database.GetCollection<T>(collectionName);
-            List<T> result = collection.Find(filter).ToList();
-            return result;
+            var findFluent = collection.Find(filter);
+
+            if (skip.HasValue)
+                findFluent = findFluent.Skip(skip.Value);
+            if (limit.HasValue)
+                findFluent = findFluent.Limit(limit.Value);
+            
+            return findFluent.ToList();
         }
         catch (Exception e)
         {

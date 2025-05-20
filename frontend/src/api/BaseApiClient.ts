@@ -100,6 +100,7 @@ export class ApiConfiguration {
         // Handle forbidden errors (403)
         if (error.response?.status === 403) {
           // Handle access denied - could redirect to forbidden page or show message
+          window.location.href = "/forbidden";
           console.error("Access forbidden");
         }
 
@@ -115,6 +116,7 @@ export class ApiConfiguration {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     sessionStorage.removeItem("refreshToken");
+    localStorage.removeItem("userType");
 
     // Redirect to login page - adjust based on your routing setup
     window.location.href = "/login";

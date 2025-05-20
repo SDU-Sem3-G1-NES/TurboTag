@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 
 CREATE TABLE IF NOT EXISTS libraries (
     library_id SERIAL PRIMARY KEY,
-    library_name VARCHAR(255) NOT NULL
+    library_name VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS uploads (
