@@ -77,7 +77,6 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
     {
         if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId))
         {
-            // Remove refresh token from memory
             refreshTokenService.Remove(userId);
         }
         
