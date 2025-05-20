@@ -1,5 +1,5 @@
-import React from 'react'
-import { Col, Input, Row, Spin } from 'antd'
+import React, { useState } from 'react'
+import { Checkbox, Col, Input, Row, Spin } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 import { useHomePageState } from './hooks/useHomepageState'
 import LessonCard from '../components/lessonCard'
@@ -8,25 +8,44 @@ const HomePage: React.FC = () => {
   const { ownerLessons, starredLessons, loading, search, setSearch, handleSearch, reload } =
     useHomePageState()
 
-  // Slice lessons to max 4 items for display, no filtering or exclusion
-  const sliceLessons = (lessons: typeof ownerLessons) => lessons.slice(0, 4)
+  // Local state to track if showing all lessons for each section
+  const [showAllOwner, setShowAllOwner] = useState(false)
+  const [showAllStarred, setShowAllStarred] = useState(false)
 
-  const renderSection = (title: string, lessons: typeof ownerLessons) => (
-    <>
-      <Row gutter={[16, 16]} style={{ width: '75%' }}>
-        <Col span={24}>
-          <h1 style={{ textAlign: 'left' }}>{title}</h1>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ width: '75%' }}>
-        {sliceLessons(lessons).map((lesson) => (
-          <Col key={lesson.mongoId} span={12}>
-            <LessonCard lesson={lesson} onStarToggled={reload} />
+  const renderSection = (
+    title: string,
+    lessons: typeof ownerLessons,
+    showAll: boolean,
+    setShowAll: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    // Limit to 4 lessons if showAll is false
+    const displayedLessons = showAll ? lessons : lessons.slice(0, 4)
+
+    return (
+      <>
+        <Row
+          align="middle"
+          gutter={[16, 16]}
+          style={{ width: '75%', marginBottom: 8, justifyContent: 'space-between' }}>
+          <Col>
+            <h1 style={{ textAlign: 'left', margin: 0 }}>{title}</h1>
           </Col>
-        ))}
-      </Row>
-    </>
-  )
+          <Col>
+            <Checkbox checked={showAll} onChange={() => setShowAll(!showAll)}>
+              Show All
+            </Checkbox>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]} style={{ width: '75%' }}>
+          {displayedLessons.map((lesson) => (
+            <Col key={lesson.mongoId} span={12}>
+              <LessonCard lesson={lesson} onStarToggled={reload} />
+            </Col>
+          ))}
+        </Row>
+      </>
+    )
+  }
 
   return (
     <div
@@ -41,7 +60,7 @@ const HomePage: React.FC = () => {
         placeholder="Search by title or description"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        onSearch={handleSearch}
+        onSearch={(value) => handleSearch(value)}
         style={{ width: '50%', marginBottom: 24 }}
         allowClear
       />
@@ -54,8 +73,8 @@ const HomePage: React.FC = () => {
         />
       ) : (
         <>
-          {renderSection('Your Uploads', ownerLessons)}
-          {renderSection('Starred Uploads', starredLessons)}
+          {renderSection('Your Uploads', ownerLessons, showAllOwner, setShowAllOwner)}
+          {renderSection('Starred Uploads', starredLessons, showAllStarred, setShowAllStarred)}
         </>
       )}
     </div>

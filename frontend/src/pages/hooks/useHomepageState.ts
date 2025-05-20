@@ -43,10 +43,9 @@ export const useHomePageState = () => {
       const allList = Array.isArray(all) ? all : (all?.items ?? [])
       const starredList = Array.isArray(starred) ? starred : (starred?.items ?? [])
 
-      const maxDisplay = 4
-
-      setOwnerLessons(allList.slice(0, maxDisplay))
-      setStarredLessons(starredList.slice(0, maxDisplay))
+      // Do NOT slice here, just store full lists
+      setOwnerLessons(allList)
+      setStarredLessons(starredList)
     } catch (error) {
       console.error('Error fetching lesson data:', error)
     } finally {
