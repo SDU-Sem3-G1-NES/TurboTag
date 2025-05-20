@@ -150,11 +150,12 @@ if (app.Environment.IsDevelopment())
     app.UseHangfireDashboard();
 }
 
-app.UseHttpsRedirection();
-app.MapControllers();
 app.UseRouting();
 app.UseCors("AllowAll");
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
+
 
 app.Run();
