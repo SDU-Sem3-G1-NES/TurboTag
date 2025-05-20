@@ -14,13 +14,14 @@ public class LessonDto
     }
 
     [method: JsonConstructor]
-    public LessonDto(int uploadId, LessonDetailsDto? lessonDetails, List<FileMetadataDto>? fileMetadata,
-        int? ownerId, string ownerName)
+    public LessonDto(int? uploadId, LessonDetailsDto? lessonDetails, List<FileMetadataDto>? fileMetadata,
+        int? ownerId, string ownerName, bool isStarred = false)
     {
         UploadId = uploadId;
         LessonDetails = lessonDetails;
         FileMetadata = fileMetadata;
         OwnerId = ownerId;
+        IsStarred = isStarred;
         OwnerName = ownerName;
     }
 
@@ -28,7 +29,7 @@ public class LessonDto
     [BsonRepresentation(BsonType.ObjectId)]
     public string? MongoId { get; set; }
 
-    [BsonElement("upload_id")] public int UploadId { get; set; }
+    [BsonElement("upload_id")] public int? UploadId { get; set; }
 
     [BsonElement("lesson_details")] public LessonDetailsDto? LessonDetails { get; set; }
 
@@ -37,7 +38,8 @@ public class LessonDto
     [BsonElement("owner_id")] public int? OwnerId { get; set; }
     
     [BsonElement("owner_name")]  public string? OwnerName { get; set; }
-   
+    
+    public bool IsStarred { get; set; }
 
     public void GenerateMongoId()
     {

@@ -75,6 +75,24 @@ CREATE TABLE IF NOT EXISTS "refresh_tokens" (
     expiry TIMESTAMP NOT NULL
     );
 
+CREATE TABLE IF NOT EXISTS "starred_uploads" (
+    user_id int NOT NULL,
+    upload_id int NOT NULL,
+    
+    CONSTRAINT fk_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(user_id)
+    ON DELETE CASCADE,
+
+    CONSTRAINT fk_upload
+    FOREIGN KEY (upload_id)
+    REFERENCES uploads(upload_id)
+    ON DELETE CASCADE,
+
+    CONSTRAINT unique_starred_upload
+    UNIQUE (user_id, upload_id)
+    );
+
 -- Insert default data into tables
 
 DO

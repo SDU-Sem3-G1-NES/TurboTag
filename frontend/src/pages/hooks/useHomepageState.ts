@@ -1,49 +1,77 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LessonClient, LessonDto, LessonFilter } from '../../api/apiClient'
 
 export const useHomePageState = () => {
   const [ownerLessons, setOwnerLessons] = useState<LessonDto[]>([])
+  const [starredLessons, setStarredLessons] = useState<LessonDto[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
 
-  // Flat filter values so we can easily update properties
+  const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
+
   const [filterValues, setFilterValues] = useState<Partial<LessonFilter>>({
-    ownerId: parseInt(localStorage.getItem('userId') ?? '0', 10),
+    ownerId,
+    userId: ownerId,
     searchText: ''
   })
 
-  // Memoize actual filter object to prevent new reference every render
-  const filter = useMemo(() => new LessonFilter({ ...filterValues }), [filterValues])
+  const filterValuesJson = useMemo(() => JSON.stringify(filterValues), [filterValues])
+
+  const filter = useMemo(() => {
+    return new LessonFilter(JSON.parse(filterValuesJson))
+  }, [filterValuesJson])
+
+  const starredFilter = useMemo(() => {
+    const base = JSON.parse(filterValuesJson)
+    return new LessonFilter({
+      ...base,
+      isStarred: true,
+      userId: ownerId
+    })
+  }, [filterValuesJson, ownerId])
 
   const lessonClient = useMemo(() => new LessonClient(), [])
 
   const loadLessons = useCallback(async () => {
     setLoading(true)
+    console.log('Loading lessons with filters:', filter, starredFilter)
+
     try {
-      const data = await lessonClient.getAllLessons(filter)
-      setOwnerLessons(Array.isArray(data) ? data : data.items || [])
+      const [all] = await Promise.all([lessonClient.getAllLessons(filter)])
+      const [starred] = await Promise.all([lessonClient.getAllLessons(starredFilter)])
+
+      const allList = Array.isArray(all) ? all : (all?.items ?? [])
+      const starredList = Array.isArray(starred) ? starred : (starred?.items ?? [])
+
+      // Do NOT slice here, just store full lists
+      setOwnerLessons(allList)
+      setStarredLessons(starredList)
     } catch (error) {
       console.error('Error fetching lesson data:', error)
     } finally {
       setLoading(false)
     }
-  }, [lessonClient, filter])
+  }, [lessonClient, filter, starredFilter])
 
-  // Initial + on-filter-change load
   useEffect(() => {
-    loadLessons()
+    loadLessons().then((r) => r)
   }, [loadLessons])
 
-  // Called when user presses Enter or clicks the search icon
   const handleSearch = useCallback((text: string) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      searchText: text
-    }))
+    setFilterValues((prev) => {
+      if (prev.searchText === text) return prev
+      return { ...prev, searchText: text }
+    })
   }, [])
 
-  // Called when user types into the search bar (debounced)
+  const isFirstRender = useRef(true)
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
     const delay = setTimeout(() => {
       handleSearch(search)
     }, 500)
@@ -53,9 +81,11 @@ export const useHomePageState = () => {
 
   return {
     ownerLessons,
+    starredLessons,
     loading,
     search,
     setSearch,
-    handleSearch
+    handleSearch,
+    reload: loadLessons
   }
 }

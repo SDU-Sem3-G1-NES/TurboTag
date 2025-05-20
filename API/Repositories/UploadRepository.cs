@@ -10,6 +10,9 @@ public interface IUploadRepository : IRepositoryBase
     PagedResult<UploadDto> GetAllUploads(UploadFilter? filter = null);
     void UpdateUpload(UploadDto upload);
     void DeleteUploadById(int uploadId);
+    int[]? GetStarredUploads(int userId);
+    void StarUpload(int uploadId, int userId);
+    void UnstarUpload(int uploadId, int userId);
 }
 
 public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
@@ -107,25 +110,25 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
             if (filter.UploadIds != null && filter.UploadIds.Any())
             {
                 parameters.Add("@uploadIds", filter.UploadIds);
-                fromWhereSql += $" AND u.upload_id = ANY(@uploadIds)";
+                fromWhereSql += " AND u.upload_id = ANY(@uploadIds)";
             }
 
             if (filter.OwnerIds != null && filter.OwnerIds.Any())
             {
                 parameters.Add("@ownerIds", filter.OwnerIds);
-                fromWhereSql += $" AND u.user_id = ANY(@ownerIds)";
+                fromWhereSql += " AND u.user_id = ANY(@ownerIds)";
             }
 
             if (filter.LibraryIds != null && filter.LibraryIds.Any())
             {
                 parameters.Add("@libraryIds", filter.LibraryIds);
-                fromWhereSql += $" AND lu.library_id = ANY(@libraryIds)";
+                fromWhereSql += " AND lu.library_id = ANY(@libraryIds)";
             }
 
             if (filter.UploadTypes != null && filter.UploadTypes.Any())
             {
                 parameters.Add("@uploadTypes", filter.UploadTypes);
-                fromWhereSql += $" AND u.upload_type = ANY(@uploadTypes)";
+                fromWhereSql += " AND u.upload_type = ANY(@uploadTypes)";
             }
 
             if (filter.DateFrom.HasValue)
@@ -238,6 +241,56 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
         // Delete the upload
         var deleteUploadSql = @"DELETE FROM uploads WHERE upload_id = @uploadId";
         sqlDbAccess.ExecuteNonQuery(_databaseName, deleteUploadSql, parameters);
+    }
+
+    public int[]? GetStarredUploads(int userId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "@user_id", userId }
+        };
+
+        var sql = @"
+            SELECT upload_id
+            FROM starred_uploads
+            WHERE user_id = @user_id";
+
+        return sqlDbAccess.ExecuteQuery<int>(
+            _databaseName,
+            sql,
+            "",
+            "",
+            parameters).ToArray();
+    }
+
+    public void StarUpload(int uploadId, int userId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "@uploadId", uploadId },
+            { "@userId", userId }
+        };
+
+        var sql = @"
+            INSERT INTO starred_uploads (upload_id, user_id)
+            VALUES (@uploadId, @userId)";
+
+        sqlDbAccess.ExecuteNonQuery(_databaseName, sql, parameters);
+    }
+
+    public void UnstarUpload(int uploadId, int userId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "@uploadId", uploadId },
+            { "@userId", userId }
+        };
+
+        var sql = @"
+            DELETE FROM starred_uploads
+            WHERE upload_id = @uploadId AND user_id = @userId";
+
+        sqlDbAccess.ExecuteNonQuery(_databaseName, sql, parameters);
     }
 }
 
