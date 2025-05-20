@@ -16,7 +16,7 @@ public class UserController(IUserService userService, IUserCredentialService use
     {
         return Ok(userService.GetAllUsers(filter));
     }
-    
+
     [Authorize]
     [HttpPost("GetUserNames")]
     public ActionResult<IEnumerable<UserName>> GetUserNames([FromBody] UserFilter? filter)
@@ -28,6 +28,7 @@ public class UserController(IUserService userService, IUserCredentialService use
         });
         return Ok(result);
     }
+
     [Authorize(Roles = "1")]
     [HttpGet("GetUserByEmail")]
     public ActionResult<UserDto> GetUserByEmail(string email)
@@ -65,13 +66,13 @@ public class UserController(IUserService userService, IUserCredentialService use
     {
         return Ok(userCredentialService.UserExists(email));
     }
-    
-    public class UserRequest
+
+    public class UserRequest(UserDto user)
     {
-        public UserDto User { get; set; }
+        public UserDto User { get; set; } = user;
         public string? Password { get; set; }
     }
-    
+
     public class UserName
     {
         public int Id { get; set; }
