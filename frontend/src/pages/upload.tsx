@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import Tags from '../components/tags'
 import {
   UploadClient,
+  LessonClient,
   UploadDto,
   LessonDto,
   LessonDetailsDto,
   FileMetadataDto,
-  AddUploadRequestDto,
   FileClient,
   UploadChunkDto,
   FinaliseUploadDto
@@ -24,9 +24,11 @@ const UploadPage: React.FC = () => {
   const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
+  const lessonClient = new LessonClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
 
   const ownerId = Number(localStorage.getItem('userId'))
+  const ownerName = localStorage.getItem('userName')
 
   const handleFileChange: UploadProps['beforeUpload'] = (file) => {
     setFile(file)
@@ -118,16 +120,18 @@ const UploadPage: React.FC = () => {
 
       const uploadDTO = new UploadDto()
       uploadDTO.init({
-        id: 0,
+        id: null,
         ownerId: ownerId,
         date: new Date(),
         type: file.type,
         libraryId: 1
       })
 
+      const uploadID = await uploadClient.addUpload(uploadDTO)
+
       const lessonDetailsDTO = new LessonDetailsDto()
       lessonDetailsDTO.init({
-        id: 0,
+        id: uploadID,
         title: title,
         description: description,
         tags: tags
@@ -144,23 +148,22 @@ const UploadPage: React.FC = () => {
         checksum: null
       })
 
+      
+
       const fileMetadataArray = Array.isArray(fileMetadataDTO) ? fileMetadataDTO : [fileMetadataDTO]
 
       const lessonDTO = new LessonDto()
       lessonDTO.init({
-        uploadId: fileId,
+        uploadId: uploadID,
         lessonDetails: lessonDetailsDTO,
         fileMetadata: fileMetadataArray,
-        ownerId: ownerId
+        ownerId: ownerId,
+        ownerName: ownerName,
       })
+      
+      await lessonClient.addLesson(lessonDTO)
 
-      const request = new AddUploadRequestDto()
-      request.init({
-        uploadDto: uploadDTO,
-        lessonDto: lessonDTO
-      })
-
-      await uploadClient.addUpload(request)
+      
 
       notification.success({
         message: 'Upload successful',

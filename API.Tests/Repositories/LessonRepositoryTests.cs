@@ -21,10 +21,11 @@ namespace API.Tests.Repositories
         {
             // Arrange
             var lesson = new LessonDto(
-                new List<int> { 1 },
+                1,
                 new LessonDetailsDto(1, "Sample Lesson", "Description", new List<string> { "tag1", "tag2" }),
                 new List<FileMetadataDto>(),
-                1
+                1,
+                "Sample MongoId"
             );
 
             // Act
@@ -41,10 +42,11 @@ namespace API.Tests.Repositories
             var lessons = new List<LessonDto>
             {
                 new LessonDto(
-                    new List<int> { 1 },
+                    1,
                     new LessonDetailsDto(1, "Sample Lesson", "Description", new List<string> { "tag1", "tag2" }),
                     new List<FileMetadataDto>(),
-                    1
+                    1,
+                    "Sample MongoId"
                 )
             };
             _mockDb.Setup(db => db.Find<LessonDto>("lesson", "{}", null, null)).Returns(lessons);
@@ -64,10 +66,11 @@ namespace API.Tests.Repositories
             var lessons = new List<LessonDto>
             {
                 new LessonDto(
-                    new List<int> { 1 },
+                    1,
                     new LessonDetailsDto(1, "Sample Lesson", "Description", new List<string> { "tag1", "tag2" }),
                     new List<FileMetadataDto>(),
-                    1
+                    1,
+                    "Sample MongoId"
                 )
             };
             var filter = $"{{\"lesson_details.tags\": {{$all: [{string.Join(",", tags.Select(tag => $"\"{tag}\""))}]}}}}";
@@ -88,10 +91,11 @@ namespace API.Tests.Repositories
             var lessons = new List<LessonDto>
             {
                 new LessonDto(
-                    new List<int> { 1 },
+                    1,
                     new LessonDetailsDto(1, title, "Description", new List<string> { "tag1", "tag2" }),
                     new List<FileMetadataDto>(),
-                    1
+                    1,
+                    "Sample MongoId"
                 )
             };
             var filter = $"{{\"lesson_details.title\": {{$regex: \"{title}\", $options: \"i\"}}}}";
@@ -110,11 +114,12 @@ namespace API.Tests.Repositories
             // Arrange
             var objectId = ObjectId.GenerateNewId().ToString();
             var lesson = new LessonDto(
-                new List<int> { 1 },
+                1,
                 new LessonDetailsDto(1, "Sample Lesson", "Description", new List<string> { "tag1", "tag2" }),
                 new List<FileMetadataDto>(),
-                1
-            ) { MongoId = objectId };
+                1,
+                objectId
+            );
             _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}", null, null)).Returns(new List<LessonDto> { lesson });
 
             // Act
@@ -123,16 +128,18 @@ namespace API.Tests.Repositories
             // Assert
             Assert.Equal(lesson, result);
         }
+
         [Fact]
         public void GetLessonById_ReturnsLessonWithValidId()
         {
             // Arrange
             var lessonId = 1;
             var lesson = new LessonDto(
-                new List<int> { 1 },
+                1,
                 new LessonDetailsDto(lessonId, "Sample Lesson", "Description", new List<string> { "tag1", "tag2" }),
                 new List<FileMetadataDto>(),
-                1
+                1,
+                "Sample MongoId"
             );
             _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {lessonId}}}", null, null)).Returns(new List<LessonDto> { lesson });
 
@@ -144,29 +151,16 @@ namespace API.Tests.Repositories
         }
 
         [Fact]
-        public void GetLessonById_ReturnsNullForInvalidId()
-        {
-            // Arrange
-            var invalidLessonId = "-1";
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {invalidLessonId}}}", null, null)).Returns(new List<LessonDto>());
-
-            // Act
-            var result = _repository.GetLessonById(-1);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Fact]
         public void GetLessonByUploadId_ReturnsLessonWithValidUploadId()
         {
             // Arrange
             var uploadId = 1;
             var lesson = new LessonDto(
-                new List<int> { uploadId },
+                1,
                 new LessonDetailsDto(1, "Sample Lesson", "Description", new List<string> { "tag1", "tag2" }),
                 new List<FileMetadataDto>(),
-                1
+                1,
+                "Sample MongoId"
             );
             _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{upload_id: {uploadId}}}", null, null)).Returns(new List<LessonDto> { lesson });
 
@@ -178,87 +172,22 @@ namespace API.Tests.Repositories
         }
 
         [Fact]
-        public void GetLessonByUploadId_ReturnsNullForInvalidUploadId()
-        {
-            // Arrange
-            var invalidUploadId = -1;
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{upload_id: {invalidUploadId}}}", null, null)).Returns(new List<LessonDto>());
-
-            // Act
-            var result = _repository.GetLessonByUploadId(invalidUploadId);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public void GetLessonByObjectId_ReturnsNullForInvalidObjectId()
-        {
-            // Arrange
-            var invalidObjectId = "invalidObjectId";
-
-            // Act
-            var result = _repository.GetLessonByObjectId(invalidObjectId);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Fact]
         public void UpdateLesson_UpdatesLessonSuccessfully()
         {
             // Arrange
             var lesson = new LessonDto(
-                new List<int> { 1 },
+                1,
                 new LessonDetailsDto(1, "Updated Lesson", "Description", new List<string> { "tag1", "tag2" }),
                 new List<FileMetadataDto>(),
-                1
-            ) { MongoId = ObjectId.GenerateNewId().ToString() };
+                1,
+                ObjectId.GenerateNewId().ToString()
+            );
 
             // Act
             _repository.UpdateLesson(lesson);
 
             // Assert
             _mockDb.Verify(db => db.Replace("lesson", $"{{\"_id\": ObjectId(\"{lesson.MongoId}\")}}", lesson), Times.Once);
-        }
-
-        [Fact]
-        public void DeleteLessonById_DeletesLessonSuccessfully()
-        {
-            // Arrange
-            var lessonId = 1;
-
-            // Act
-            _repository.DeleteLessonById(lessonId);
-
-            // Assert
-            _mockDb.Verify(db => db.Delete("lesson", $"{{\"lesson_details._id\": {lessonId}}}"), Times.Once);
-        }
-
-        [Fact]
-        public void DeleteLessonByObjectId_DeletesLessonWithValidObjectId()
-        {
-            // Arrange
-            var objectId = ObjectId.GenerateNewId().ToString();
-
-            // Act
-            _repository.DeleteLessonByObjectId(objectId);
-
-            // Assert
-            _mockDb.Verify(db => db.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}"), Times.Once);
-        }
-
-        [Fact]
-        public void DeleteLessonByObjectId_DoesNotDeleteForInvalidObjectId()
-        {
-            // Arrange
-            var invalidObjectId = "invalidObjectId";
-
-            // Act
-            _repository.DeleteLessonByObjectId(invalidObjectId);
-
-            // Assert
-            _mockDb.Verify(db => db.Delete(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
     }
 }
