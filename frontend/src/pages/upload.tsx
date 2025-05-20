@@ -148,8 +148,6 @@ const UploadPage: React.FC = () => {
         checksum: null
       })
 
-      
-
       const fileMetadataArray = Array.isArray(fileMetadataDTO) ? fileMetadataDTO : [fileMetadataDTO]
 
       const lessonDTO = new LessonDto()
@@ -158,12 +156,10 @@ const UploadPage: React.FC = () => {
         lessonDetails: lessonDetailsDTO,
         fileMetadata: fileMetadataArray,
         ownerId: ownerId,
-        ownerName: ownerName,
+        ownerName: ownerName
       })
-      
-      await lessonClient.addLesson(lessonDTO)
 
-      
+      await lessonClient.addLesson(lessonDTO)
 
       notification.success({
         message: 'Upload successful',
