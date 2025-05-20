@@ -26,15 +26,83 @@ export class ApiConfiguration {
         }
       })
 
+    // Request interceptor for authentication
     this.instance.interceptors.request.use(
       (config) => {
-        // Add auth token if needed
-        // const token = localStorage.getItem("authToken");
-        // if (token) config.headers.Authorization = `Bearer ${token}`;
-        return config
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
       },
       (error) => Promise.reject(error)
-    )
+    );
+
+    // Response interceptor for handling auth errors and token refresh
+    this.instance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        // Handle unauthorized errors (401) for token refresh
+        if (error.response?.status === 401 && !originalRequest._retry && window.location.pathname !== "/login") {
+          originalRequest._retry = true;
+
+          try {
+            // Attempt to refresh the token
+            const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
+            const accessToken = localStorage.getItem("authToken");
+            if (!refreshToken) {
+              // No refresh token available, redirect to login
+              this.redirectToLogin();
+              return Promise.reject(error);
+            }
+
+            // Call your token refresh endpoint
+            const response = await axios.post(`${baseUrl}/Login/refresh-token`, {
+              accessToken, refreshToken
+            });
+
+            // If successful, update stored tokens
+            if (localStorage.getItem("refreshToken")) {
+              localStorage.setItem("refreshToken", response.data.refreshToken);
+            }
+            else {
+              sessionStorage.setItem("refreshToken", response.data.refreshToken);
+            }
+            localStorage.setItem("authToken", response.data.accessToken);
+
+            // Update the authorization header and retry
+            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+            return axios(originalRequest);
+          } catch (refreshError) {
+            // If refresh fails, redirect to login
+            this.redirectToLogin();
+            return Promise.reject(refreshError);
+          }
+        }
+
+        // Handle forbidden errors (403)
+        if (error.response?.status === 403) {
+          // Handle access denied - could redirect to forbidden page or show message
+          console.error("Access forbidden");
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  private redirectToLogin(): void {
+    // Clear authentication data
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    sessionStorage.removeItem("refreshToken");
+
+    // Redirect to login page - adjust based on your routing setup
+    window.location.href = "/login";
   }
 }
 
@@ -735,16 +803,9 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface ILessonClient {
                     /**
-             * @param title (optional) 
-             * @param tags (optional) 
-             * @param ownerId (optional) 
-             * @param uploadIds (optional) 
-             * @param lessonId (optional) 
-             * @param pageSize (optional) 
-             * @param pageNumber (optional) 
              * @return OK
              */
-            getAllLessons(title?: string | undefined, tags?: string[] | undefined, ownerId?: number | undefined, uploadIds?: number[] | undefined, lessonId?: number | undefined, pageSize?: number | undefined, pageNumber?: number | undefined): Promise<PagedResult<LessonDto> | LessonDto[]>                    /**
+            getAllLessons(): Promise<PagedResult<LessonDto> | LessonDto[]>                    /**
              * @param tags (optional) 
              * @return OK
              */
@@ -795,44 +856,9 @@ url_ = url_.replace(/[?&]$/, "");
     
 
         /**
-         * @param title (optional) 
-         * @param tags (optional) 
-         * @param ownerId (optional) 
-         * @param uploadIds (optional) 
-         * @param lessonId (optional) 
-         * @param pageSize (optional) 
-         * @param pageNumber (optional) 
          * @return OK
          */
-        getAllLessons(title?: string | undefined, tags?: string[] | undefined, ownerId?: number | undefined, uploadIds?: number[] | undefined, lessonId?: number | undefined, pageSize?: number | undefined, pageNumber?: number | undefined, cancelToken?: CancelToken): Promise<PagedResult<LessonDto> | LessonDto[]> {        let url_ = this.baseUrl + "/Lesson/GetAllLessons?";
-if (title === null)
-    throw new Error("The parameter 'title' cannot be null.");
-else if (title !== undefined)
-    url_ += "Title=" + encodeURIComponent("" + title) + "&";
-if (tags === null)
-    throw new Error("The parameter 'tags' cannot be null.");
-else if (tags !== undefined)
-    tags && tags.forEach(item => { url_ += "Tags=" + encodeURIComponent("" + item) + "&"; });
-if (ownerId === null)
-    throw new Error("The parameter 'ownerId' cannot be null.");
-else if (ownerId !== undefined)
-    url_ += "OwnerId=" + encodeURIComponent("" + ownerId) + "&";
-if (uploadIds === null)
-    throw new Error("The parameter 'uploadIds' cannot be null.");
-else if (uploadIds !== undefined)
-    uploadIds && uploadIds.forEach(item => { url_ += "UploadIds=" + encodeURIComponent("" + item) + "&"; });
-if (lessonId === null)
-    throw new Error("The parameter 'lessonId' cannot be null.");
-else if (lessonId !== undefined)
-    url_ += "LessonId=" + encodeURIComponent("" + lessonId) + "&";
-if (pageSize === null)
-    throw new Error("The parameter 'pageSize' cannot be null.");
-else if (pageSize !== undefined)
-    url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-if (pageNumber === null)
-    throw new Error("The parameter 'pageNumber' cannot be null.");
-else if (pageNumber !== undefined)
-    url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        getAllLessons( cancelToken?: CancelToken): Promise<PagedResult<LessonDto> | LessonDto[]> {        let url_ = this.baseUrl + "/Lesson/GetAllLessons";
 url_ = url_.replace(/[?&]$/, "");
 
                 let options_: AxiosRequestConfig = {
@@ -1399,11 +1425,18 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            validateUserCredentials(body?: UserCredentialsDto | undefined): Promise<boolean>                    /**
-             * @param email (optional) 
+            setupUserCredentials(body?: UserIdPassword | undefined): Promise<void>                    /**
+             * @param body (optional) 
              * @return OK
              */
-            getUserDataByEmail(email?: string | undefined): Promise<UserDto>        }
+            login(body?: UserCredentialsDto | undefined): Promise<SignInResponse>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            refreshToken(body?: TokenModel | undefined): Promise<void>                    /**
+             * @return OK
+             */
+            logout(): Promise<void>        }
 
     export class LoginClient extends BaseApiClient implements ILoginClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -1421,14 +1454,65 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        validateUserCredentials(body?: UserCredentialsDto | undefined, cancelToken?: CancelToken): Promise<boolean> {        let url_ = this.baseUrl + "/Login/ValidateUserCredentials";
+        setupUserCredentials(body?: UserIdPassword | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Login/SetupUserCredentials";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
 
                 let options_: AxiosRequestConfig = {
                     data: content_,
-                        method: "GET",
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processSetupUserCredentials(_response);
+                });
+        }
+
+    protected processSetupUserCredentials(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        login(body?: UserCredentialsDto | undefined, cancelToken?: CancelToken): Promise<SignInResponse> {        let url_ = this.baseUrl + "/Login/login";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
         url: url_,
         headers: {
                             "Content-Type": "application/json-patch+json",
@@ -1444,11 +1528,11 @@ url_ = url_.replace(/[?&]$/, "");
         throw _error;
         }
         }).then((_response: AxiosResponse) => {
-                    return this.processValidateUserCredentials(_response);
+                    return this.processLogin(_response);
                 });
         }
 
-    protected processValidateUserCredentials(response: AxiosResponse): Promise<boolean> {
+    protected processLogin(response: AxiosResponse): Promise<SignInResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -1462,35 +1546,34 @@ url_ = url_.replace(/[?&]$/, "");
                 const _responseText = response.data;
         let result200: any = null;
         let resultData200 = _responseText;
-                result200 = resultData200 as boolean;
+                result200 = SignInResponse.fromJS(resultData200);
         
-        return Promise.resolve<boolean>(result200);
+        return Promise.resolve<SignInResponse>(result200);
         
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
-    return Promise.resolve<boolean>(null as any);
+    return Promise.resolve<SignInResponse>(null as any);
 }
     
 
         /**
-         * @param email (optional) 
+         * @param body (optional) 
          * @return OK
          */
-        getUserDataByEmail(email?: string | undefined, cancelToken?: CancelToken): Promise<UserDto> {        let url_ = this.baseUrl + "/Login/GetUserDataByEmail?";
-if (email === null)
-    throw new Error("The parameter 'email' cannot be null.");
-else if (email !== undefined)
-    url_ += "email=" + encodeURIComponent("" + email) + "&";
+        refreshToken(body?: TokenModel | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Login/refresh-token";
 url_ = url_.replace(/[?&]$/, "");
 
+                    const content_ = JSON.stringify(body);
+
                 let options_: AxiosRequestConfig = {
-                        method: "GET",
+                    data: content_,
+                        method: "POST",
         url: url_,
         headers: {
-                                    "Accept": "text/plain"
-                },
+                            "Content-Type": "application/json-patch+json",
+                        },
             cancelToken
         };
 
@@ -1501,11 +1584,11 @@ url_ = url_.replace(/[?&]$/, "");
         throw _error;
         }
         }).then((_response: AxiosResponse) => {
-                    return this.processGetUserDataByEmail(_response);
+                    return this.processRefreshToken(_response);
                 });
         }
 
-    protected processGetUserDataByEmail(response: AxiosResponse): Promise<UserDto> {
+    protected processRefreshToken(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -1516,18 +1599,59 @@ url_ = url_.replace(/[?&]$/, "");
         }
     }
     if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                result200 = UserDto.fromJS(resultData200);
-        
-        return Promise.resolve<UserDto>(result200);
+                return Promise.resolve<void>(null as any);
         
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
-    return Promise.resolve<UserDto>(null as any);
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @return OK
+         */
+        logout( cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Login/logout";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "POST",
+        url: url_,
+        headers: {
+                                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processLogout(_response);
+                });
+        }
+
+    protected processLogout(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
 }
         }
 
@@ -2308,11 +2432,11 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            createNewUser(body?: UserRequest | undefined): Promise<void>                    /**
+            createNewUser(body?: UserDtoUserCredentialsDtoValueTuple | undefined): Promise<void>                    /**
              * @param body (optional) 
              * @return OK
              */
-            updateUserById(body?: UserRequest | undefined): Promise<void>                    /**
+            updateUserById(body?: UserDto | undefined): Promise<void>                    /**
              * @param userId (optional) 
              * @return OK
              */
@@ -2460,7 +2584,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        createNewUser(body?: UserRequest | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/CreateNewUser";
+        createNewUser(body?: UserDtoUserCredentialsDtoValueTuple | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/CreateNewUser";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -2511,7 +2635,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        updateUserById(body?: UserRequest | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/UpdateUserById";
+        updateUserById(body?: UserDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/User/UpdateUserById";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -2663,200 +2787,6 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<boolean>(null as any);
-}
-        }
-
-            export interface IUserTypeClient {
-                    /**
-             * @return OK
-             */
-            getAllUserTypes(): Promise<PagedResult<UserTypeDto> | UserTypeDto[]>                    /**
-             * @param id (optional) 
-             * @return OK
-             */
-            getUserTypeById(id?: number | undefined): Promise<UserTypeDto>                    /**
-             * @param body (optional) 
-             * @return OK
-             */
-            addUserType(body?: UserTypeDto | undefined): Promise<void>        }
-
-    export class UserTypeClient extends BaseApiClient implements IUserTypeClient {
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
-
-            super(configuration);
-
-        }
-
-    
-    
-
-        /**
-         * @return OK
-         */
-        getAllUserTypes( cancelToken?: CancelToken): Promise<PagedResult<UserTypeDto> | UserTypeDto[]> {        let url_ = this.baseUrl + "/UserType/GetAllUserTypes";
-url_ = url_.replace(/[?&]$/, "");
-
-                let options_: AxiosRequestConfig = {
-                        method: "GET",
-        url: url_,
-        headers: {
-                                    "Accept": "application/json"
-                },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processGetAllUserTypes(_response);
-                });
-        }
-
-    protected processGetAllUserTypes(response: AxiosResponse): Promise<PagedResult<UserTypeDto> | UserTypeDto[]> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                if (Array.isArray(resultData200)) {
-            result200 = [] as any;
-            for (let item of resultData200)
-                result200!.push(UserTypeDto.fromJS(item));
-        } else if (isPagedResult<UserTypeDto>(resultData200)) {
-            result200 = resultData200 as PagedResult<UserTypeDto>;
-        } else {
-            result200 = <any>null;
-        }
-        
-        return Promise.resolve<PagedResult<UserTypeDto> | UserTypeDto[]>(result200);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<PagedResult<UserTypeDto> | UserTypeDto[]>(null as any);
-}
-    
-
-        /**
-         * @param id (optional) 
-         * @return OK
-         */
-        getUserTypeById(id?: number | undefined, cancelToken?: CancelToken): Promise<UserTypeDto> {        let url_ = this.baseUrl + "/UserType/GetUserTypeById?";
-if (id === null)
-    throw new Error("The parameter 'id' cannot be null.");
-else if (id !== undefined)
-    url_ += "id=" + encodeURIComponent("" + id) + "&";
-url_ = url_.replace(/[?&]$/, "");
-
-                let options_: AxiosRequestConfig = {
-                        method: "GET",
-        url: url_,
-        headers: {
-                                    "Accept": "text/plain"
-                },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processGetUserTypeById(_response);
-                });
-        }
-
-    protected processGetUserTypeById(response: AxiosResponse): Promise<UserTypeDto> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                result200 = UserTypeDto.fromJS(resultData200);
-        
-        return Promise.resolve<UserTypeDto>(result200);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<UserTypeDto>(null as any);
-}
-    
-
-        /**
-         * @param body (optional) 
-         * @return OK
-         */
-        addUserType(body?: UserTypeDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/UserType/AddUserType";
-url_ = url_.replace(/[?&]$/, "");
-
-                    const content_ = JSON.stringify(body);
-
-                let options_: AxiosRequestConfig = {
-                    data: content_,
-                        method: "POST",
-        url: url_,
-        headers: {
-                            "Content-Type": "application/json-patch+json",
-                        },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processAddUserType(_response);
-                });
-        }
-
-    protected processAddUserType(response: AxiosResponse): Promise<void> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                return Promise.resolve<void>(null as any);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<void>(null as any);
 }
         }
 
@@ -3175,7 +3105,7 @@ export interface ILibraryDto {
 
 export class LibraryFilter implements ILibraryFilter {
     libraryIds?: number[] | null;
-    libraryName?: string | null;
+    libraryNames?: string[] | null;
     pageSize?: number | null;
     pageNumber?: number | null;
 
@@ -3198,7 +3128,14 @@ export class LibraryFilter implements ILibraryFilter {
             else {
                 this.libraryIds = <any>null;
             }
-            this.libraryName = _data["libraryName"] !== undefined ? _data["libraryName"] : <any>null;
+            if (Array.isArray(_data["libraryNames"])) {
+                this.libraryNames = [] as any;
+                for (let item of _data["libraryNames"])
+                    this.libraryNames!.push(item);
+            }
+            else {
+                this.libraryNames = <any>null;
+            }
             this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
             this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
         }
@@ -3218,7 +3155,11 @@ export class LibraryFilter implements ILibraryFilter {
             for (let item of this.libraryIds)
                 data["libraryIds"].push(item);
         }
-        data["libraryName"] = this.libraryName !== undefined ? this.libraryName : <any>null;
+        if (Array.isArray(this.libraryNames)) {
+            data["libraryNames"] = [];
+            for (let item of this.libraryNames)
+                data["libraryNames"].push(item);
+        }
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
         data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
         return data;
@@ -3227,7 +3168,7 @@ export class LibraryFilter implements ILibraryFilter {
 
 export interface ILibraryFilter {
     libraryIds?: number[] | null;
-    libraryName?: string | null;
+    libraryNames?: string[] | null;
     pageSize?: number | null;
     pageNumber?: number | null;
 }
@@ -3607,81 +3548,6 @@ export interface IPagedResult_UserDto {
     [key: string]: any;
 }
 
-export class PagedResult_UserTypeDto implements IPagedResult_UserTypeDto {
-    items?: UserTypeDto[];
-    totalCount?: number;
-    pageSize?: number;
-    currentPage?: number;
-    totalPages?: number;
-
-    [key: string]: any;
-
-    constructor(data?: IPagedResult_UserTypeDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(UserTypeDto.fromJS(item));
-            }
-            else {
-                this.items = <any>null;
-            }
-            this.totalCount = _data["totalCount"] !== undefined ? _data["totalCount"] : <any>null;
-            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
-            this.currentPage = _data["currentPage"] !== undefined ? _data["currentPage"] : <any>null;
-            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): PagedResult_UserTypeDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PagedResult_UserTypeDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item ? item.toJSON() : <any>null);
-        }
-        data["totalCount"] = this.totalCount !== undefined ? this.totalCount : <any>null;
-        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
-        data["currentPage"] = this.currentPage !== undefined ? this.currentPage : <any>null;
-        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
-        return data;
-    }
-}
-
-export interface IPagedResult_UserTypeDto {
-    items?: UserTypeDto[];
-    totalCount?: number;
-    pageSize?: number;
-    currentPage?: number;
-    totalPages?: number;
-
-    [key: string]: any;
-}
-
 export class SettingsDto implements ISettingsDto {
     id?: number;
     name?: string | null;
@@ -3724,6 +3590,94 @@ export interface ISettingsDto {
     id?: number;
     name?: string | null;
     value?: string | null;
+}
+
+export class SignInResponse implements ISignInResponse {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+    userId?: number;
+    name?: string | null;
+
+    constructor(data?: ISignInResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"] !== undefined ? _data["accessToken"] : <any>null;
+            this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
+            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): SignInResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SignInResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken !== undefined ? this.accessToken : <any>null;
+        data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
+        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        return data;
+    }
+}
+
+export interface ISignInResponse {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+    userId?: number;
+    name?: string | null;
+}
+
+export class TokenModel implements ITokenModel {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+
+    constructor(data?: ITokenModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"] !== undefined ? _data["accessToken"] : <any>null;
+            this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TokenModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new TokenModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken !== undefined ? this.accessToken : <any>null;
+        data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
+        return data;
+    }
+}
+
+export interface ITokenModel {
+    accessToken?: string | null;
+    refreshToken?: string | null;
 }
 
 export class UploadChunkDto implements IUploadChunkDto {
@@ -4093,6 +4047,36 @@ export class UserDtoUploadFilterValueTuple implements IUserDtoUploadFilterValueT
 export interface IUserDtoUploadFilterValueTuple {
 }
 
+export class UserDtoUserCredentialsDtoValueTuple implements IUserDtoUserCredentialsDtoValueTuple {
+
+    constructor(data?: IUserDtoUserCredentialsDtoValueTuple) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): UserDtoUserCredentialsDtoValueTuple {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserDtoUserCredentialsDtoValueTuple();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data;
+    }
+}
+
+export interface IUserDtoUserCredentialsDtoValueTuple {
+}
+
 export class UserFilter implements IUserFilter {
     userIds?: number[] | null;
     userTypeIds?: number[] | null;
@@ -4175,11 +4159,11 @@ export interface IUserFilter {
     pageSize?: number | null;
 }
 
-export class UserRequest implements IUserRequest {
-    user?: UserDto;
+export class UserIdPassword implements IUserIdPassword {
+    userId?: number;
     password?: string | null;
 
-    constructor(data?: IUserRequest) {
+    constructor(data?: IUserIdPassword) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4190,88 +4174,29 @@ export class UserRequest implements IUserRequest {
 
     init(_data?: any) {
         if (_data) {
-            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>null;
+            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
             this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
         }
     }
 
-    static fromJS(data: any): UserRequest {
+    static fromJS(data: any): UserIdPassword {
         data = typeof data === 'object' ? data : {};
-        let result = new UserRequest();
+        let result = new UserIdPassword();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["user"] = this.user ? this.user.toJSON() : <any>null;
+        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
         data["password"] = this.password !== undefined ? this.password : <any>null;
         return data;
     }
 }
 
-export interface IUserRequest {
-    user?: UserDto;
+export interface IUserIdPassword {
+    userId?: number;
     password?: string | null;
-}
-
-export class UserTypeDto implements IUserTypeDto {
-    id?: number;
-    name?: string | null;
-    permissions?: { [key: string]: boolean; } | null;
-
-    constructor(data?: IUserTypeDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
-            if (_data["permissions"]) {
-                this.permissions = {} as any;
-                for (let key in _data["permissions"]) {
-                    if (_data["permissions"].hasOwnProperty(key))
-                        (<any>this.permissions)![key] = _data["permissions"][key] !== undefined ? _data["permissions"][key] : <any>null;
-                }
-            }
-            else {
-                this.permissions = <any>null;
-            }
-        }
-    }
-
-    static fromJS(data: any): UserTypeDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserTypeDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id !== undefined ? this.id : <any>null;
-        data["name"] = this.name !== undefined ? this.name : <any>null;
-        if (this.permissions) {
-            data["permissions"] = {};
-            for (let key in this.permissions) {
-                if (this.permissions.hasOwnProperty(key))
-                    (<any>data["permissions"])[key] = this.permissions[key] !== undefined ? this.permissions[key] : <any>null;
-            }
-        }
-        return data;
-    }
-}
-
-export interface IUserTypeDto {
-    id?: number;
-    name?: string | null;
-    permissions?: { [key: string]: boolean; } | null;
 }
 
 export interface FileParameter {
@@ -4324,7 +4249,6 @@ function isAxiosError(obj: any): obj is AxiosError {
 /* tslint:disable */
 
 // ReSharper disable InconsistentNaming
-
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;

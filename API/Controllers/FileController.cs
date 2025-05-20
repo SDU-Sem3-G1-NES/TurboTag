@@ -1,11 +1,12 @@
 using API.Services;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize]
 [ApiController]
-
 [Route("[controller]")]
 public class FileController(IFileService fileService, IFFmpegService ffmpegService, IMediaProcessingService mediaProcessingService) : ControllerBase
 {
@@ -173,7 +174,7 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                 Console.WriteLine($"Cleanup error: {cleanupEx.Message}");
             }
             
-            return Ok(new { fileId });
+            return Ok(fileId);
         }
         catch (Exception ioEx)
         {

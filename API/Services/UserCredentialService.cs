@@ -1,16 +1,16 @@
+using System.Security.Cryptography;
 using API.DTOs;
 using API.Repositories;
-using System.Security.Cryptography;
 
 namespace API.Services;
 
 public interface IUserCredentialService : IServiceBase
 {
     bool UserExists(string email);
-    void AddUserCredentials(int userId, string password);
-    bool ValidateUserCredentials(UserCredentialsDto userCredentials);
+    void AddUserCredentials(int userId, UserCredentialsDto userCredentials);
+    bool ValidateUserCredentials(int userId, string password);
     UserDto GetUserByEmail(string email);
-    void UpdateUserCredentials(int userId, string password);
+    public void SetupCredentials(int userId, string password);
 }
 
 public class UserCredentialService(IUserRepository userRepository) : IUserCredentialService
@@ -21,41 +21,39 @@ public class UserCredentialService(IUserRepository userRepository) : IUserCreden
         return user != null;
     }
 
-    public void AddUserCredentials(int userId, string password)
+    public void AddUserCredentials(int userId, UserCredentialsDto userCredentials)
     {
-        var hashedUserCredentials = HashUserCredentials(userId, password);
+        var hashedUserCredentials = new HashedUserCredentialsDto();
         userRepository.AddUserCredentials(hashedUserCredentials);
     }
 
-    public bool ValidateUserCredentials(UserCredentialsDto userCredentials)
+    public bool ValidateUserCredentials(int userId, string password)
     {
-        return true;
+        var hashedUserCredentials = userRepository.GetUserCredentials(userId);
+        
+        using var pbkdf2 = new Rfc2898DeriveBytes(password, hashedUserCredentials.PasswordSalt, 100_000, HashAlgorithmName.SHA256);
+        byte[] hash = pbkdf2.GetBytes(32);
+        
+        return CryptographicOperations.FixedTimeEquals(hash, hashedUserCredentials.PasswordHash);
     }
 
     public UserDto GetUserByEmail(string email)
     {
         return userRepository.GetUserByEmail(email) ?? new UserDto();
     }
-    
-    public void UpdateUserCredentials(int userId, string password)
+    public void SetupCredentials(int userId, string password)
     {
-        var hashedUserCredentials = HashUserCredentials(userId, password);
-        userRepository.UpdateUserCredentials(hashedUserCredentials);
-    }
-    
-    private HashedUserCredentialsDto HashUserCredentials(int userId, string password)
-    {
-        // Generate a random salt
         var salt = RandomNumberGenerator.GetBytes(16);
-        // Hash the password with the salt
         var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256);
         var hash = pbkdf2.GetBytes(32);
-
-        return new HashedUserCredentialsDto
+        
+        var hashedUserCredentials = new HashedUserCredentialsDto
         {
             UserId = userId,
             PasswordHash = hash,
             PasswordSalt = salt
         };
+        
+        userRepository.UpdateUserCredentials(hashedUserCredentials);
     }
 }
