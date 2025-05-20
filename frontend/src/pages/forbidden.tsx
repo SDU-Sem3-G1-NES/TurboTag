@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Forbidden: React.FC = () => {
-  return(
+  return (
     <div className="centered-container">
       <div>
         <h1> 403 Forbidden</h1>

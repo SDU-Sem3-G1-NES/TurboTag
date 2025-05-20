@@ -435,7 +435,8 @@ const AdminPage: React.FC = () => {
                   type="primary"
                   icon={<UserAddOutlined />}
                   style={{ float: 'right' }}
-                  onClick={handleAddUser}>
+                  onClick={handleAddUser}
+                >
                   Add User
                 </Button>
               </h2>
@@ -472,12 +473,14 @@ const AdminPage: React.FC = () => {
                 open={isAddUserModalVisible}
                 onCancel={() => setIsAddUserModalVisible(false)}
                 onOk={handleAddUserSubmit}
-                okText="Add">
+                okText="Add"
+              >
                 <Form form={addUserForm} layout="vertical">
                   <Form.Item
                     name="name"
                     label="Name"
-                    rules={[{ required: true, message: 'Name is required' }]}>
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
                   <Form.Item
@@ -489,7 +492,8 @@ const AdminPage: React.FC = () => {
                         message: 'Email is required'
                       },
                       { type: 'email', message: 'Please enter a valid email address' }
-                    ]}>
+                    ]}
+                  >
                     <Input />
                   </Form.Item>
                   <Form.Item
@@ -500,7 +504,8 @@ const AdminPage: React.FC = () => {
                         required: true,
                         message: 'Password is required'
                       }
-                    ]}>
+                    ]}
+                  >
                     <Input.Password />
                   </Form.Item>
                   <Form.Item
@@ -511,7 +516,8 @@ const AdminPage: React.FC = () => {
                         required: true,
                         message: 'User type is required'
                       }
-                    ]}>
+                    ]}
+                  >
                     <Select placeholder="Select user type">
                       {userTypes.map((type) => (
                         <Select.Option key={type.id} value={type.id}>
@@ -524,7 +530,8 @@ const AdminPage: React.FC = () => {
                     <Select
                       mode="multiple"
                       placeholder="Select accessible libraries"
-                      optionFilterProp="children">
+                      optionFilterProp="children"
+                    >
                       {allLibraries.map((lib) => (
                         <Select.Option key={lib.id} value={lib.id}>
                           {lib.name}
@@ -542,12 +549,14 @@ const AdminPage: React.FC = () => {
                   setIsEditUserModalVisible(false)
                 }}
                 onOk={handleUserEditSubmit}
-                okText="Save">
+                okText="Save"
+              >
                 <Form form={userForm} layout="vertical">
                   <Form.Item
                     name="name"
                     label="Name"
-                    rules={[{ required: true, message: 'Name is required' }]}>
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
                   <Form.Item
@@ -559,7 +568,8 @@ const AdminPage: React.FC = () => {
                         message: 'Email is required'
                       },
                       { type: 'email', message: 'Please enter a valid email address' }
-                    ]}>
+                    ]}
+                  >
                     <Input />
                   </Form.Item>
                   <Form.Item name="password" label="Password" rules={[]}>
@@ -573,7 +583,8 @@ const AdminPage: React.FC = () => {
                         required: true,
                         message: 'User type is required'
                       }
-                    ]}>
+                    ]}
+                  >
                     <Select placeholder="Select user type">
                       {userTypes.map((type) => (
                         <Select.Option key={type.id} value={type.id}>
@@ -586,7 +597,8 @@ const AdminPage: React.FC = () => {
                     <Select
                       mode="multiple"
                       placeholder="Select accessible libraries"
-                      optionFilterProp="children">
+                      optionFilterProp="children"
+                    >
                       {allLibraries.map((lib) => (
                         <Select.Option key={lib.id} value={lib.id}>
                           {lib.name}
@@ -605,7 +617,8 @@ const AdminPage: React.FC = () => {
                   type="primary"
                   icon={<FolderAddOutlined />}
                   style={{ float: 'right' }}
-                  onClick={handleAddLibrary}>
+                  onClick={handleAddLibrary}
+                >
                   Add Library
                 </Button>
               </h2>
@@ -642,12 +655,14 @@ const AdminPage: React.FC = () => {
                 open={isAddLibraryModalVisible}
                 onCancel={() => setIsAddLibraryModalVisible(false)}
                 onOk={handleAddLibrarySubmit}
-                okText="Add">
+                okText="Add"
+              >
                 <Form form={addLibraryForm} layout="vertical">
                   <Form.Item
                     name="name"
                     label="Name"
-                    rules={[{ required: true, message: 'Name is required' }]}>
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
                 </Form>
@@ -657,12 +672,14 @@ const AdminPage: React.FC = () => {
                 open={isEditLibraryModalVisible}
                 onCancel={() => setIsEditLibraryModalVisible(false)}
                 onOk={handleLibraryEditSubmit}
-                okText="Save">
+                okText="Save"
+              >
                 <Form form={libraryForm} layout="vertical">
                   <Form.Item
                     name="name"
                     label="Name"
-                    rules={[{ required: true, message: 'Name is required' }]}>
+                    rules={[{ required: true, message: 'Name is required' }]}
+                  >
                     <Input />
                   </Form.Item>
                 </Form>

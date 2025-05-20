@@ -47,11 +47,13 @@ const AppLayout = () => {
       onClick: () => navigate('/upload')
     },
     ...(userType === 'speedadmin'
-      ? [{
-        key: 'admin',
-        label: 'Admin',
-        onClick: () => navigate('/admin')
-      }]
+      ? [
+          {
+            key: 'admin',
+            label: 'Admin',
+            onClick: () => navigate('/admin')
+          }
+        ]
       : [])
   ]
 
