@@ -9,8 +9,8 @@ import {
   AddUploadRequestDto,
   FileClient,
   UploadChunkDto,
-  FinaliseUploadDto, 
-  GenerationClient,
+  FinaliseUploadDto,
+  GenerationClient
 } from '../api/apiClient.ts'
 import { Button, Form, Input, notification, Progress, Upload, UploadProps, Spin } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
@@ -28,7 +28,7 @@ const UploadPage: React.FC = () => {
   const fileClient = new FileClient()
   const contentGenerationClient = new GenerationClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
-  const [form] = Form.useForm();
+  const [form] = Form.useForm()
 
   const ownerId = Number(localStorage.getItem('userId'))
 
@@ -112,25 +112,26 @@ const UploadPage: React.FC = () => {
     setUploading(false)
     return fileId
   }
-  
+
   const generateContention = async (/*file: File*/) => {
     setGenerating(true)
-    const text = "One bright morning in Beijing, President Xi Jinping woke up craving something sweet and cold. 'Today,' he declared, 'I want bing chilling!' With great excitement, he summoned his personal chef and requested the finest ice cream in all of China.\n\nHowever, the chef looked worried. 'President Xi, we have run out of milk and sugar!'\n\nDetermined not to be defeated, Xi Jinping put on his casual jacket, sunglasses, and set out on his own to find bing chilling. As he walked through the streets, people gathered and waved, surprised to see their leader casually strolling around.\n\nEventually, he came across a small, colorful ice cream cart with a sign that read 'Bing Chilling – The Coolest Treat in Town!' Behind the cart stood none other than John Cena, holding a cone and speaking fluent Mandarin.\n\n'你想要冰淇淋吗？' John asked with a smile.\n\n'当然!' Xi Jinping replied, laughing.\n\nThey sat on a nearby bench, enjoying their bing chilling together while the crowd snapped selfies and laughed at the surreal moment. That day, the phrase 'Xi Jinping loves bing chilling' went viral across the internet.\n\nFrom that day on, every Sunday became 'Bing Chilling Day' in China, a day where everyone—from top leaders to children—would enjoy ice cream and remember the day diplomacy was served in a cone."
+    const text =
+      "One bright morning in Beijing, President Xi Jinping woke up craving something sweet and cold. 'Today,' he declared, 'I want bing chilling!' With great excitement, he summoned his personal chef and requested the finest ice cream in all of China.\n\nHowever, the chef looked worried. 'President Xi, we have run out of milk and sugar!'\n\nDetermined not to be defeated, Xi Jinping put on his casual jacket, sunglasses, and set out on his own to find bing chilling. As he walked through the streets, people gathered and waved, surprised to see their leader casually strolling around.\n\nEventually, he came across a small, colorful ice cream cart with a sign that read 'Bing Chilling – The Coolest Treat in Town!' Behind the cart stood none other than John Cena, holding a cone and speaking fluent Mandarin.\n\n'你想要冰淇淋吗？' John asked with a smile.\n\n'当然!' Xi Jinping replied, laughing.\n\nThey sat on a nearby bench, enjoying their bing chilling together while the crowd snapped selfies and laughed at the surreal moment. That day, the phrase 'Xi Jinping loves bing chilling' went viral across the internet.\n\nFrom that day on, every Sunday became 'Bing Chilling Day' in China, a day where everyone—from top leaders to children—would enjoy ice cream and remember the day diplomacy was served in a cone."
 
-    const result = await contentGenerationClient.generate(text);
+    const result = await contentGenerationClient.generate(text)
 
-    if (result != null){
-      const tagsList = (result.tags ?? "")
-        .split(",")
-        .map(tag => tag.trim())
-        .filter(tag => tag !== "");
+    if (result != null) {
+      const tagsList = (result.tags ?? '')
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== '')
 
       setTags(tagsList)
-      
-      const description = result.description ?? ""
+
+      const description = result.description ?? ''
       setDescription(description)
-      form.setFieldsValue({ description });
-      
+      form.setFieldsValue({ description })
+
       notification.success({
         message: 'Content Generation successful',
         description: 'Your lecture content has been generated successfully',
@@ -138,8 +139,7 @@ const UploadPage: React.FC = () => {
         duration: 2
       })
       console.log('Content Generation successful')
-    }
-    else {
+    } else {
       notification.error({
         message: 'Content Generation failed',
         description: 'Your lecture content could not be generated',
@@ -148,7 +148,7 @@ const UploadPage: React.FC = () => {
       })
       console.error('Content Generation failed')
     }
-    
+
     setGenerating(false)
   }
 
@@ -224,14 +224,15 @@ const UploadPage: React.FC = () => {
       console.error('Upload failed', error)
     }
   }
-  
 
   return (
     <div className="form-container">
-      <Form form={form}
-            layout="vertical" 
-            onFinish={handleSubmit}
-            initialValues={{ description: description }}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{ description: description }}
+      >
         <Form.Item
           label="Title"
           name="title"
@@ -264,33 +265,27 @@ const UploadPage: React.FC = () => {
           name="description"
           rules={[{ required: true, message: 'Please input your description!' }]}
         >
-          <TextArea
-            maxLength={100}
-            disabled
-          />
+          <TextArea maxLength={100} disabled />
         </Form.Item>
 
         <Form.Item label="Tags" name="tags">
           <Tags tags={tags} setTags={setTags} />
         </Form.Item>
-        
+
         <Form.Item label="Content Generation" name="contentGeneration">
           <div className="upload-button-wrapper">
             {generating ? (
               <Spin tip="Loading..." />
             ) : (
-              //Need to put it in generateContention function after implentation of mp3 to text 
+              //Need to put it in generateContention function after implentation of mp3 to text
               /*file as File*/
               <Button
                 type="primary"
                 className="upload-btn"
                 icon={<UploadOutlined />}
                 onClick={() => generateContention()}
-              >
-                
-              </Button>
-            )
-            }
+              ></Button>
+            )}
           </div>
         </Form.Item>
 
