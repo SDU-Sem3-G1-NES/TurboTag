@@ -3266,6 +3266,7 @@ export class LessonDto implements ILessonDto {
     lessonDetails?: LessonDetailsDto;
     fileMetadata?: FileMetadataDto[] | null;
     ownerId?: number | null;
+    ownerName?: string | null;
 
     constructor(data?: ILessonDto) {
         if (data) {
@@ -3297,6 +3298,7 @@ export class LessonDto implements ILessonDto {
                 this.fileMetadata = <any>null;
             }
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+            this.ownerName = _data["ownerName"] !== undefined ? _data["ownerName"] : <any>null;
         }
     }
 
@@ -3322,6 +3324,7 @@ export class LessonDto implements ILessonDto {
                 data["fileMetadata"].push(item ? item.toJSON() : <any>null);
         }
         data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        data["ownerName"] = this.ownerName !== undefined ? this.ownerName : <any>null;
         return data;
     }
 }
@@ -3332,6 +3335,7 @@ export interface ILessonDto {
     lessonDetails?: LessonDetailsDto;
     fileMetadata?: FileMetadataDto[] | null;
     ownerId?: number | null;
+    ownerName?: string | null;
 }
 
 export class LessonFilter implements ILessonFilter {
@@ -3342,6 +3346,7 @@ export class LessonFilter implements ILessonFilter {
     lessonId?: number | null;
     pageSize?: number | null;
     pageNumber?: number | null;
+    searchText?: string | null;
 
     constructor(data?: ILessonFilter) {
         if (data) {
@@ -3375,6 +3380,7 @@ export class LessonFilter implements ILessonFilter {
             this.lessonId = _data["lessonId"] !== undefined ? _data["lessonId"] : <any>null;
             this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
             this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.searchText = _data["searchText"] !== undefined ? _data["searchText"] : <any>null;
         }
     }
 
@@ -3402,6 +3408,7 @@ export class LessonFilter implements ILessonFilter {
         data["lessonId"] = this.lessonId !== undefined ? this.lessonId : <any>null;
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
         data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["searchText"] = this.searchText !== undefined ? this.searchText : <any>null;
         return data;
     }
 }
@@ -3414,6 +3421,7 @@ export interface ILessonFilter {
     lessonId?: number | null;
     pageSize?: number | null;
     pageNumber?: number | null;
+    searchText?: string | null;
 }
 
 export class LibraryDto implements ILibraryDto {

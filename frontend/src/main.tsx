@@ -1,9 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Layout, Menu } from 'antd'
+import { Button, Layout, Menu } from 'antd'
 import Upload from './pages/upload.tsx'
 import Login from './pages/login.tsx'
 import Admin from './pages/admin.tsx'
+import HomePage from './pages/homepage.tsx'
 import ProtectedRoute from './components/ProtectedRoute'
 import './index.css'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
@@ -13,10 +14,8 @@ import { Content, Footer, Header } from 'antd/es/layout/layout'
 import logo from './assets/logo.png'
 import avatar from './assets/avatar.png'
 import './App.css'
-import { Button } from 'antd'
-import { LogoutOutlined, LoginOutlined } from '@ant-design/icons'
+import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
 import { LoginClient } from './api/apiClient.ts'
-import Library from './pages/library.tsx'
 import Forbidden from './pages/forbidden.tsx'
 
 const AppLayout = () => {
@@ -96,7 +95,7 @@ const AppLayout = () => {
               path="/"
               element={
                 <ProtectedRoute>
-                  <Library />
+                  <HomePage />
                 </ProtectedRoute>
               }
             />
