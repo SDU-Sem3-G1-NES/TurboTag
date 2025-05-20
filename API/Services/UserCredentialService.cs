@@ -7,10 +7,10 @@ namespace API.Services;
 public interface IUserCredentialService : IServiceBase
 {
     bool UserExists(string email);
-    void AddUserCredentials(int userId, UserCredentialsDto userCredentials);
+    void AddUserCredentials(int userId, string password);
     bool ValidateUserCredentials(int userId, string password);
     UserDto GetUserByEmail(string email);
-    public void SetupCredentials(int userId, string password);
+    public void UpdateUserCredentials(int userId, string password);
 }
 
 public class UserCredentialService(IUserRepository userRepository) : IUserCredentialService
@@ -21,9 +21,9 @@ public class UserCredentialService(IUserRepository userRepository) : IUserCreden
         return user != null;
     }
 
-    public void AddUserCredentials(int userId, UserCredentialsDto userCredentials)
+    public void AddUserCredentials(int userId, string password)
     {
-        var hashedUserCredentials = new HashedUserCredentialsDto();
+        var hashedUserCredentials = HashUserCredentials(userId, password);
         userRepository.AddUserCredentials(hashedUserCredentials);
     }
 
@@ -41,7 +41,13 @@ public class UserCredentialService(IUserRepository userRepository) : IUserCreden
     {
         return userRepository.GetUserByEmail(email) ?? new UserDto();
     }
-    public void SetupCredentials(int userId, string password)
+    public void UpdateUserCredentials(int userId, string password)
+    {
+        var hashedUserCredentials = HashUserCredentials(userId, password);
+        userRepository.UpdateUserCredentials(hashedUserCredentials);
+    }
+
+    private HashedUserCredentialsDto HashUserCredentials(int userId, string password)
     {
         var salt = RandomNumberGenerator.GetBytes(16);
         var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256);
@@ -54,6 +60,6 @@ public class UserCredentialService(IUserRepository userRepository) : IUserCreden
             PasswordSalt = salt
         };
         
-        userRepository.UpdateUserCredentials(hashedUserCredentials);
+        return hashedUserCredentials;
     }
 }

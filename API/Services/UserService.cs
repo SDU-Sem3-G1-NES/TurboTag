@@ -9,7 +9,7 @@ public interface IUserService : IServiceBase
     UserDto GetUserByEmail(string email);
     UserDto GetUserById(int id);
     void CreateNewUser(UserDto user, string password);
-    void UpdateUser(UserDto user, string password);
+    void UpdateUser(UserDto user, string? password);
     void DeleteUserById(int userId);
 }
 

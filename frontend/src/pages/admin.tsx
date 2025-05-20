@@ -146,25 +146,35 @@ const AdminPage: React.FC = () => {
   const handleAddUserSubmit = async () => {
     try {
       const values = await addUserForm.validateFields();
+      console.log('Form values:', values); // Log form values for debugging
+
       const { password, ...userFields } = values;
       const request = new UserRequest();
-      request.user = userFields;
+      request.user = { ...userFields }; // Convert to a plain object
       request.password = password;
-      await userClient.createNewUser(request);
+
+      console.log('Request payload:', request); // Log request payload
+
+      await userClient.createNewUser({
+        ...request,
+        user: { ...request.user }, // Ensure `user` is a plain object
+      });
       notification.success({
         message: 'Success',
         description: 'User added',
         placement: 'topRight',
-        duration: 2
+        duration: 2,
       });
+
       setIsAddUserModalVisible(false);
       await fetchUsers(userPage);
-    } catch {
+    } catch (error) {
+      console.error('Error adding user:', error); // Log error details
       notification.error({
         message: 'Error',
         description: 'Failed to add user',
         placement: 'topRight',
-        duration: 2
+        duration: 2,
       });
     }
   };

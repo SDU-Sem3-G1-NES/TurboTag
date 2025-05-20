@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Authorize]
+[Authorize(Roles = "1")]
 [ApiController]
 [Route("[controller]")]
 public class UserController(IUserService userService, IUserCredentialService userCredentialService) : ControllerBase
@@ -26,7 +26,7 @@ public class UserController(IUserService userService, IUserCredentialService use
     [HttpPost("CreateNewUser")]
     public ActionResult CreateNewUser([FromBody] UserRequest request)
     {
-        userService.CreateNewUser(request.User, request.Password);
+        userService.CreateNewUser(request.User, request.Password!);
         return Ok();
     }
 

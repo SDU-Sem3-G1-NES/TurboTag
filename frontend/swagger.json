@@ -419,11 +419,35 @@
       }
     },
     "/Lesson/GetAllLessons": {
-      "get": {
+      "post": {
         "tags": [
           "Lesson"
         ],
         "operationId": "Lesson_GetAllLessons",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonFilter"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonFilter"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -737,12 +761,12 @@
         }
       }
     },
-    "/Login/SetupUserCredentials": {
+    "/Login/UpdateUserCredentials": {
       "post": {
         "tags": [
           "Login"
         ],
-        "operationId": "Login_SetupUserCredentials",
+        "operationId": "Login_UpdateUserCredentials",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
@@ -1427,22 +1451,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+                "$ref": "#/components/schemas/UserRequest"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+                "$ref": "#/components/schemas/UserRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+                "$ref": "#/components/schemas/UserRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDtoUserCredentialsDtoValueTuple"
+                "$ref": "#/components/schemas/UserRequest"
               }
             }
           }
@@ -1464,22 +1488,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDto"
+                "$ref": "#/components/schemas/UserRequest"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDto"
+                "$ref": "#/components/schemas/UserRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDto"
+                "$ref": "#/components/schemas/UserRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserDto"
+                "$ref": "#/components/schemas/UserRequest"
               }
             }
           }
@@ -1549,6 +1573,103 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/UserType/GetAllUserTypes": {
+      "get": {
+        "tags": [
+          "UserType"
+        ],
+        "operationId": "UserType_GetAllUserTypes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_UserTypeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/UserType/GetUserTypeById": {
+      "get": {
+        "tags": [
+          "UserType"
+        ],
+        "operationId": "UserType_GetUserTypeById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserTypeDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserTypeDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserTypeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/UserType/AddUserType": {
+      "post": {
+        "tags": [
+          "UserType"
+        ],
+        "operationId": "UserType_AddUserType",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserTypeDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserTypeDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserTypeDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -1678,6 +1799,51 @@
         },
         "additionalProperties": false
       },
+      "LessonFilter": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "uploadIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "lessonId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LibraryDto": {
         "type": "object",
         "properties": {
@@ -1703,11 +1869,8 @@
             },
             "nullable": true
           },
-          "libraryNames": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
+          "libraryName": {
+            "type": "string",
             "nullable": true
           },
           "pageSize": {
@@ -1838,6 +2001,33 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_UserTypeDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserTypeDto"
             }
           },
           "totalCount": {
@@ -2066,10 +2256,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UserDtoUserCredentialsDtoValueTuple": {
-        "type": "object",
-        "additionalProperties": false
-      },
       "UserFilter": {
         "type": "object",
         "properties": {
@@ -2124,6 +2310,40 @@
           },
           "password": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRequest": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserDto"
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            },
             "nullable": true
           }
         },

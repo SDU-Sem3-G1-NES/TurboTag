@@ -10,10 +10,10 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class LoginController(IUserCredentialService userCredentialService, IAuthenticationService authenticationService, IRefreshTokenService refreshTokenService, IUserService userService) : ControllerBase
 {
-    [HttpPost("SetupUserCredentials")]
-    public ActionResult SetupUserCredentials([FromBody] UserIdPassword parameters)
+    [HttpPost("UpdateUserCredentials")]
+    public ActionResult UpdateUserCredentials([FromBody] UserIdPassword parameters)
     {
-        userCredentialService.SetupCredentials(parameters.UserId, parameters.Password);
+        userCredentialService.UpdateUserCredentials(parameters.UserId, parameters.Password);
         
         return Ok();
     }

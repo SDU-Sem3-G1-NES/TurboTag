@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Layout, Menu } from 'antd'
 import Upload from './pages/upload.tsx'
 import Login from './pages/login.tsx'
+import Admin from './pages/admin.tsx'
 import ProtectedRoute from './components/ProtectedRoute'
 import './index.css'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
@@ -41,6 +42,11 @@ const AppLayout = () => {
       key: 'upload',
       label: 'Upload',
       onClick: () => navigate('/upload')
+    },
+    {
+      key: 'admin',
+      label: 'Admin',
+      onClick: () => navigate('/admin')
     }
   ]
 
@@ -92,6 +98,14 @@ const AppLayout = () => {
               element={
                 <ProtectedRoute>
                   <Upload />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Admin />
                 </ProtectedRoute>
               }
             />
