@@ -9,7 +9,7 @@ namespace API.Controllers;
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class UploadController(IUploadService uploadService, ILessonService lessonService) : ControllerBase
+public class UploadController(IUploadService uploadService) : ControllerBase
 {
     [HttpPost("GetAllUploads")]
     public ActionResult<IEnumerable<UploadDto>> GetAllUploads([FromBody] UploadFilter? filter)
