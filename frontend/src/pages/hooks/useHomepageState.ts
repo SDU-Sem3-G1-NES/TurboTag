@@ -1,62 +1,61 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { LessonClient, LessonDto, LessonFilter } from '../../api/apiClient'
 
 export const useHomePageState = () => {
-  const lessonClient = new LessonClient()
-
   const [ownerLessons, setOwnerLessons] = useState<LessonDto[]>([])
-  const [search, setSearch] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
-  const [filter, setFilter] = useState<LessonFilter>(
-    new LessonFilter({
-      ownerId: parseInt(localStorage.getItem('userId') ?? '0', 10),
-      searchText: ''
-    })
-  )
+  const [search, setSearch] = useState<string>('')
 
-  const loadLessons = async () => {
+  // Flat filter values so we can easily update properties
+  const [filterValues, setFilterValues] = useState<Partial<LessonFilter>>({
+    ownerId: parseInt(localStorage.getItem('userId') ?? '0', 10),
+    searchText: ''
+  })
+
+  // Memoize actual filter object to prevent new reference every render
+  const filter = useMemo(() => new LessonFilter({ ...filterValues }), [filterValues])
+
+  const lessonClient = useMemo(() => new LessonClient(), [])
+
+  const loadLessons = useCallback(async () => {
+    setLoading(true)
     try {
-      setLoading(true)
       const data = await lessonClient.getAllLessons(filter)
       setOwnerLessons(Array.isArray(data) ? data : data.items || [])
     } catch (error) {
-      console.error('Error fetching lessons:', error)
+      console.error('Error fetching lesson data:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [lessonClient, filter])
 
-  const setFilterProperty = <K extends keyof LessonFilter>(key: K, value: LessonFilter[K]) => {
-    setFilter((prev: LessonFilter) => {
-      const newFilter = new LessonFilter({ ...prev, [key]: value })
-      return newFilter
-    })
-  }
-
-  const handleSearch = (text: string) => {
-    setFilterProperty('searchText', text)
-  }
-
+  // Initial + on-filter-change load
   useEffect(() => {
     loadLessons()
-  }, [filter])
+  }, [loadLessons])
 
-  // Debounced effect
+  // Called when user presses Enter or clicks the search icon
+  const handleSearch = useCallback((text: string) => {
+    setFilterValues((prev) => ({
+      ...prev,
+      searchText: text
+    }))
+  }, [])
+
+  // Called when user types into the search bar (debounced)
   useEffect(() => {
     const delay = setTimeout(() => {
       handleSearch(search)
     }, 500)
+
     return () => clearTimeout(delay)
-  }, [search])
+  }, [search, handleSearch])
 
   return {
     ownerLessons,
     loading,
     search,
     setSearch,
-    handleSearch,
-    filter,
-    setFilterProperty,
-    refresh: loadLessons
+    handleSearch
   }
 }
