@@ -1888,6 +1888,10 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "searchText": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

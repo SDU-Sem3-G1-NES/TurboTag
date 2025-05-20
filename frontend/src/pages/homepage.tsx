@@ -1,41 +1,21 @@
-import React, { useEffect, useState } from 'react'
-import { LessonClient, LessonDto, LessonFilter } from '../api/apiClient'
+import React from 'react'
 import { Col, Input, Row, Spin } from 'antd'
-import LibraryItem from '../components/library/libraryItem'
 import { LoadingOutlined } from '@ant-design/icons'
+import LibraryItem from '../components/library/libraryItem'
+import { useHomePageState } from './hooks/useHomepageState'
 
 const HomePage: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true)
-
-  const lessonClient = new LessonClient()
-
-  const [ownerLessons, setOwnerLessons] = useState<LessonDto[]>([])
-  const [search, setSearch] = useState<string>('')
-
-  const getUserOwnedLessons = async () => {
-    try {
-      const filter = new LessonFilter({
-        ownerId: parseInt(localStorage.getItem('userId') ?? '0', 10)
-      })
-      const data = await lessonClient.getAllLessons(filter)
-      setOwnerLessons(Array.isArray(data) ? data : data.items || [])
-    } catch (error) {
-      console.error('Error fetching lesson data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    getUserOwnedLessons()
-  }, [])
+  const { ownerLessons, loading, search, setSearch, handleSearch } = useHomePageState()
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Input.Search
-        placeholder="Search by title, description, or tag..."
+        placeholder="Search by title or description"
+        value={search}
         onChange={(e) => setSearch(e.target.value)}
+        onSearch={(value) => handleSearch(value)} // when user presses Enter or clicks icon
         style={{ width: '50%', marginBottom: 24 }}
+        allowClear
       />
       {loading ? (
         <Spin
@@ -51,7 +31,7 @@ const HomePage: React.FC = () => {
             </Col>
           </Row>
           <Row gutter={[16, 16]} style={{ width: '75%' }}>
-            {ownerLessons.map((lesson: LessonDto) => (
+            {ownerLessons.map((lesson) => (
               <Col key={lesson.mongoId} span={12}>
                 <LibraryItem lesson={lesson} />
               </Col>
