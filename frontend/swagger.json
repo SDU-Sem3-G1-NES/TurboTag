@@ -1839,6 +1839,10 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "ownerName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
