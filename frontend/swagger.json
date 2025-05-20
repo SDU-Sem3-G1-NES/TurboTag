@@ -2155,6 +2155,10 @@
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "userType": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

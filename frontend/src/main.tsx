@@ -23,6 +23,7 @@ const AppLayout = () => {
   const navigate = useNavigate()
   const loginClient = new LoginClient()
   const userName = localStorage.getItem('userName')
+  const userType = localStorage.getItem('userType')
 
   const handleLogout = async () => {
     await loginClient.logout()
@@ -30,6 +31,7 @@ const AppLayout = () => {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('userId')
     localStorage.removeItem('userName')
+    localStorage.removeItem('userType')
     navigate('/login')
   }
 
@@ -44,11 +46,13 @@ const AppLayout = () => {
       label: 'Upload',
       onClick: () => navigate('/upload')
     },
-    {
-      key: 'admin',
-      label: 'Admin',
-      onClick: () => navigate('/admin')
-    }
+    ...(userType === 'speedadmin'
+      ? [{
+        key: 'admin',
+        label: 'Admin',
+        onClick: () => navigate('/admin')
+      }]
+      : [])
   ]
 
   return (

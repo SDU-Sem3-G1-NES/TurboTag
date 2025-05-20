@@ -33,6 +33,7 @@ const LoginPage: React.FC = () => {
       }
       localStorage.setItem('userId', response.userId?.toString() ?? 'undefined')
       localStorage.setItem('userName', response.name ?? 'undefined')
+      localStorage.setItem('userType', response.userType ?? 'undefined')
       navigate('/')
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 401) {

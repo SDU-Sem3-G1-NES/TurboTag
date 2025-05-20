@@ -116,6 +116,7 @@ export class ApiConfiguration {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     sessionStorage.removeItem("refreshToken");
+    localStorage.removeItem("userType");
 
     // Redirect to login page - adjust based on your routing setup
     window.location.href = "/login";

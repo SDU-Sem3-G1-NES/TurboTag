@@ -8,7 +8,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LoginController(IUserCredentialService userCredentialService, IAuthenticationService authenticationService, IRefreshTokenService refreshTokenService, IUserService userService) : ControllerBase
+public class LoginController(IUserCredentialService userCredentialService, IAuthenticationService authenticationService, IRefreshTokenService refreshTokenService, IUserService userService, IUserTypeService userTypeService) : ControllerBase
 {
     [HttpPost("UpdateUserCredentials")]
     public ActionResult UpdateUserCredentials([FromBody] UserIdPassword parameters)
@@ -22,6 +22,7 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
     public ActionResult<SignInResponse> Login([FromBody] UserCredentialsDto userCredentials)
     {
         var user = userCredentialService.GetUserByEmail(userCredentials.Email);
+        var userType = userTypeService.GetUserTypeById(user.UserTypeId).Name;
         if (user.Id == 0 || !userCredentialService.ValidateUserCredentials(user.Id, userCredentials.Password)) 
         {
             return Unauthorized("Invalid credentials");
@@ -36,7 +37,7 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
             DateTime.UtcNow.AddDays(15)
         );
         
-        return Ok(new SignInResponse(accessToken, refreshToken, user.Id, user.Name));
+        return Ok(new SignInResponse(accessToken, refreshToken, user.Id, user.Name, userType));
     }
 
     [HttpPost("refresh-token")]
@@ -84,12 +85,13 @@ public class LoginController(IUserCredentialService userCredentialService, IAuth
     }
 }
 
-public class SignInResponse(string accessToken, string refreshToken, int userId, string name)
+public class SignInResponse(string accessToken, string refreshToken, int userId, string name, string userType = "user")
 {
     public string AccessToken { get; set; } = accessToken;
     public string RefreshToken { get; set; } = refreshToken;
     public int UserId { get; set; } = userId;
     public string Name { get; set; } = name;
+    public string UserType { get; set; } = userType;
 }
 
 public class TokenModel(string accessToken, string refreshToken)

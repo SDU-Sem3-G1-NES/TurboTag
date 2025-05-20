@@ -101,6 +101,7 @@ export class ApiConfiguration {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     sessionStorage.removeItem("refreshToken");
+    localStorage.removeItem("userType");
 
     // Redirect to login page - adjust based on your routing setup
     window.location.href = "/login";
@@ -4088,6 +4089,7 @@ export class SignInResponse implements ISignInResponse {
     refreshToken?: string | null;
     userId?: number;
     name?: string | null;
+    userType?: string | null;
 
     constructor(data?: ISignInResponse) {
         if (data) {
@@ -4104,6 +4106,7 @@ export class SignInResponse implements ISignInResponse {
             this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
             this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.userType = _data["userType"] !== undefined ? _data["userType"] : <any>null;
         }
     }
 
@@ -4120,6 +4123,7 @@ export class SignInResponse implements ISignInResponse {
         data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
         data["userId"] = this.userId !== undefined ? this.userId : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["userType"] = this.userType !== undefined ? this.userType : <any>null;
         return data;
     }
 }
@@ -4129,6 +4133,7 @@ export interface ISignInResponse {
     refreshToken?: string | null;
     userId?: number;
     name?: string | null;
+    userType?: string | null;
 }
 
 export class TokenModel implements ITokenModel {
