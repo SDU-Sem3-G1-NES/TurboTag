@@ -38,27 +38,36 @@ def call_ollama(prompt: str, model: str = "gemma:2b") -> str:
 @app.post("/generate-content", response_model=GenerationResponse, tags=["Generation"])
 def generate_content(req: GenerationRequest):
     """
-    Generate tags and description from input text using Ollama gemma:2b model.
+    Generate 5 relevant tags (comma-separated) and a clean description using Ollama gemma:2b model.
     """
     text = req.text.strip()
 
-    tag_prompt = f"""You are an API that only returns a plain, comma-separated list of relevant tags based on the input text. 
-    Do not include any introductory phrases, explanations, or formatting—just the tags.
-    
-    Input text:
-    {text}
-    
-    Output tags:"""
-    
-    desc_prompt = f"""You are an API that only returns a plain, concise, and clear description of the input text. 
-    Do not include any introductory phrases, explanations, or formatting—just the description.
-    
-    Input text:
-    {text}
-    
-    Output description:"""
+    tag_prompt = f"""You are an API that returns exactly 5 most relevant tags from the input text.
+Respond ONLY with a comma-separated list of tags, no bullet points, newlines, or explanations.
 
-    tags = call_ollama(tag_prompt)
-    description = call_ollama(desc_prompt)
+Input text:
+{text}
 
-    return GenerationResponse(tags=tags, description=description)
+Tags:"""
+
+    desc_prompt = f"""You are an API that returns a plain, concise, and clear one-sentence description of the input text.
+Respond ONLY with the description, no explanations or formatting.
+
+Input text:
+{text}
+
+Description:"""
+
+    raw_tags = call_ollama(tag_prompt)
+    raw_description = call_ollama(desc_prompt)
+
+    cleaned_tags = ', '.join(
+        [tag.strip().lstrip("-").strip() for tag in raw_tags.replace("\n", ",").split(",") if tag.strip()]
+    )
+    tag_list = list(dict.fromkeys(cleaned_tags.split(", ")))
+    tag_list = tag_list[:5]  
+    final_tags = ', '.join(tag_list)
+
+    final_description = raw_description.strip()
+
+    return GenerationResponse(tags=final_tags, description=final_description)

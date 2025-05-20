@@ -11,9 +11,8 @@ import {
   UploadChunkDto,
   FinaliseUploadDto, 
   GenerationClient,
-  GenerationResult
 } from '../api/apiClient.ts'
-import { Button, Form, Input, notification, Progress, Upload, UploadProps } from 'antd'
+import { Button, Form, Input, notification, Progress, Upload, UploadProps, Spin } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import TextArea from 'antd/es/input/TextArea'
 
@@ -29,6 +28,7 @@ const UploadPage: React.FC = () => {
   const fileClient = new FileClient()
   const contentGenerationClient = new GenerationClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
+  const [form] = Form.useForm();
 
   const handleFileChange: UploadProps['beforeUpload'] = (file) => {
     setFile(file)
@@ -113,20 +113,21 @@ const UploadPage: React.FC = () => {
   
   const generateContention = async (file: File) => {
     setGenerating(true)
-    const text = "That will be from file analysis" // Placeholder for actual file analysis
+    const text = "One bright morning in Beijing, President Xi Jinping woke up craving something sweet and cold. 'Today,' he declared, 'I want bing chilling!' With great excitement, he summoned his personal chef and requested the finest ice cream in all of China.\n\nHowever, the chef looked worried. 'President Xi, we have run out of milk and sugar!'\n\nDetermined not to be defeated, Xi Jinping put on his casual jacket, sunglasses, and set out on his own to find bing chilling. As he walked through the streets, people gathered and waved, surprised to see their leader casually strolling around.\n\nEventually, he came across a small, colorful ice cream cart with a sign that read 'Bing Chilling – The Coolest Treat in Town!' Behind the cart stood none other than John Cena, holding a cone and speaking fluent Mandarin.\n\n'你想要冰淇淋吗？' John asked with a smile.\n\n'当然!' Xi Jinping replied, laughing.\n\nThey sat on a nearby bench, enjoying their bing chilling together while the crowd snapped selfies and laughed at the surreal moment. That day, the phrase 'Xi Jinping loves bing chilling' went viral across the internet.\n\nFrom that day on, every Sunday became 'Bing Chilling Day' in China, a day where everyone—from top leaders to children—would enjoy ice cream and remember the day diplomacy was served in a cone."
 
     const result = await contentGenerationClient.generate(text);
 
     if (result != null){
       const tagsList = (result.tags ?? "")
-        .split("\n")
-        .map(tag => tag.replace(/^- /, "").trim())
+        .split(",")
+        .map(tag => tag.trim())
         .filter(tag => tag !== "");
 
       setTags(tagsList)
       
       const description = result.description ?? ""
       setDescription(description)
+      form.setFieldsValue({ description });
       
       notification.success({
         message: 'Content Generation successful',
@@ -225,7 +226,10 @@ const UploadPage: React.FC = () => {
 
   return (
     <div className="form-container">
-      <Form layout="vertical" onFinish={handleSubmit}>
+      <Form form={form}
+            layout="vertical" 
+            onFinish={handleSubmit}
+            initialValues={{ description: description }}>
         <Form.Item
           label="Title"
           name="title"
@@ -260,9 +264,6 @@ const UploadPage: React.FC = () => {
         >
           <TextArea
             maxLength={100}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Optional short description"
             disabled
           />
         </Form.Item>
@@ -273,8 +274,8 @@ const UploadPage: React.FC = () => {
         
         <Form.Item label="Content Generation" name="contentGeneration">
           <div className="upload-button-wrapper">
-            {uploading ? (
-              <Progress status="active"/>
+            {generating ? (
+              <Spin tip="Loading..." />
             ) : (
               <Button
                 type="primary"
@@ -282,7 +283,6 @@ const UploadPage: React.FC = () => {
                 icon={<UploadOutlined />}
                 onClick={() => generateContention(file as File)}
               >
-                Generate Content
               </Button>
             )
             }
