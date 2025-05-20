@@ -1989,7 +1989,7 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            addUpload(body?: AddUploadRequestDto | undefined): Promise<number>                    /**
+            addUpload(body?: UploadDto | undefined): Promise<number>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -2272,7 +2272,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        addUpload(body?: AddUploadRequestDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Upload/AddUpload";
+        addUpload(body?: UploadDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Upload/AddUpload";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -3061,46 +3061,6 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
-export class AddUploadRequestDto implements IAddUploadRequestDto {
-    uploadDto?: UploadDto;
-    lessonDto?: LessonDto;
-
-    constructor(data?: IAddUploadRequestDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.uploadDto = _data["uploadDto"] ? UploadDto.fromJS(_data["uploadDto"]) : <any>null;
-            this.lessonDto = _data["lessonDto"] ? LessonDto.fromJS(_data["lessonDto"]) : <any>null;
-        }
-    }
-
-    static fromJS(data: any): AddUploadRequestDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AddUploadRequestDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["uploadDto"] = this.uploadDto ? this.uploadDto.toJSON() : <any>null;
-        data["lessonDto"] = this.lessonDto ? this.lessonDto.toJSON() : <any>null;
-        return data;
-    }
-}
-
-export interface IAddUploadRequestDto {
-    uploadDto?: UploadDto;
-    lessonDto?: LessonDto;
-}
-
 export class FileMetadataDto implements IFileMetadataDto {
     id?: string | null;
     fileType?: string | null;
@@ -3262,7 +3222,7 @@ export interface ILessonDetailsDto {
 
 export class LessonDto implements ILessonDto {
     mongoId?: string | null;
-    uploadId?: number[] | null;
+    uploadId?: number;
     lessonDetails?: LessonDetailsDto;
     fileMetadata?: FileMetadataDto[] | null;
     ownerId?: number | null;
@@ -3280,14 +3240,7 @@ export class LessonDto implements ILessonDto {
     init(_data?: any) {
         if (_data) {
             this.mongoId = _data["mongoId"] !== undefined ? _data["mongoId"] : <any>null;
-            if (Array.isArray(_data["uploadId"])) {
-                this.uploadId = [] as any;
-                for (let item of _data["uploadId"])
-                    this.uploadId!.push(item);
-            }
-            else {
-                this.uploadId = <any>null;
-            }
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
             this.lessonDetails = _data["lessonDetails"] ? LessonDetailsDto.fromJS(_data["lessonDetails"]) : <any>null;
             if (Array.isArray(_data["fileMetadata"])) {
                 this.fileMetadata = [] as any;
@@ -3312,11 +3265,7 @@ export class LessonDto implements ILessonDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["mongoId"] = this.mongoId !== undefined ? this.mongoId : <any>null;
-        if (Array.isArray(this.uploadId)) {
-            data["uploadId"] = [];
-            for (let item of this.uploadId)
-                data["uploadId"].push(item);
-        }
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
         data["lessonDetails"] = this.lessonDetails ? this.lessonDetails.toJSON() : <any>null;
         if (Array.isArray(this.fileMetadata)) {
             data["fileMetadata"] = [];
@@ -3331,7 +3280,7 @@ export class LessonDto implements ILessonDto {
 
 export interface ILessonDto {
     mongoId?: string | null;
-    uploadId?: number[] | null;
+    uploadId?: number;
     lessonDetails?: LessonDetailsDto;
     fileMetadata?: FileMetadataDto[] | null;
     ownerId?: number | null;
