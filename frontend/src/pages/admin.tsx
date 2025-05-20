@@ -1,29 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
-  ContentLibraryClient,
-  LibraryDto,
-  LibraryFilter,
   UserClient,
-  UserDto,
-  UserFilter,
-  UserRequest,
+  ContentLibraryClient,
   UserTypeClient,
-  UserTypeDto
+  UserDto,
+  UserRequest,
+  LibraryDto,
+  UserTypeDto,
+  UserFilter,
+  LibraryFilter
 } from '../api/apiClient.ts'
 import {
-  Button,
-  Form,
-  Input,
   Layout,
   Menu,
-  MenuProps,
-  message,
+  Table,
+  Button,
   Modal,
   notification,
+  Form,
+  Input,
   Select,
-  Table
+  MenuProps
 } from 'antd'
-import { DeleteOutlined, EditOutlined, FolderAddOutlined, UserAddOutlined } from '@ant-design/icons'
+import { UserAddOutlined, FolderAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 const { Sider, Content } = Layout
 
@@ -71,30 +70,32 @@ const AdminPage: React.FC = () => {
         const items = Array.isArray(types) ? types : types?.items || []
         setUserTypes(items)
       } catch {
-        message.error('Failed to fetch user types')
+        notification.error({
+          message: 'Error',
+          description: 'Error fetching user types',
+          placement: 'topRight',
+          duration: 2
+        })
       }
     }
     fetchUserTypes()
   }, [userTypeClient])
 
   useEffect(() => {
-    const fetchAllLibraries = async () => {
-      try {
-        const filter = new LibraryFilter()
-        const result = await contentLibraryClient.getAllLibraries(filter)
-        const items = Array.isArray(result) ? result : result?.items || []
-        setAllLibraries(items)
-      } catch {
-        // handle error if needed
-      }
-    }
     fetchAllLibraries()
   }, [])
 
   useEffect(() => {
-    if (activeSection === 'users') fetchUsers(userPage)
-    if (activeSection === 'libraries') fetchLibraries(libraryPage)
-  }, [activeSection, userPage, libraryPage])
+    if (activeSection === 'users') {
+      fetchUsers(userPage, userPageSize)
+    }
+  }, [activeSection, userPage, userPageSize])
+
+  useEffect(() => {
+    if (activeSection === 'libraries') {
+      fetchLibraries(libraryPage, libraryPageSize)
+    }
+  }, [activeSection, libraryPage, libraryPageSize])
 
   const fetchUsers = async (page = 1, pageSize = userPageSize) => {
     try {
@@ -144,17 +145,21 @@ const AdminPage: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    if (activeSection === 'users') {
-      fetchUsers(userPage, userPageSize)
+  const fetchAllLibraries = async () => {
+    try {
+      const filter = new LibraryFilter()
+      const result = await contentLibraryClient.getAllLibraries(filter)
+      const items = Array.isArray(result) ? result : result?.items || []
+      setAllLibraries(items)
+    } catch {
+      notification.error({
+        message: 'Error',
+        description: 'Error fetching libraries',
+        placement: 'topRight',
+        duration: 2
+      })
     }
-  }, [activeSection, userPage, userPageSize])
-
-  useEffect(() => {
-    if (activeSection === 'libraries') {
-      fetchLibraries(libraryPage, libraryPageSize)
-    }
-  }, [activeSection, libraryPage, libraryPageSize])
+  }
 
   const handleAddUser = () => {
     addUserForm.resetFields()
@@ -164,18 +169,15 @@ const AdminPage: React.FC = () => {
   const handleAddUserSubmit = async () => {
     try {
       const values = await addUserForm.validateFields()
-      console.log('Form values:', values) // Log form values for debugging
 
       const { password, ...userFields } = values
       const request = new UserRequest()
-      request.user = { ...userFields } // Convert to a plain object
+      request.user = { ...userFields }
       request.password = password
-
-      console.log('Request payload:', request) // Log request payload
 
       await userClient.createNewUser({
         ...request,
-        user: { ...request.user } // Ensure `user` is a plain object
+        user: { ...request.user }
       })
       notification.success({
         message: 'Success',
@@ -186,8 +188,7 @@ const AdminPage: React.FC = () => {
 
       setIsAddUserModalVisible(false)
       await fetchUsers(userPage)
-    } catch (error) {
-      console.error('Error adding user:', error) // Log error details
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to add user',
@@ -284,6 +285,7 @@ const AdminPage: React.FC = () => {
       })
       setIsAddLibraryModalVisible(false)
       await fetchLibraries(libraryPage)
+      await fetchAllLibraries()
     } catch {
       notification.error({
         message: 'Error',
@@ -314,6 +316,7 @@ const AdminPage: React.FC = () => {
         })
         setIsEditLibraryModalVisible(false)
         await fetchLibraries(libraryPage)
+        await fetchAllLibraries()
       }
     } catch {
       notification.error({
@@ -342,6 +345,7 @@ const AdminPage: React.FC = () => {
             duration: 2
           })
           await fetchLibraries(libraryPage)
+          await fetchAllLibraries()
         } catch {
           notification.error({
             message: 'Error',
@@ -359,7 +363,7 @@ const AdminPage: React.FC = () => {
     { key: 'libraries', label: 'Libraries' }
   ]
 
-  const userColumns = [
+  const userColumns: ColumnType<UserDto>[] = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
     { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
     { title: 'Email', dataIndex: 'email', key: 'email', width: 200 },
@@ -388,7 +392,7 @@ const AdminPage: React.FC = () => {
     }
   ]
 
-  const libraryColumns = [
+  const libraryColumns: ColumnType<LibraryDto>[] = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
     { title: 'Name', dataIndex: 'name', key: 'name', width: 200 },
     {
@@ -487,10 +491,7 @@ const AdminPage: React.FC = () => {
                     name="email"
                     label="Email"
                     rules={[
-                      {
-                        required: true,
-                        message: 'Email is required'
-                      },
+                      { required: true, message: 'Email is required' },
                       { type: 'email', message: 'Please enter a valid email address' }
                     ]}
                   >
@@ -499,24 +500,14 @@ const AdminPage: React.FC = () => {
                   <Form.Item
                     name="password"
                     label="Password"
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Password is required'
-                      }
-                    ]}
+                    rules={[{ required: true, message: 'Password is required' }]}
                   >
                     <Input.Password />
                   </Form.Item>
                   <Form.Item
                     name="userTypeId"
                     label="User Type"
-                    rules={[
-                      {
-                        required: true,
-                        message: 'User type is required'
-                      }
-                    ]}
+                    rules={[{ required: true, message: 'User type is required' }]}
                   >
                     <Select placeholder="Select user type">
                       {userTypes.map((type) => (
@@ -563,10 +554,7 @@ const AdminPage: React.FC = () => {
                     name="email"
                     label="Email"
                     rules={[
-                      {
-                        required: true,
-                        message: 'Email is required'
-                      },
+                      { required: true, message: 'Email is required' },
                       { type: 'email', message: 'Please enter a valid email address' }
                     ]}
                   >
@@ -578,12 +566,7 @@ const AdminPage: React.FC = () => {
                   <Form.Item
                     name="userTypeId"
                     label="User Type"
-                    rules={[
-                      {
-                        required: true,
-                        message: 'User type is required'
-                      }
-                    ]}
+                    rules={[{ required: true, message: 'User type is required' }]}
                   >
                     <Select placeholder="Select user type">
                       {userTypes.map((type) => (
