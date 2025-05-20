@@ -38,29 +38,15 @@ export const useHomePageState = () => {
 
     try {
       const [all] = await Promise.all([lessonClient.getAllLessons(filter)])
-
       const [starred] = await Promise.all([lessonClient.getAllLessons(starredFilter)])
 
       const allList = Array.isArray(all) ? all : (all?.items ?? [])
       const starredList = Array.isArray(starred) ? starred : (starred?.items ?? [])
 
-      const itemsPerRow = 2
+      const maxDisplay = 4
 
-      let maxItems: number
-
-      if (allList.length === 0 || starredList.length === 0) {
-        // If either is empty, no need to trim both to zero
-        maxItems = Math.max(allList.length, starredList.length)
-      } else {
-        const numRows = Math.min(
-          Math.ceil(allList.length / itemsPerRow),
-          Math.ceil(starredList.length / itemsPerRow)
-        )
-        maxItems = numRows * itemsPerRow
-      }
-
-      setOwnerLessons(allList.slice(0, maxItems))
-      setStarredLessons(starredList.slice(0, maxItems))
+      setOwnerLessons(allList.slice(0, maxDisplay))
+      setStarredLessons(starredList.slice(0, maxDisplay))
     } catch (error) {
       console.error('Error fetching lesson data:', error)
     } finally {
