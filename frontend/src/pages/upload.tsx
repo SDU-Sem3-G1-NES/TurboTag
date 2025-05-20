@@ -113,7 +113,7 @@ const UploadPage: React.FC = () => {
     return fileId
   }
   
-  const generateContention = async (file: File) => {
+  const generateContention = async (/*file: File*/) => {
     setGenerating(true)
     const text = "One bright morning in Beijing, President Xi Jinping woke up craving something sweet and cold. 'Today,' he declared, 'I want bing chilling!' With great excitement, he summoned his personal chef and requested the finest ice cream in all of China.\n\nHowever, the chef looked worried. 'President Xi, we have run out of milk and sugar!'\n\nDetermined not to be defeated, Xi Jinping put on his casual jacket, sunglasses, and set out on his own to find bing chilling. As he walked through the streets, people gathered and waved, surprised to see their leader casually strolling around.\n\nEventually, he came across a small, colorful ice cream cart with a sign that read 'Bing Chilling – The Coolest Treat in Town!' Behind the cart stood none other than John Cena, holding a cone and speaking fluent Mandarin.\n\n'你想要冰淇淋吗？' John asked with a smile.\n\n'当然!' Xi Jinping replied, laughing.\n\nThey sat on a nearby bench, enjoying their bing chilling together while the crowd snapped selfies and laughed at the surreal moment. That day, the phrase 'Xi Jinping loves bing chilling' went viral across the internet.\n\nFrom that day on, every Sunday became 'Bing Chilling Day' in China, a day where everyone—from top leaders to children—would enjoy ice cream and remember the day diplomacy was served in a cone."
 
@@ -279,12 +279,15 @@ const UploadPage: React.FC = () => {
             {generating ? (
               <Spin tip="Loading..." />
             ) : (
+              //Need to put it in generateContention function after implentation of mp3 to text 
+              /*file as File*/
               <Button
                 type="primary"
                 className="upload-btn"
                 icon={<UploadOutlined />}
-                onClick={() => generateContention(file as File)}
+                onClick={() => generateContention()}
               >
+                
               </Button>
             )
             }
