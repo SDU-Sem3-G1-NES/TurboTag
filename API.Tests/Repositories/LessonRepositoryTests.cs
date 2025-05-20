@@ -47,7 +47,7 @@ namespace API.Tests.Repositories
                     1
                 )
             };
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", "{}")).Returns(lessons);
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", "{}", null, null)).Returns(lessons);
 
             // Act
             var result = _repository.GetAllLessons();
@@ -71,7 +71,7 @@ namespace API.Tests.Repositories
                 )
             };
             var filter = $"{{\"lesson_details.tags\": {{$all: [{string.Join(",", tags.Select(tag => $"\"{tag}\""))}]}}}}";
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", filter)).Returns(lessons);
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", filter, null, null)).Returns(lessons);
 
             // Act
             var result = _repository.GetLessonsByTags(tags);
@@ -95,7 +95,7 @@ namespace API.Tests.Repositories
                 )
             };
             var filter = $"{{\"lesson_details.title\": {{$regex: \"{title}\", $options: \"i\"}}}}";
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", filter)).Returns(lessons);
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", filter, null, null)).Returns(lessons);
 
             // Act
             var result = _repository.GetLessonsByTitle(title);
@@ -115,7 +115,7 @@ namespace API.Tests.Repositories
                 new List<FileMetadataDto>(),
                 1
             ) { MongoId = objectId };
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}")).Returns(new List<LessonDto> { lesson });
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}", null, null)).Returns(new List<LessonDto> { lesson });
 
             // Act
             var result = _repository.GetLessonByObjectId(objectId);
@@ -134,7 +134,7 @@ namespace API.Tests.Repositories
                 new List<FileMetadataDto>(),
                 1
             );
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {lessonId}}}")).Returns(new List<LessonDto> { lesson });
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {lessonId}}}", null, null)).Returns(new List<LessonDto> { lesson });
 
             // Act
             var result = _repository.GetLessonById(lessonId);
@@ -148,8 +148,8 @@ namespace API.Tests.Repositories
         {
             // Arrange
             var invalidLessonId = "-1";
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {invalidLessonId}}}")).Returns(new List<LessonDto>());
-            
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{\"lesson_details._id\": {invalidLessonId}}}", null, null)).Returns(new List<LessonDto>());
+
             // Act
             var result = _repository.GetLessonById(-1);
 
@@ -168,7 +168,7 @@ namespace API.Tests.Repositories
                 new List<FileMetadataDto>(),
                 1
             );
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{upload_id: {uploadId}}}")).Returns(new List<LessonDto> { lesson });
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{upload_id: {uploadId}}}", null, null)).Returns(new List<LessonDto> { lesson });
 
             // Act
             var result = _repository.GetLessonByUploadId(uploadId);
@@ -182,7 +182,7 @@ namespace API.Tests.Repositories
         {
             // Arrange
             var invalidUploadId = -1;
-            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{upload_id: {invalidUploadId}}}")).Returns(new List<LessonDto>());
+            _mockDb.Setup(db => db.Find<LessonDto>("lesson", $"{{upload_id: {invalidUploadId}}}", null, null)).Returns(new List<LessonDto>());
 
             // Act
             var result = _repository.GetLessonByUploadId(invalidUploadId);
@@ -190,7 +190,7 @@ namespace API.Tests.Repositories
             // Assert
             Assert.Null(result);
         }
-        
+
         [Fact]
         public void GetLessonByObjectId_ReturnsNullForInvalidObjectId()
         {

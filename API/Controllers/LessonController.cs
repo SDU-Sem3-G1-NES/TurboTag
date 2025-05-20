@@ -1,18 +1,20 @@
 using API.DTOs;
+using API.Repositories;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize]
 [ApiController]
-
 [Route("[controller]")]
 public class LessonController(ILessonService lessonService) : ControllerBase
 {
-    [HttpGet("GetAllLessons")]
-    public ActionResult<IEnumerable<LessonDto>> GetAllLessons()
+    [HttpPost("GetAllLessons")]
+    public ActionResult<IEnumerable<LessonDto>> GetAllLessons([FromBody] LessonFilter? filter)
     {
-        return Ok(lessonService.GetAllLessons());
+        return Ok(lessonService.GetAllLessons(filter));
     }
     
     [HttpGet("GetLessonsByTags")]

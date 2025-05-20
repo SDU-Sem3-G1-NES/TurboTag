@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 
 CREATE TABLE IF NOT EXISTS libraries (
     library_id SERIAL PRIMARY KEY,
-    library_name VARCHAR(255) NOT NULL
+    library_name VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS uploads (
@@ -69,6 +69,11 @@ CREATE TABLE IF NOT EXISTS user_credentials (
     PRIMARY KEY (user_id)
 );
 
+CREATE TABLE IF NOT EXISTS "refresh_tokens" (
+    user_id SERIAL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    expiry TIMESTAMP NOT NULL
+    );
 
 -- Insert default data into tables
 

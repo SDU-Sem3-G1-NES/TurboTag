@@ -1,10 +1,12 @@
 using API.DTOs;
 using API.Services;
 using API.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UploadController(IUploadService uploadService, ILessonService lessonService) : ControllerBase
