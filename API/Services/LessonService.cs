@@ -17,7 +17,10 @@ public interface ILessonService : IServiceBase
     void DeleteLessonByObjectId(string objectId);
 }
 
-public class LessonService(ILessonRepository lessonRepository, IUserRepository userRepository) : ILessonService
+public class LessonService(
+    ILessonRepository lessonRepository,
+    IUserRepository userRepository,
+    IUploadRepository uploadRepository) : ILessonService
 {
     public void AddLesson(LessonDto lesson)
     {
@@ -26,7 +29,7 @@ public class LessonService(ILessonRepository lessonRepository, IUserRepository u
 
     public List<LessonDto> GetAllLessons(LessonFilter? filter)
     {
-        return AddOwners(lessonRepository.GetAllLessons(filter));
+        return AddOwners(lessonRepository.GetAllLessons(AddStarredLessonsToFilter(filter)));
     }
 
     public List<LessonDto> GetLessonsByTags(string[] tags)
@@ -97,5 +100,12 @@ public class LessonService(ILessonRepository lessonRepository, IUserRepository u
             }
 
         return lessons;
+    }
+
+    private LessonFilter? AddStarredLessonsToFilter(LessonFilter? filter)
+    {
+        if (filter?.UserId == null || filter.IsStarred == null || (bool)!filter.IsStarred) return filter;
+        filter.StarredLessons = uploadRepository.GetStarredUploads(filter.UserId.Value);
+        return filter;
     }
 }

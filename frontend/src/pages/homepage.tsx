@@ -5,18 +5,44 @@ import LibraryItem from '../components/library/libraryItem'
 import { useHomePageState } from './hooks/useHomepageState'
 
 const HomePage: React.FC = () => {
-  const { ownerLessons, loading, search, setSearch, handleSearch } = useHomePageState()
+  const { ownerLessons, starredLessons, loading, search, setSearch, handleSearch } =
+    useHomePageState()
+
+  const renderSection = (title: string, lessons: typeof ownerLessons) => (
+    <>
+      <Row gutter={[16, 16]} style={{ width: '75%' }}>
+        <Col span={24}>
+          <h1 style={{ textAlign: 'left' }}>{title}</h1>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]} style={{ width: '75%' }}>
+        {lessons.map((lesson) => (
+          <Col key={lesson.mongoId} span={12}>
+            <LibraryItem lesson={lesson} />
+          </Col>
+        ))}
+      </Row>
+    </>
+  )
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        overflow: 'hidden' // No scroll
+      }}>
       <Input.Search
         placeholder="Search by title or description"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        onSearch={(value) => handleSearch(value)} // when user presses Enter or clicks icon
+        onSearch={(value) => handleSearch(value)}
         style={{ width: '50%', marginBottom: 24 }}
         allowClear
       />
+
       {loading ? (
         <Spin
           indicator={<LoadingOutlined />}
@@ -25,18 +51,8 @@ const HomePage: React.FC = () => {
         />
       ) : (
         <>
-          <Row gutter={[16, 16]} style={{ width: '75%' }}>
-            <Col span={24}>
-              <h1 style={{ textAlign: 'left' }}>Your Uploads</h1>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]} style={{ width: '75%' }}>
-            {ownerLessons.map((lesson) => (
-              <Col key={lesson.mongoId} span={12}>
-                <LibraryItem lesson={lesson} />
-              </Col>
-            ))}
-          </Row>
+          {renderSection('Your Uploads', ownerLessons)}
+          {renderSection('Starred Uploads', starredLessons)}
         </>
       )}
     </div>

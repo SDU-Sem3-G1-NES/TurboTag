@@ -9,13 +9,13 @@ public class LessonDto
 {
     public LessonDto()
     {
-        UploadId = new List<int>();
+        UploadId = 0;
         LessonDetails = new LessonDetailsDto();
         FileMetadata = new List<FileMetadataDto>();
     }
 
     [method: JsonConstructor]
-    public LessonDto(List<int>? uploadId, LessonDetailsDto? lessonDetails, List<FileMetadataDto>? fileMetadata,
+    public LessonDto(int? uploadId, LessonDetailsDto? lessonDetails, List<FileMetadataDto>? fileMetadata,
         int? ownerId)
     {
         UploadId = uploadId;
@@ -28,7 +28,7 @@ public class LessonDto
     [BsonRepresentation(BsonType.ObjectId)]
     public string? MongoId { get; set; }
 
-    [BsonElement("upload_id")] public List<int>? UploadId { get; set; }
+    [BsonElement("upload_id")] public int? UploadId { get; set; }
 
     [BsonElement("lesson_details")] public LessonDetailsDto? LessonDetails { get; set; }
 

@@ -1818,11 +1818,8 @@
             "nullable": true
           },
           "uploadId": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "lessonDetails": {
@@ -1866,6 +1863,11 @@
             "format": "int32",
             "nullable": true
           },
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "uploadIds": {
             "type": "array",
             "items": {
@@ -1891,6 +1893,18 @@
           },
           "searchText": {
             "type": "string",
+            "nullable": true
+          },
+          "isStarred": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "starredLessons": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
             "nullable": true
           }
         },

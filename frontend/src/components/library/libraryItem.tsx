@@ -1,9 +1,9 @@
 import React from 'react'
 import { Card, Image, Tag, Typography } from 'antd'
-import { LessonDtoWithOwnerName } from '../../pages/library'
+import { LessonDto } from '../../api/apiClient'
 
 interface LibraryItemProps {
-  lesson: LessonDtoWithOwnerName
+  lesson: LessonDto
 }
 
 const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
@@ -17,8 +17,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
       hoverable
       style={{
         margin: 8
-      }}
-    >
+      }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <Image
           src="https://placehold.co/100x100"
@@ -50,13 +49,11 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
           </div>
           <div>
             <Typography.Text
-              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}
-            >
+              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}>
               {'Uploaded by ' + lesson.ownerName}
             </Typography.Text>
             <Typography.Text
-              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}
-            >
+              style={{ fontSize: 10, fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.45)' }}>
               {lesson.fileMetadata?.[0]?.date
                 ? '  at ' +
                   new Date(lesson.fileMetadata[0].date).toLocaleString('da-DK', {
