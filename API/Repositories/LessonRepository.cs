@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Api.Controllers;
 using API.DataAccess;
 using API.DTOs;
 using MongoDB.Bson;
@@ -17,6 +18,8 @@ public interface ILessonRepository : IRepositoryBase
     void UpdateLesson(LessonDto lesson);
     void DeleteLessonById(int lessonId);
     void DeleteLessonByObjectId(string objectId);
+
+    Dictionary<string, int[]> TagOptions(TagOptionsFilter filter);
 }
 
 public class LessonRepository(IMongoDataAccess database) : ILessonRepository
@@ -147,6 +150,59 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
         }
 
         database.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
+    }
+
+    public Dictionary<string, int[]> TagOptions(TagOptionsFilter filter)
+    {
+        var queryParts = new List<string>();
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+        {
+            var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
+            queryParts.Add(
+                $@"{{""lesson_details.tags"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}");
+        }
+
+        var filterString = queryParts.Count switch
+        {
+            0 => "{}",
+            1 => queryParts[0],
+            _ => $"{{ \"$and\": [{string.Join(",", queryParts)}] }}"
+        };
+
+        var lessons = database.Find<BsonDocument>("lesson", filterString);
+
+        var tagUploads = new Dictionary<string, HashSet<int>>();
+
+        foreach (var lesson in lessons)
+        {
+            if (!lesson.Contains("lesson_details") || !lesson.Contains("upload_id"))
+                continue;
+
+            var lessonDetails = lesson["lesson_details"].AsBsonDocument;
+            var uploadId = lesson["upload_id"].AsInt32;
+
+            if (!lessonDetails.Contains("tags"))
+                continue;
+
+            var tagsArray = lessonDetails["tags"].AsBsonArray;
+
+            foreach (var tagValue in tagsArray)
+            {
+                var tag = tagValue.AsString;
+
+                if (!string.IsNullOrEmpty(filter.SearchText) &&
+                    !tag.Contains(filter.SearchText, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (!tagUploads.ContainsKey(tag))
+                    tagUploads[tag] = new HashSet<int>();
+
+                tagUploads[tag].Add(uploadId);
+            }
+        }
+
+        return tagUploads.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray());
     }
 }
 

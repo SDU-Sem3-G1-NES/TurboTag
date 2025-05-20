@@ -1,3 +1,4 @@
+using Api.Controllers;
 using API.DTOs;
 using API.Repositories;
 
@@ -17,6 +18,7 @@ public interface ILessonService : IServiceBase
     void DeleteLessonByObjectId(string objectId);
     void StarLesson(int lessonId, int userId);
     void UnstarLesson(int lessonId, int userId);
+    Dictionary<string, int[]> TagOptions(TagOptionsFilter filter);
 }
 
 internal class LessonService(
@@ -92,6 +94,11 @@ internal class LessonService(
     public void UnstarLesson(int lessonId, int userId)
     {
         uploadRepository.UnstarUpload(lessonId, userId);
+    }
+
+    public Dictionary<string, int[]> TagOptions(TagOptionsFilter filter)
+    {
+        return lessonRepository.TagOptions(filter);
     }
 
     private List<LessonDto> AddOwnersAndStars(List<LessonDto> lessons, LessonFilter? filter = null)
