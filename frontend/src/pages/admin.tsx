@@ -264,6 +264,7 @@ const AdminPage: React.FC = () => {
       });
       setIsAddLibraryModalVisible(false);
       await fetchLibraries(libraryPage);
+      await fetchAllLibraries();
     } catch {
       notification.error({
         message: 'Error',
