@@ -11,6 +11,7 @@ export const useHomePageState = () => {
 
   const [filterValues, setFilterValues] = useState<Partial<LessonFilter>>({
     ownerId,
+    userId: ownerId,
     searchText: ''
   })
 
@@ -36,10 +37,9 @@ export const useHomePageState = () => {
     console.log('Loading lessons with filters:', filter, starredFilter)
 
     try {
-      const [all, starred] = await Promise.all([
-        lessonClient.getAllLessons(filter),
-        lessonClient.getAllLessons(starredFilter)
-      ])
+      const [all] = await Promise.all([lessonClient.getAllLessons(filter)])
+
+      const [starred] = await Promise.all([lessonClient.getAllLessons(starredFilter)])
 
       const allList = Array.isArray(all) ? all : (all?.items ?? [])
       const starredList = Array.isArray(starred) ? starred : (starred?.items ?? [])
@@ -100,6 +100,7 @@ export const useHomePageState = () => {
     loading,
     search,
     setSearch,
-    handleSearch
+    handleSearch,
+    reload: loadLessons
   }
 }

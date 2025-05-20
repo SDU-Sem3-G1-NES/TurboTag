@@ -809,6 +809,16 @@ url_ = url_.replace(/[?&]$/, "");
              * @return OK
              */
             getAllLessons(body?: LessonFilter | undefined): Promise<PagedResult<LessonDto> | LessonDto[]>                    /**
+             * @param userId (optional) 
+             * @param body (optional) 
+             * @return OK
+             */
+            starLesson(userId?: number | undefined, body?: number | undefined): Promise<void>                    /**
+             * @param userId (optional) 
+             * @param body (optional) 
+             * @return OK
+             */
+            unstarLesson(userId?: number | undefined, body?: number | undefined): Promise<void>                    /**
              * @param tags (optional) 
              * @return OK
              */
@@ -920,6 +930,118 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<PagedResult<LessonDto> | LessonDto[]>(null as any);
+}
+    
+
+        /**
+         * @param userId (optional) 
+         * @param body (optional) 
+         * @return OK
+         */
+        starLesson(userId?: number | undefined, body?: number | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/StarLesson?";
+if (userId === null)
+    throw new Error("The parameter 'userId' cannot be null.");
+else if (userId !== undefined)
+    url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processStarLesson(_response);
+                });
+        }
+
+    protected processStarLesson(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param userId (optional) 
+         * @param body (optional) 
+         * @return OK
+         */
+        unstarLesson(userId?: number | undefined, body?: number | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/UnstarLesson?";
+if (userId === null)
+    throw new Error("The parameter 'userId' cannot be null.");
+else if (userId !== undefined)
+    url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processUnstarLesson(_response);
+                });
+        }
+
+    protected processUnstarLesson(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
 }
     
 
@@ -3267,6 +3389,7 @@ export class LessonDto implements ILessonDto {
     fileMetadata?: FileMetadataDto[] | null;
     ownerId?: number | null;
     ownerName?: string | null;
+    isStarred?: boolean;
 
     constructor(data?: ILessonDto) {
         if (data) {
@@ -3292,6 +3415,7 @@ export class LessonDto implements ILessonDto {
             }
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
             this.ownerName = _data["ownerName"] !== undefined ? _data["ownerName"] : <any>null;
+            this.isStarred = _data["isStarred"] !== undefined ? _data["isStarred"] : <any>null;
         }
     }
 
@@ -3314,6 +3438,7 @@ export class LessonDto implements ILessonDto {
         }
         data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
         data["ownerName"] = this.ownerName !== undefined ? this.ownerName : <any>null;
+        data["isStarred"] = this.isStarred !== undefined ? this.isStarred : <any>null;
         return data;
     }
 }
@@ -3325,6 +3450,7 @@ export interface ILessonDto {
     fileMetadata?: FileMetadataDto[] | null;
     ownerId?: number | null;
     ownerName?: string | null;
+    isStarred?: boolean;
 }
 
 export class LessonFilter implements ILessonFilter {

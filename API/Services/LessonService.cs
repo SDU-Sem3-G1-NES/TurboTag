@@ -15,9 +15,11 @@ public interface ILessonService : IServiceBase
     void UpdateLesson(LessonDto lesson);
     void DeleteLessonById(int uploadId);
     void DeleteLessonByObjectId(string objectId);
+    void StarLesson(int lessonId, int userId);
+    void UnstarLesson(int lessonId, int userId);
 }
 
-public class LessonService(
+internal class LessonService(
     ILessonRepository lessonRepository,
     IUserRepository userRepository,
     IUploadRepository uploadRepository) : ILessonService
@@ -29,17 +31,17 @@ public class LessonService(
 
     public List<LessonDto> GetAllLessons(LessonFilter? filter)
     {
-        return AddOwners(lessonRepository.GetAllLessons(AddStarredLessonsToFilter(filter)));
+        return AddOwnersAndStars(lessonRepository.GetAllLessons(AddStarredLessonsToFilter(filter)), filter);
     }
 
     public List<LessonDto> GetLessonsByTags(string[] tags)
     {
-        return AddOwners(lessonRepository.GetLessonsByTags(tags));
+        return AddOwnersAndStars(lessonRepository.GetLessonsByTags(tags));
     }
 
     public List<LessonDto> GetLessonsByTitle(string title)
     {
-        return AddOwners(lessonRepository.GetLessonsByTitle(title));
+        return AddOwnersAndStars(lessonRepository.GetLessonsByTitle(title));
     }
 
     public LessonDto? GetLessonById(int lessonId)
@@ -47,7 +49,7 @@ public class LessonService(
         var lesson = lessonRepository.GetLessonById(lessonId);
         if (lesson is null) return null;
 
-        return AddOwners([lesson]).FirstOrDefault();
+        return AddOwnersAndStars([lesson]).FirstOrDefault();
     }
 
     public LessonDto? GetLessonByUploadId(int uploadId)
@@ -55,7 +57,7 @@ public class LessonService(
         var lesson = lessonRepository.GetLessonByUploadId(uploadId);
         if (lesson is null) return null;
 
-        return AddOwners([lesson]).FirstOrDefault();
+        return AddOwnersAndStars([lesson]).FirstOrDefault();
     }
 
     public LessonDto? GetLessonByObjectId(string objectId)
@@ -63,7 +65,7 @@ public class LessonService(
         var lesson = lessonRepository.GetLessonByObjectId(objectId);
         if (lesson is null) return null;
 
-        return AddOwners([lesson]).FirstOrDefault();
+        return AddOwnersAndStars([lesson]).FirstOrDefault();
     }
 
 
@@ -82,7 +84,17 @@ public class LessonService(
         lessonRepository.DeleteLessonByObjectId(objectId);
     }
 
-    private List<LessonDto> AddOwners(List<LessonDto> lessons)
+    public void StarLesson(int lessonId, int userId)
+    {
+        uploadRepository.StarUpload(lessonId, userId);
+    }
+
+    public void UnstarLesson(int lessonId, int userId)
+    {
+        uploadRepository.UnstarUpload(lessonId, userId);
+    }
+
+    private List<LessonDto> AddOwnersAndStars(List<LessonDto> lessons, LessonFilter? filter = null)
     {
         var ownerIds = lessons
             .Select(l => l.OwnerId)
@@ -98,6 +110,20 @@ public class LessonService(
                 var owner = ownerNames.FirstOrDefault(u => u.Id == lesson.OwnerId.Value);
                 lesson.OwnerName = owner?.Name;
             }
+
+        if (filter?.UserId == null) return lessons;
+
+        var starredLessons = uploadRepository.GetStarredUploads(filter.UserId.Value);
+        if ((starredLessons == null || starredLessons.Length == 0) &&
+            (filter.IsStarred == null || (bool)!filter.IsStarred)) return lessons;
+
+        foreach (var lesson in lessons)
+            if (lesson.UploadId.HasValue)
+                if (starredLessons != null)
+                    lesson.IsStarred = starredLessons.Any(u => u == lesson.UploadId.Value);
+
+        if (filter.IsStarred == null || (bool)!filter.IsStarred) return lessons;
+        lessons = lessons.Where(l => l.IsStarred).ToList();
 
         return lessons;
     }

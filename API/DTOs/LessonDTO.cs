@@ -16,12 +16,13 @@ public class LessonDto
 
     [method: JsonConstructor]
     public LessonDto(int? uploadId, LessonDetailsDto? lessonDetails, List<FileMetadataDto>? fileMetadata,
-        int? ownerId)
+        int? ownerId, bool isStarred = false)
     {
         UploadId = uploadId;
         LessonDetails = lessonDetails;
         FileMetadata = fileMetadata;
         OwnerId = ownerId;
+        IsStarred = isStarred;
     }
 
     [BsonId]
@@ -37,6 +38,7 @@ public class LessonDto
     [BsonElement("owner_id")] public int? OwnerId { get; set; }
 
     public string? OwnerName { get; set; }
+    public bool IsStarred { get; set; }
 
     public void GenerateMongoId()
     {

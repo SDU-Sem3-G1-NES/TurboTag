@@ -1,11 +1,11 @@
 import React from 'react'
 import { Col, Input, Row, Spin } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
-import LibraryItem from '../components/library/libraryItem'
 import { useHomePageState } from './hooks/useHomepageState'
+import LessonCard from '../components/lessonCard'
 
 const HomePage: React.FC = () => {
-  const { ownerLessons, starredLessons, loading, search, setSearch, handleSearch } =
+  const { ownerLessons, starredLessons, loading, search, setSearch, handleSearch, reload } =
     useHomePageState()
 
   const renderSection = (title: string, lessons: typeof ownerLessons) => (
@@ -18,7 +18,7 @@ const HomePage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ width: '75%' }}>
         {lessons.map((lesson) => (
           <Col key={lesson.mongoId} span={12}>
-            <LibraryItem lesson={lesson} />
+            <LessonCard lesson={lesson} onStarToggled={reload} />
           </Col>
         ))}
       </Row>

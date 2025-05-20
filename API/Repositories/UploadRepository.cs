@@ -11,6 +11,8 @@ public interface IUploadRepository : IRepositoryBase
     void UpdateUpload(UploadDto upload);
     void DeleteUploadById(int uploadId);
     int[]? GetStarredUploads(int userId);
+    void StarUpload(int uploadId, int userId);
+    void UnstarUpload(int uploadId, int userId);
 }
 
 public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
@@ -259,6 +261,36 @@ public class UploadRepository(ISqlDbAccess sqlDbAccess) : IUploadRepository
             "",
             "",
             parameters).ToArray();
+    }
+
+    public void StarUpload(int uploadId, int userId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "@uploadId", uploadId },
+            { "@userId", userId }
+        };
+
+        var sql = @"
+            INSERT INTO starred_uploads (upload_id, user_id)
+            VALUES (@uploadId, @userId)";
+
+        sqlDbAccess.ExecuteNonQuery(_databaseName, sql, parameters);
+    }
+
+    public void UnstarUpload(int uploadId, int userId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "@uploadId", uploadId },
+            { "@userId", userId }
+        };
+
+        var sql = @"
+            DELETE FROM starred_uploads
+            WHERE upload_id = @uploadId AND user_id = @userId";
+
+        sqlDbAccess.ExecuteNonQuery(_databaseName, sql, parameters);
     }
 }
 

@@ -16,37 +16,46 @@ public class LessonController(ILessonService lessonService) : ControllerBase
     {
         return Ok(lessonService.GetAllLessons(filter));
     }
-    
+
+    [HttpPost("StarLesson")]
+    public ActionResult StarLesson([FromBody] int lessonId, int userId)
+    {
+        lessonService.StarLesson(lessonId, userId);
+        return Ok();
+    }
+
+    [HttpPost("UnstarLesson")]
+    public ActionResult UnstarLesson([FromBody] int lessonId, int userId)
+    {
+        lessonService.UnstarLesson(lessonId, userId);
+        return Ok();
+    }
+
     [HttpGet("GetLessonsByTags")]
     public ActionResult<IEnumerable<LessonDto>> GetLessonsByTags([FromQuery] string[] tags)
     {
         return Ok(lessonService.GetLessonsByTags(tags));
     }
-    
+
     [HttpGet("GetLessonsByTitle")]
     public ActionResult<IEnumerable<LessonDto>> GetLessonsByTitle(string title)
     {
         return Ok(lessonService.GetLessonsByTitle(title));
     }
+
     [HttpGet("GetLessonById")]
     public ActionResult<LessonDto> GetLessonById(int lessonId)
     {
         var result = lessonService.GetLessonById(lessonId);
-        if (result == null)
-        {
-            return NotFound();
-        }
+        if (result == null) return NotFound();
         return Ok(result);
     }
-    
+
     [HttpGet("GetLessonByObjectId")]
     public ActionResult<LessonDto> GetLessonByObjectId(string objectId)
     {
         var result = lessonService.GetLessonByObjectId(objectId);
-        if (result == null)
-        {
-            return NotFound();
-        }
+        if (result == null) return NotFound();
         return Ok(result);
     }
 
@@ -54,10 +63,7 @@ public class LessonController(ILessonService lessonService) : ControllerBase
     public ActionResult<LessonDto> GetLessonByUploadId(int uploadId)
     {
         var result = lessonService.GetLessonByUploadId(uploadId);
-        if (result == null)
-        {
-            return NotFound();
-        }
+        if (result == null) return NotFound();
         return Ok(result);
     }
 
@@ -81,7 +87,7 @@ public class LessonController(ILessonService lessonService) : ControllerBase
         lessonService.DeleteLessonById(lessonId);
         return Ok();
     }
-    
+
     [HttpDelete("DeleteLessonByObjectId")]
     public ActionResult DeleteLessonByObjectId(string objectId)
     {
