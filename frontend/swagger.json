@@ -1251,22 +1251,22 @@
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUploadRequestDto"
+                "$ref": "#/components/schemas/UploadDto"
               }
             }
           }
@@ -1721,18 +1721,6 @@
   },
   "components": {
     "schemas": {
-      "AddUploadRequestDto": {
-        "type": "object",
-        "properties": {
-          "uploadDto": {
-            "$ref": "#/components/schemas/UploadDto"
-          },
-          "lessonDto": {
-            "$ref": "#/components/schemas/LessonDto"
-          }
-        },
-        "additionalProperties": false
-      },
       "FileMetadataDto": {
         "type": "object",
         "properties": {
@@ -1818,12 +1806,8 @@
             "nullable": true
           },
           "uploadId": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
+            "type": "integer",
+            "format": "int32"
           },
           "lessonDetails": {
             "$ref": "#/components/schemas/LessonDetailsDto"
