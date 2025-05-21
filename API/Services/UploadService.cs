@@ -8,7 +8,7 @@ public interface IUploadService : IServiceBase
     IEnumerable<UploadDto> GetUserUploads(UserDto user, UploadFilter filter);
     IEnumerable<UploadDto> GetLibraryUploads(int libraryId, UploadFilter filter);
     UploadDto GetUploadById(int uploadId);
-    void CreateNewUpload(UploadDto upload);
+    int CreateNewUpload(UploadDto upload);
     void UpdateUpload(UploadDto upload);
     void DeleteUploadById(int uploadId);
     
@@ -37,9 +37,9 @@ public class UploadService(IUploadRepository uploadRepository) : IUploadService
         return uploadRepository.GetUploadById(uploadId);
     }
 
-    public void CreateNewUpload(UploadDto upload)
+    public int CreateNewUpload(UploadDto upload)
     {
-        uploadRepository.AddUpload(upload);
+        return uploadRepository.AddUpload(upload);
     }
     
     public void UpdateUpload(UploadDto upload)

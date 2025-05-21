@@ -1,33 +1,59 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, Image, Tag, Typography } from 'antd'
-import { LessonDtoWithOwnerName } from '../../pages/library'
+import { LessonClient, LessonDto } from '../api/apiClient'
+import { StarFilled, StarOutlined } from '@ant-design/icons'
 
-interface LibraryItemProps {
-  lesson: LessonDtoWithOwnerName
+interface LessonCardProps {
+  lesson: LessonDto
+  onStarToggled?: () => void
 }
 
-const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
+const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
+  const [isStarred, setIsStarred] = useState<boolean>(lesson.isStarred ?? false)
+
+  const userId = parseInt(localStorage.getItem('userId') ?? '0', 10)
+  const lessonClient = new LessonClient()
+
+  const toggleStar = async () => {
+    try {
+      if (isStarred) {
+        await lessonClient.unstarLesson(userId, lesson.uploadId!)
+      } else {
+        await lessonClient.starLesson(userId, lesson.uploadId!)
+      }
+      setIsStarred(!isStarred)
+      onStarToggled?.()
+    } catch (err) {
+      console.error('Failed to toggle star:', err)
+    }
+  }
+
   const limitDescription = (text: string | undefined, maxLength: number): string => {
     if (!text) return ''
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
   }
 
   return (
-    <Card
-      hoverable
-      style={{
-        margin: 8
-      }}
-    >
+    <Card hoverable style={{ margin: 8, position: 'relative' }} bodyStyle={{ paddingRight: 32 }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          fontSize: 20,
+          cursor: 'pointer'
+        }}
+        onClick={toggleStar}
+        title={isStarred ? 'Unstar this lesson' : 'Star this lesson'}
+      >
+        {isStarred ? <StarFilled style={{ color: '#fadb14' }} /> : <StarOutlined />}
+      </div>
+
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <Image
           src="https://placehold.co/100x100"
           preview={false}
-          style={{
-            maxWidth: 100,
-            maxHeight: 100,
-            marginRight: 16
-          }}
+          style={{ maxWidth: 100, maxHeight: 100, marginRight: 16 }}
         />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <Typography.Text style={{ fontSize: 16, fontWeight: 'bold' }}>
@@ -37,7 +63,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
             {limitDescription(lesson.lessonDetails?.description ?? undefined, 50)}
           </Typography.Text>
           <div>
-            {lesson.lessonDetails?.tags?.slice(0, 4).map((tag, index) => (
+            {lesson.lessonDetails?.tags?.slice(0, 4).map((tag: string, index: number) => (
               <Tag color="blue" key={index} style={{ marginRight: 4 }}>
                 {tag}
               </Tag>
@@ -75,4 +101,4 @@ const LibraryItem: React.FC<LibraryItemProps> = ({ lesson }) => {
   )
 }
 
-export default LibraryItem
+export default LessonCard

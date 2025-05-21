@@ -54,6 +54,12 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
                 query.Add($"{{\"lesson_details.tags\": {{$all: [{string.Join(",", escapedTags)}]}}}}");
             }
 
+            if (filter is { IsStarred: true, StarredLessons.Length: > 0 })
+            {
+                var uploadIdList = string.Join(",", filter.StarredLessons);
+                query.Add($"{{\"upload_id\": {{ \"$in\": [{uploadIdList}] }} }}");
+            }
+
             if (!string.IsNullOrEmpty(filter.SearchText))
             {
                 var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
@@ -150,19 +156,25 @@ public class LessonFilter : PaginationFilter
         string? title,
         int? lessonId,
         int? ownerId,
+        int? userId,
         List<string>? tags,
         int? pageNumber,
         int? pageSize,
-        string? searchText) : base(pageNumber, pageSize)
+        string? searchText,
+        bool? isStarred,
+        int[]? starredLessons) : base(pageNumber, pageSize)
     {
         UploadIds = uploadIds;
         Title = title;
         OwnerId = ownerId;
+        UserId = userId;
         Tags = tags;
         LessonId = lessonId;
         PageSize = pageSize;
         PageNumber = pageNumber;
         SearchText = searchText;
+        IsStarred = isStarred;
+        StarredLessons = starredLessons;
     }
 
     public LessonFilter()
@@ -172,10 +184,12 @@ public class LessonFilter : PaginationFilter
     public string? Title { get; set; }
     public List<string>? Tags { get; set; }
     public int? OwnerId { get; set; }
+    public int? UserId { get; set; }
     public List<int>? UploadIds { get; set; }
     public int? LessonId { get; set; }
     public int? PageSize { get; set; }
     public int? PageNumber { get; set; }
-
     public string? SearchText { get; set; }
+    public bool? IsStarred { get; set; }
+    public int[]? StarredLessons { get; set; }
 }
