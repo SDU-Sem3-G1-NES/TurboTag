@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { FileClient, LessonClient, LessonDto } from "../api/apiClient";
 import { Card, Spin, Typography, Tag } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import VideoPlayer from "../components/videoPlayer";
 
 const { Title, Paragraph } = Typography;
 
@@ -51,8 +52,7 @@ const LessonPage: React.FC = () => {
     return (
         <div style={{ display: "flex", justifyContent: "center", marginTop: 20}}>
             <Card style={{ width: 1000 }}>
-                <Card style={{ height: 500, backgroundColor: "lightGray" }}>
-                </Card>
+                <VideoPlayer videoId={lesson.fileMetadata?.[0]?.id ?? ""} />
                 <div style={{ marginTop: 20 }}>
                     <Title level={3}>{lesson.lessonDetails?.title}</Title>
                     {lesson.lessonDetails?.tags?.map((tag, index) => (

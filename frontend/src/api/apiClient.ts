@@ -429,6 +429,9 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface IFileClient {
                     /**
+             * @return OK
+             */
+            streamVideo(id: string): Promise<FileResponse>                    /**
              * @param file (optional) 
              * @return OK
              */
@@ -460,6 +463,62 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     
+    
+
+        /**
+         * @return OK
+         */
+        streamVideo(id: string, cancelToken?: CancelToken): Promise<FileResponse> {        let url_ = this.baseUrl + "/File/StreamVideo/{id}";
+if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+url_ = url_.replace("{id}", encodeURIComponent("" + id));
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                            responseType: "blob",
+                method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "video/mp4"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processStreamVideo(_response);
+                });
+        }
+
+    protected processStreamVideo(response: AxiosResponse): Promise<FileResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = FileResponse.fromJS(resultData200);
+        
+        return Promise.resolve<FileResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<FileResponse>(null as any);
+}
     
 
         /**
@@ -5175,4 +5234,20 @@ export function isPagedResult<T>(result: unknown): result is PagedResult<T> {
     Array.isArray((result as PagedResult<T>).items) &&
     typeof (result as PagedResult<T>).totalCount === 'number'
   )
+}
+
+export class FileResponse {
+    data: Blob;
+
+    constructor(data: Blob) {
+        this.data = data;
+    }
+
+    static fromJS(data: any): FileResponse {
+        return new FileResponse(data);
+    }
+
+    toJSON(): any {
+        return this.data;
+    }
 }
