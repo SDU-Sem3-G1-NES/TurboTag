@@ -41,9 +41,11 @@ const HomePage: React.FC = () => {
             <h1 style={{ textAlign: 'left', margin: 0 }}>{title}</h1>
           </Col>
           <Col>
-            <Checkbox checked={!limit} onChange={(e) => setLimit(!e.target.checked)}>
-              Show All
-            </Checkbox>
+            {lessons.length > 4 && (
+              <Checkbox checked={!limit} onChange={(e) => setLimit(!e.target.checked)}>
+                Show All
+              </Checkbox>
+            )}
           </Col>
         </Row>
         <Row gutter={[16, 16]} style={{ width: '75%' }}>

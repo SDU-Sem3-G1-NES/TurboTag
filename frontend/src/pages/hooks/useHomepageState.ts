@@ -40,6 +40,7 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
     }
     return new LessonFilter({
       ...base,
+      ownerId: null,
       isStarred: true,
       userId: ownerId
     })
