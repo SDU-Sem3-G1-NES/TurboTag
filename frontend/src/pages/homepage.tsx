@@ -5,13 +5,14 @@ import { useHomePageState } from './hooks/useHomepageState'
 import LessonCard from '../components/lessonCard'
 import TagSelectFilter from '../components/Filters/TagSelectFilter'
 import UploaderSelectFilter from '../components/Filters/UploaderSelectFilter'
+import { useNavigate } from 'react-router-dom'
 
 const HomePage: React.FC = () => {
   const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
 
   const [showAllOwner, setShowAllOwner] = useState(true)
   const [showAllStarred, setShowAllStarred] = useState(true)
-
+  const navigate = useNavigate()
   const {
     ownerLessons,
     starredLessons,
@@ -55,7 +56,7 @@ const HomePage: React.FC = () => {
         <Row gutter={[16, 16]} style={{ width: '75%' }}>
           {displayedLessons.map((lesson) => (
             <Col key={lesson.mongoId} span={12}>
-              <LessonCard lesson={lesson} onStarToggled={reload} />
+              <LessonCard lesson={lesson} onStarToggled={reload} onClick={() => navigate(`/lesson/${lesson.uploadId}`)}/>
             </Col>
           ))}
         </Row>
