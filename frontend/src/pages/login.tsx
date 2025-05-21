@@ -41,14 +41,14 @@ const LoginPage: React.FC = () => {
         'status' in error &&
         typeof (error as Record<string, unknown>).status === 'number'
       ) {
-        const err = error as { status: number; message?: string };
+        const err = error as { status: number; message?: string }
         if (err.status === 401) {
-          setFormError('Login failed: Invalid email or password');
+          setFormError('Login failed: Invalid email or password')
         } else {
-          setFormError('Login failed: ' + (err.message || 'Unexpected error'));
+          setFormError('Login failed: ' + (err.message || 'Unexpected error'))
         }
       } else {
-        setFormError('Login failed: Unexpected error');
+        setFormError('Login failed: Unexpected error')
       }
     }
   }
