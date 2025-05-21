@@ -19,7 +19,7 @@ public class UserRepositoryTests
     public void AddUser_ShouldReturnNewUserId()
     {
         // Arrange
-        var user = new UserDto(0, 1, "Test User", "test@example.com", new List<int> { 1, 2 });
+        var user = new UserDto(0, 1, "Test User", "test@example.com");
         var expectedId = 1;
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
@@ -50,16 +50,6 @@ public class UserRepositoryTests
                     p["@userName"].Equals(user.Name) &&
                     p["@userEmail"].Equals(user.Email))),
             Times.Once);
-
-        // Verify library access entries
-        foreach (var libraryId in user.AccessibleLibraryIds)
-            _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.Is<Dictionary<string, object>>(p =>
-                        p["@userId"].Equals(expectedId) &&
-                        p["@libraryId"].Equals(libraryId))),
-                Times.Once);
     }
 
     [Fact]
@@ -107,8 +97,7 @@ public class UserRepositoryTests
     {
         // Arrange
         var userId = 1;
-        var expectedUser = new UserDto(userId, 1, "Test User", "test@example.com", new List<int>());
-        var libraryIds = new List<int> { 1, 2 };
+        var expectedUser = new UserDto(userId, 1, "Test User", "test@example.com");
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
                 It.IsAny<string>(),
@@ -118,14 +107,6 @@ public class UserRepositoryTests
                 It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
             .Returns(new List<UserDto> { expectedUser });
 
-        _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-                It.IsAny<string>(),
-                It.Is<string>(s => s.Contains("library_id")),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))))
-            .Returns(libraryIds);
-
         // Act
         var result = _userRepository.GetUserById(userId);
 
@@ -134,7 +115,6 @@ public class UserRepositoryTests
         Assert.Equal(expectedUser.UserTypeId, result.UserTypeId);
         Assert.Equal(expectedUser.Name, result.Name);
         Assert.Equal(expectedUser.Email, result.Email);
-        Assert.Equal(libraryIds, result.AccessibleLibraryIds);
     }
 
     [Fact]
@@ -161,8 +141,7 @@ public class UserRepositoryTests
     {
         // Arrange
         var email = "test@example.com";
-        var expectedUser = new UserDto(1, 1, "Test User", email, new List<int>());
-        var libraryIds = new List<int> { 1, 2 };
+        var expectedUser = new UserDto(1, 1, "Test User", email);
 
         _mockSqlDbAccess.Setup(db => db.ExecuteQuery<UserDto>(
                 It.IsAny<string>(),
@@ -172,14 +151,6 @@ public class UserRepositoryTests
                 It.Is<Dictionary<string, object>>(p => p["@email"].Equals(email))))
             .Returns(new List<UserDto> { expectedUser });
 
-        _mockSqlDbAccess.Setup(db => db.ExecuteQuery<int>(
-                It.IsAny<string>(),
-                It.Is<string>(s => s.Contains("library_id")),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(expectedUser.Id))))
-            .Returns(libraryIds);
-
         // Act
         var result = _userRepository.GetUserByEmail(email);
 
@@ -188,7 +159,6 @@ public class UserRepositoryTests
         Assert.Equal(expectedUser.UserTypeId, result.UserTypeId);
         Assert.Equal(expectedUser.Name, result.Name);
         Assert.Equal(expectedUser.Email, result.Email);
-        Assert.Equal(libraryIds, result.AccessibleLibraryIds);
     }
 
     [Fact]
@@ -197,8 +167,8 @@ public class UserRepositoryTests
         // Arrange
         var expectedUsers = new List<UserDto>
         {
-            new(1, 1, "User 1", "user1@example.com", new List<int> { 1 }),
-            new(2, 2, "User 2", "user2@example.com", new List<int> { 2 })
+            new(1, 1, "User 1", "user1@example.com"),
+            new(2, 2, "User 2", "user2@example.com")
         };
 
         // Important: Set up the library IDs inside the user objects
@@ -222,7 +192,6 @@ public class UserRepositoryTests
             Assert.Equal(expectedUsers[i].UserTypeId, result[i].UserTypeId);
             Assert.Equal(expectedUsers[i].Name, result[i].Name);
             Assert.Equal(expectedUsers[i].Email, result[i].Email);
-            Assert.Contains(expectedUsers[i].Id, result[i].AccessibleLibraryIds);
         }
     }
 
@@ -241,7 +210,7 @@ public class UserRepositoryTests
         );
 
         // Include the library ID in the expected user
-        var expectedUser = new UserDto(1, 1, "Test User", "test@example.com", new List<int> { 1 });
+        var expectedUser = new UserDto(1, 1, "Test User", "test@example.com");
         var expectedUsers = new List<UserDto> { expectedUser };
 
         var pagedResult = new PagedResult<UserDto>
@@ -273,7 +242,6 @@ public class UserRepositoryTests
         Assert.Equal(expectedUser.UserTypeId, result.First().UserTypeId);
         Assert.Equal(expectedUser.Name, result.First().Name);
         Assert.Equal(expectedUser.Email, result.First().Email);
-        Assert.Contains(1, result.First().AccessibleLibraryIds);
     }
 
     [Fact]
@@ -308,7 +276,7 @@ public class UserRepositoryTests
     public void UpdateUser_ShouldUpdateUserAndLibraryAccess()
     {
         // Arrange
-        var user = new UserDto(1, 2, "Updated User", "updated@example.com", new List<int> { 3, 4 });
+        var user = new UserDto(1, 2, "Updated User", "updated@example.com");
 
         // Act
         _userRepository.UpdateUser(user);
@@ -328,23 +296,6 @@ public class UserRepositoryTests
                     p.ContainsKey("@userEmail") &&
                     p["@userEmail"].Equals(user.Email))),
             Times.Once);
-
-        // Verify library access deletion
-        _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-                It.IsAny<string>(),
-                It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
-                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(user.Id))),
-            Times.Once);
-
-        // Verify library access creation
-        foreach (var libraryId in user.AccessibleLibraryIds)
-            _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-                    It.IsAny<string>(),
-                    It.Is<string>(sql => sql.Contains("INSERT INTO user_library_access")),
-                    It.Is<Dictionary<string, object>>(p =>
-                        p["@userId"].Equals(user.Id) &&
-                        p["@libraryId"].Equals(libraryId))),
-                Times.Once);
     }
 
     [Fact]
@@ -381,13 +332,6 @@ public class UserRepositoryTests
         _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
                 It.IsAny<string>(),
                 It.Is<string>(sql => sql.Contains("DELETE FROM user_credentials")),
-                It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
-            Times.Once);
-
-        // Verify library access deletion
-        _mockSqlDbAccess.Verify(db => db.ExecuteNonQuery(
-                It.IsAny<string>(),
-                It.Is<string>(sql => sql.Contains("DELETE FROM user_library_access")),
                 It.Is<Dictionary<string, object>>(p => p["@userId"].Equals(userId))),
             Times.Once);
 

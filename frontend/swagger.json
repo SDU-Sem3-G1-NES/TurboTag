@@ -49,50 +49,6 @@
         }
       }
     },
-    "/ContentLibrary/GetUserLibraries": {
-      "post": {
-        "tags": [
-          "ContentLibrary"
-        ],
-        "operationId": "ContentLibrary_GetUserLibraries",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedResult_LibraryDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/ContentLibrary/GetLibraryById": {
       "get": {
         "tags": [
@@ -2581,20 +2537,8 @@
           "email": {
             "type": "string",
             "nullable": true
-          },
-          "accessibleLibraryIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
           }
         },
-        "additionalProperties": false
-      },
-      "UserDtoLibraryFilterValueTuple": {
-        "type": "object",
         "additionalProperties": false
       },
       "UserDtoUploadFilterValueTuple": {
@@ -2626,11 +2570,6 @@
           },
           "email": {
             "type": "string",
-            "nullable": true
-          },
-          "libraryId": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           },
           "pageNumber": {
@@ -2708,6 +2647,19 @@
         },
         "additionalProperties": false
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter your valid JWT token (\"accessToken\") from the login endpoint.\n\nExample: eyJhbGciOiJIUzI1...",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
 }

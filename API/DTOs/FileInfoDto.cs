@@ -21,21 +21,21 @@ public class FileInfoDto
     [BsonElement("filename")]
     public string? Filename { get; set; }
     
-    [BsonElement("description")]
-    public string? Description { get; set; }
+    [BsonElement("transcription")]
+    public string? Transcription { get; set; }
     
     public FileInfoDto()
     {
     }
     
-    public FileInfoDto(string mongoId, int length, int chunkSize, DateTime uploadDate, string filename, string? description)
+    public FileInfoDto(string mongoId, int length, int chunkSize, DateTime uploadDate, string filename, string? transcription)
     {
         MongoId = mongoId;
         Length = length;
         ChunkSize = chunkSize;
         UploadDate = uploadDate;
         Filename = filename;
-        Description = description;
+        Transcription = transcription;
     }
     
     public void GenerateMongoId()
