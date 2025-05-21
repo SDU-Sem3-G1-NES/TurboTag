@@ -3,7 +3,6 @@ import { Button, Form, Input, Checkbox, Modal, Alert } from 'antd'
 import { LoginClient, UserCredentialsDto } from '../api/apiClient.ts'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
-import { AxiosError } from 'axios'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
@@ -35,12 +34,21 @@ const LoginPage: React.FC = () => {
       localStorage.setItem('userName', response.name ?? 'undefined')
       localStorage.setItem('userType', response.userType ?? 'undefined')
       navigate('/')
-    } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 401) {
-        setFormError('Login failed: Invalid email or password')
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        typeof (error as Record<string, unknown>).status === 'number'
+      ) {
+        const err = error as { status: number; message?: string };
+        if (err.status === 401) {
+          setFormError('Login failed: Invalid email or password');
+        } else {
+          setFormError('Login failed: ' + (err.message || 'Unexpected error'));
+        }
       } else {
-        const msg = error instanceof Error ? error.message : 'Unexpected error'
-        setFormError('Login failed: ' + msg)
+        setFormError('Login failed: Unexpected error');
       }
     }
   }
