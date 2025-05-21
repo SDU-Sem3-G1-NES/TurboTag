@@ -13,7 +13,7 @@ namespace API.Controllers
 
         public GenerationController(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClientFactory.CreateClient("OllamaClient");
         }
 
         [HttpPost("generate")]

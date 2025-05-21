@@ -28,7 +28,7 @@ def call_ollama(prompt: str, model: str = "gemma:2b") -> str:
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=300)
         response.raise_for_status()
         return response.json()["response"].strip()
     except requests.RequestException as e:
