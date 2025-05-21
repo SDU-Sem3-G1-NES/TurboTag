@@ -1,25 +1,38 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Checkbox, Col, Input, Row, Spin } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 import { useHomePageState } from './hooks/useHomepageState'
 import LessonCard from '../components/lessonCard'
+import TagSelectFilter from '../components/Filters/TagSelectFilter'
+import UploaderSelectFilter from '../components/Filters/UploaderSelectFilter'
 
 const HomePage: React.FC = () => {
-  const { ownerLessons, starredLessons, loading, search, setSearch, handleSearch, reload } =
-    useHomePageState()
+  const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
 
-  // Local state to track if showing all lessons for each section
-  const [showAllOwner, setShowAllOwner] = useState(false)
-  const [showAllStarred, setShowAllStarred] = useState(false)
+  const [showAllOwner, setShowAllOwner] = useState(true)
+  const [showAllStarred, setShowAllStarred] = useState(true)
+
+  const {
+    ownerLessons,
+    starredLessons,
+    loading,
+    search,
+    setSearch,
+    handleSearch,
+    reload,
+    selectedTags,
+    setSelectedTags,
+    selectedUploaderIds,
+    setSelectedUploaderIds
+  } = useHomePageState(showAllOwner, showAllStarred)
 
   const renderSection = (
     title: string,
     lessons: typeof ownerLessons,
-    showAll: boolean,
-    setShowAll: React.Dispatch<React.SetStateAction<boolean>>
+    limit: boolean,
+    setLimit: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    // Limit to 4 lessons if showAll is false
-    const displayedLessons = showAll ? lessons : lessons.slice(0, 4)
+    const displayedLessons = limit ? lessons.slice(0, 4) : lessons
 
     return (
       <>
@@ -32,9 +45,11 @@ const HomePage: React.FC = () => {
             <h1 style={{ textAlign: 'left', margin: 0 }}>{title}</h1>
           </Col>
           <Col>
-            <Checkbox checked={showAll} onChange={() => setShowAll(!showAll)}>
-              Show All
-            </Checkbox>
+            {lessons.length > 4 && (
+              <Checkbox checked={!limit} onChange={(e) => setLimit(!e.target.checked)}>
+                Show All
+              </Checkbox>
+            )}
           </Col>
         </Row>
         <Row gutter={[16, 16]} style={{ width: '75%' }}>
@@ -66,6 +81,25 @@ const HomePage: React.FC = () => {
         style={{ width: '50%', marginBottom: 24 }}
         allowClear
       />
+
+      <div style={{ width: '50%', marginBottom: 24 }}>
+        <Row gutter={8}>
+          <Col flex="auto">
+            <TagSelectFilter
+              userId={ownerId}
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+            />
+          </Col>
+          <Col flex="auto">
+            <UploaderSelectFilter
+              userId={ownerId}
+              selectedUploaders={selectedUploaderIds}
+              setSelectedUploaders={setSelectedUploaderIds}
+            />
+          </Col>
+        </Row>
+      </div>
 
       {loading ? (
         <Spin

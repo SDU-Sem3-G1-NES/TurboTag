@@ -1716,6 +1716,195 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
+            export interface IOptionsClient {
+                    /**
+             * @param pageNumber (optional) 
+             * @param pageSize (optional) 
+             * @param userId (optional) 
+             * @param searchText (optional) 
+             * @return OK
+             */
+            getTagOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined): Promise<PagedResult<OptionDto> | OptionDto[]>                    /**
+             * @param pageNumber (optional) 
+             * @param pageSize (optional) 
+             * @param userId (optional) 
+             * @param searchText (optional) 
+             * @return OK
+             */
+            getUploaderOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined): Promise<PagedResult<OptionDto> | OptionDto[]>        }
+
+    export class OptionsClient extends BaseApiClient implements IOptionsClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param pageNumber (optional) 
+         * @param pageSize (optional) 
+         * @param userId (optional) 
+         * @param searchText (optional) 
+         * @return OK
+         */
+        getTagOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined, cancelToken?: CancelToken): Promise<PagedResult<OptionDto> | OptionDto[]> {        let url_ = this.baseUrl + "/Options/GetTagOptions?";
+if (pageNumber === null)
+    throw new Error("The parameter 'pageNumber' cannot be null.");
+else if (pageNumber !== undefined)
+    url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+if (pageSize === null)
+    throw new Error("The parameter 'pageSize' cannot be null.");
+else if (pageSize !== undefined)
+    url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+if (userId === null)
+    throw new Error("The parameter 'userId' cannot be null.");
+else if (userId !== undefined)
+    url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+if (searchText === null)
+    throw new Error("The parameter 'searchText' cannot be null.");
+else if (searchText !== undefined)
+    url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "application/json"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetTagOptions(_response);
+                });
+        }
+
+    protected processGetTagOptions(response: AxiosResponse): Promise<PagedResult<OptionDto> | OptionDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push(OptionDto.fromJS(item));
+        } else if (isPagedResult<OptionDto>(resultData200)) {
+            result200 = resultData200 as PagedResult<OptionDto>;
+        } else {
+            result200 = <any>null;
+        }
+        
+        return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(null as any);
+}
+    
+
+        /**
+         * @param pageNumber (optional) 
+         * @param pageSize (optional) 
+         * @param userId (optional) 
+         * @param searchText (optional) 
+         * @return OK
+         */
+        getUploaderOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined, cancelToken?: CancelToken): Promise<PagedResult<OptionDto> | OptionDto[]> {        let url_ = this.baseUrl + "/Options/GetUploaderOptions?";
+if (pageNumber === null)
+    throw new Error("The parameter 'pageNumber' cannot be null.");
+else if (pageNumber !== undefined)
+    url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+if (pageSize === null)
+    throw new Error("The parameter 'pageSize' cannot be null.");
+else if (pageSize !== undefined)
+    url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+if (userId === null)
+    throw new Error("The parameter 'userId' cannot be null.");
+else if (userId !== undefined)
+    url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+if (searchText === null)
+    throw new Error("The parameter 'searchText' cannot be null.");
+else if (searchText !== undefined)
+    url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "application/json"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetUploaderOptions(_response);
+                });
+        }
+
+    protected processGetUploaderOptions(response: AxiosResponse): Promise<PagedResult<OptionDto> | OptionDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push(OptionDto.fromJS(item));
+        } else if (isPagedResult<OptionDto>(resultData200)) {
+            result200 = resultData200 as PagedResult<OptionDto>;
+        } else {
+            result200 = <any>null;
+        }
+        
+        return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(null as any);
+}
+        }
+
             export interface ISettingsClient {
                     /**
              * @return OK
@@ -3348,6 +3537,7 @@ export class LessonFilter implements ILessonFilter {
     title?: string | null;
     tags?: string[] | null;
     ownerId?: number | null;
+    ownerIdInts?: number[] | null;
     userId?: number | null;
     uploadIds?: number[] | null;
     lessonId?: number | null;
@@ -3378,6 +3568,14 @@ export class LessonFilter implements ILessonFilter {
                 this.tags = <any>null;
             }
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+            if (Array.isArray(_data["ownerIdInts"])) {
+                this.ownerIdInts = [] as any;
+                for (let item of _data["ownerIdInts"])
+                    this.ownerIdInts!.push(item);
+            }
+            else {
+                this.ownerIdInts = <any>null;
+            }
             this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
             if (Array.isArray(_data["uploadIds"])) {
                 this.uploadIds = [] as any;
@@ -3419,6 +3617,11 @@ export class LessonFilter implements ILessonFilter {
                 data["tags"].push(item);
         }
         data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        if (Array.isArray(this.ownerIdInts)) {
+            data["ownerIdInts"] = [];
+            for (let item of this.ownerIdInts)
+                data["ownerIdInts"].push(item);
+        }
         data["userId"] = this.userId !== undefined ? this.userId : <any>null;
         if (Array.isArray(this.uploadIds)) {
             data["uploadIds"] = [];
@@ -3443,6 +3646,7 @@ export interface ILessonFilter {
     title?: string | null;
     tags?: string[] | null;
     ownerId?: number | null;
+    ownerIdInts?: number[] | null;
     userId?: number | null;
     uploadIds?: number[] | null;
     lessonId?: number | null;
@@ -3550,6 +3754,46 @@ export interface ILibraryFilter {
     libraryName?: string | null;
     pageSize?: number | null;
     pageNumber?: number | null;
+}
+
+export class OptionDto implements IOptionDto {
+    displayText?: string | null;
+    value?: string | null;
+
+    constructor(data?: IOptionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.displayText = _data["displayText"] !== undefined ? _data["displayText"] : <any>null;
+            this.value = _data["value"] !== undefined ? _data["value"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): OptionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OptionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["displayText"] = this.displayText !== undefined ? this.displayText : <any>null;
+        data["value"] = this.value !== undefined ? this.value : <any>null;
+        return data;
+    }
+}
+
+export interface IOptionDto {
+    displayText?: string | null;
+    value?: string | null;
 }
 
 export class PagedResult_LessonDto implements IPagedResult_LessonDto {
@@ -3694,6 +3938,81 @@ export class PagedResult_LibraryDto implements IPagedResult_LibraryDto {
 
 export interface IPagedResult_LibraryDto {
     items?: LibraryDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+}
+
+export class PagedResult_OptionDto implements IPagedResult_OptionDto {
+    items?: OptionDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResult_OptionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(OptionDto.fromJS(item));
+            }
+            else {
+                this.items = <any>null;
+            }
+            this.totalCount = _data["totalCount"] !== undefined ? _data["totalCount"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+            this.currentPage = _data["currentPage"] !== undefined ? _data["currentPage"] : <any>null;
+            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PagedResult_OptionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResult_OptionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item ? item.toJSON() : <any>null);
+        }
+        data["totalCount"] = this.totalCount !== undefined ? this.totalCount : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        data["currentPage"] = this.currentPage !== undefined ? this.currentPage : <any>null;
+        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
+        return data;
+    }
+}
+
+export interface IPagedResult_OptionDto {
+    items?: OptionDto[];
     totalCount?: number;
     pageSize?: number;
     currentPage?: number;

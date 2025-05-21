@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Api.Controllers;
 using API.DataAccess;
 using API.DTOs;
 using MongoDB.Bson;
@@ -17,6 +18,9 @@ public interface ILessonRepository : IRepositoryBase
     void UpdateLesson(LessonDto lesson);
     void DeleteLessonById(int lessonId);
     void DeleteLessonByObjectId(string objectId);
+
+    Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter);
+    Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter);
 }
 
 public class LessonRepository(IMongoDataAccess database) : ILessonRepository
@@ -42,8 +46,10 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
                 query.Add($"{{\"lesson_details.title\": {{$regex: \"{escapedTitle}\", $options: \"i\"}}}}");
             }
 
-            if (filter.OwnerId != null)
-                query.Add($"{{\"owner_id\": {filter.OwnerId}}}");
+            if (filter.OwnerIdInts is { Length: > 0 })
+                // Match owner_id in array of owner IDs
+                query.Add($"{{\"owner_id\": {{ \"$in\": [{string.Join(",", filter.OwnerIdInts)}] }} }}");
+            else if (filter.OwnerId != null) query.Add($"{{\"owner_id\": {filter.OwnerId}}}");
 
             if (filter.LessonId != null)
                 query.Add($"{{\"lesson_details._id\": {filter.LessonId}}}");
@@ -64,14 +70,13 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
             {
                 var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
                 query.Add($@"{{
-            ""$or"": [
-                {{""lesson_details.title"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }},
-                {{""lesson_details.description"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}
-            ]
-        }}");
+        ""$or"": [
+            {{""lesson_details.title"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }},
+            {{""lesson_details.description"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}
+        ]
+    }}");
             }
         }
-
 
         var filterString = query.Count > 1
             ? $"{{ \"$and\": [{string.Join(",", query)}] }}"
@@ -85,6 +90,7 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
 
         return database.Find<LessonDto>("lesson", filterString);
     }
+
 
     public List<LessonDto> GetLessonsByTags(string[] tags)
     {
@@ -148,6 +154,104 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
 
         database.Delete("lesson", $"{{\"_id\": ObjectId(\"{objectId}\")}}");
     }
+
+    public Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter)
+    {
+        var pageNumber = filter.PageNumber ?? 1;
+        var pageSize = filter.PageSize ?? int.MaxValue;
+
+        var pipeline = new List<BsonDocument>();
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+        {
+            var regex = new BsonRegularExpression(filter.SearchText, "i");
+            pipeline.Add(new BsonDocument("$match",
+                new BsonDocument("lesson_details.tags", new BsonDocument("$regex", regex))));
+        }
+
+        pipeline.Add(new BsonDocument("$unwind", "$lesson_details.tags"));
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+        {
+            var regex = new BsonRegularExpression(filter.SearchText, "i");
+            pipeline.Add(new BsonDocument("$match",
+                new BsonDocument("lesson_details.tags", new BsonDocument("$regex", regex))));
+        }
+
+        pipeline.Add(new BsonDocument("$group", new BsonDocument
+        {
+            { "_id", "$lesson_details.tags" },
+            { "uploadIds", new BsonDocument("$addToSet", "$upload_id") }
+        }));
+
+        pipeline.Add(new BsonDocument("$sort", new BsonDocument("_id", 1)));
+
+        if (pageNumber > 1)
+            pipeline.Add(new BsonDocument("$skip", (pageNumber - 1) * pageSize));
+
+        pipeline.Add(new BsonDocument("$limit", pageSize));
+
+        var results = database.Aggregate("lesson", pipeline);
+
+        var tagUploads = new Dictionary<string, int[]>();
+
+        foreach (var doc in results)
+        {
+            var tag = doc["_id"].AsString;
+            var uploadIds = doc["uploadIds"].AsBsonArray.Select(u => u.AsInt32).ToArray();
+            tagUploads[tag] = uploadIds;
+        }
+
+        return tagUploads;
+    }
+
+
+    public Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter)
+    {
+        var matchStage = new BsonDocument();
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+        {
+            var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
+            matchStage = new BsonDocument("$match", new BsonDocument("owner_name", new BsonDocument
+            {
+                { "$regex", escapedSearchText },
+                { "$options", "i" }
+            }));
+        }
+
+        var groupStage = new BsonDocument("$group", new BsonDocument
+        {
+            { "_id", "$owner_id" },
+            { "owner_name", new BsonDocument("$first", "$owner_name") }
+        });
+
+        var sortStage = new BsonDocument("$sort", new BsonDocument("owner_name", 1));
+
+        var skipStage = new BsonDocument("$skip", ((filter.PageNumber ?? 1) - 1) * (filter.PageSize ?? int.MaxValue));
+        var limitStage = new BsonDocument("$limit", filter.PageSize ?? int.MaxValue);
+
+        var pipeline = new List<BsonDocument>();
+
+        if (!matchStage.ElementCount.Equals(0))
+            pipeline.Add(matchStage);
+
+        pipeline.Add(groupStage);
+        pipeline.Add(sortStage);
+        pipeline.Add(skipStage);
+        pipeline.Add(limitStage);
+
+        var results = database.Aggregate("lesson", pipeline);
+
+        var dict = results
+            .Where(doc => doc.Contains("_id") && doc.Contains("owner_name"))
+            .ToDictionary(
+                doc => doc["_id"].AsInt32,
+                doc => doc["owner_name"].AsString
+            );
+
+        return dict;
+    }
 }
 
 public class LessonFilter : PaginationFilter
@@ -184,6 +288,7 @@ public class LessonFilter : PaginationFilter
     public string? Title { get; set; }
     public List<string>? Tags { get; set; }
     public int? OwnerId { get; set; }
+    public int[]? OwnerIdInts { get; set; }
     public int? UserId { get; set; }
     public List<int>? UploadIds { get; set; }
     public int? LessonId { get; set; }
