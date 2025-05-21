@@ -39,7 +39,8 @@ const HomePage: React.FC = () => {
         <Row
           align="middle"
           gutter={[16, 16]}
-          style={{ width: '75%', marginBottom: 8, justifyContent: 'space-between' }}>
+          style={{ width: '75%', marginBottom: 8, justifyContent: 'space-between' }}
+        >
           <Col>
             <h1 style={{ textAlign: 'left', margin: 0 }}>{title}</h1>
           </Col>
@@ -70,7 +71,8 @@ const HomePage: React.FC = () => {
         flexDirection: 'column',
         alignItems: 'center',
         overflow: 'hidden' // No scroll
-      }}>
+      }}
+    >
       <Input.Search
         placeholder="Search by title or description"
         value={search}
