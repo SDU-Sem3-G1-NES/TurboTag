@@ -5,7 +5,7 @@ namespace API.Services;
 public interface IFFmpegService : IServiceBase
 {
     public Task<String> SaveFileToTemp(IFormFile file, string fileId);
-    public Task<(List<String>, List<String>)> GetVideoAudioAndSnapshots(string videoPath, string outputId, bool deleteInputFile);
+    public Task<List<String>> GetVideoAudio(string videoPath, string outputId, bool deleteInputFile);
 }
 public class FFmpegService : IFFmpegService
 {
@@ -16,11 +16,11 @@ public class FFmpegService : IFFmpegService
         Directory.CreateDirectory(_tempFolderPath); // Ensure the folder exists
     }
 
-    public async Task<(List<String>, List<String>)> GetVideoAudioAndSnapshots(string videoPath, string outputId, bool deleteInputFile)
+    public async Task<List<String>> GetVideoAudio(string videoPath, string outputId, bool deleteInputFile)
     {
         if (!File.Exists(videoPath))
         {
-            return (new List<string>(), new List<string>());
+            return (new List<string>());
         }
         var outputFolderPath = Path.Combine(_tempFolderPath, outputId);
         Directory.CreateDirectory(outputFolderPath);
@@ -36,22 +36,10 @@ public class FFmpegService : IFFmpegService
                 FFMpeg.ExtractAudio(videoPath, audioPath);
                 audioPaths = await SplitAudioTrack(audioPath);
             }
-            if (mediaInfo.VideoStreams.Any())
-            {
-                int snapshotPeriod = (int)mediaInfo.Duration.TotalSeconds / 5;
-
-                for (int i = 0; i < 5; i++)
-                {
-                    var snapshotPath = Path.Combine(outputFolderPath, $"Snapshot-{i + 1}.png");
-                    await FFMpeg.SnapshotAsync(videoPath, snapshotPath, null,
-                        TimeSpan.FromSeconds(i * snapshotPeriod));
-                    snapshotPaths.Add(snapshotPath);
-                }
-            }
         }
         catch (Exception)
         {
-            return (new List<string>(), new List<string>());
+            return new List<string>();
         }
         
         if (deleteInputFile)
@@ -59,7 +47,7 @@ public class FFmpegService : IFFmpegService
             File.Delete(videoPath);
         }
         
-        return (audioPaths, snapshotPaths);
+        return (audioPaths);
     }
     
     public async Task<String> SaveFileToTemp(IFormFile file, string fileId)

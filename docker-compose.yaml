@@ -50,6 +50,17 @@
     dns:
       - 8.8.8.8
       - 8.8.4.4
+        
+  fasterwhisper:
+    build:
+      context: ./setup/fasterWhisper
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp:/host-tmp
+    ports:
+      - "8000:8000"
+    networks:
+      - turbotag
 
 volumes:
   db_data:
