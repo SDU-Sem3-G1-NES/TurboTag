@@ -13,4 +13,5 @@ public interface IMongoDataAccess
     Task<string?> UploadFile(string bucketName, IFormFile file);
     Task<Stream?> GetFileById(string bucketName, string id);
     Task DeleteFile(string bucketName, string id);
+    long Count(string lesson, string filterString);
 }

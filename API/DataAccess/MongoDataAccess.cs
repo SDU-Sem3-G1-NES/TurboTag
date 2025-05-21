@@ -194,6 +194,13 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
         }
     }
 
+    public long Count(string collectionName, string filterJson)
+    {
+        var database = _client.GetDatabase(GetDatabaseName());
+        var filter = BsonDocument.Parse(filterJson);
+        return database.GetCollection<BsonDocument>(collectionName).CountDocuments(filter);
+    }
+
 
     private GridFSFileInfo? FindFile(GridFSBucket bucket, string id)
     {
