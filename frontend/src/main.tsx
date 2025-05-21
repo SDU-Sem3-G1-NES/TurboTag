@@ -17,6 +17,7 @@ import './App.css'
 import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
 import { LoginClient } from './api/apiClient.ts'
 import Forbidden from './pages/forbidden.tsx'
+import LibraryPage from './pages/librarypage.tsx'
 
 const AppLayout = () => {
   const navigate = useNavigate()
@@ -44,6 +45,11 @@ const AppLayout = () => {
       key: 'upload',
       label: 'Upload',
       onClick: () => navigate('/upload')
+    },
+    {
+      key: 'library',
+      label: 'Library',
+      onClick: () => navigate('/library')
     },
     ...(userType === 'speedadmin'
       ? [
@@ -112,6 +118,14 @@ const AppLayout = () => {
               element={
                 <ProtectedRoute>
                   <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/library"
+              element={
+                <ProtectedRoute>
+                  <LibraryPage />
                 </ProtectedRoute>
               }
             />

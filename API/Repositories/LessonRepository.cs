@@ -9,7 +9,7 @@ namespace API.Repositories;
 public interface ILessonRepository : IRepositoryBase
 {
     void AddLesson(LessonDto lesson);
-    List<LessonDto> GetAllLessons(LessonFilter? filter);
+    IEnumerable<LessonDto> GetAllLessons(LessonFilter? filter);
     public List<LessonDto> GetLessonsByTags(string[] tags);
     public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonByObjectId(string objectId);
@@ -31,63 +31,95 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
         database.Insert("lesson", lesson.ToBsonDocument());
     }
 
-    public List<LessonDto> GetAllLessons(LessonFilter? filter = null)
+    public IEnumerable<LessonDto> GetAllLessons(LessonFilter? filter = null)
     {
-        var query = new List<string>();
+        var queryFragments = new List<string>();
 
         if (filter != null)
         {
+            // Filter by upload IDs
             if (filter.UploadIds is { Count: > 0 })
-                query.Add($"{{\"upload_id\": {{$all: [{string.Join(",", filter.UploadIds)}]}}}}");
+            {
+                var uploads = string.Join(",", filter.UploadIds);
+                queryFragments.Add($"{{\"upload_id\": {{ \"$all\": [{uploads}] }} }}");
+            }
 
-            if (!string.IsNullOrEmpty(filter.Title))
+            // Filter by title (regex search, case-insensitive)
+            if (!string.IsNullOrWhiteSpace(filter.Title))
             {
                 var escapedTitle = JsonSerializer.Serialize(filter.Title).Trim('"');
-                query.Add($"{{\"lesson_details.title\": {{$regex: \"{escapedTitle}\", $options: \"i\"}}}}");
+                queryFragments.Add(
+                    $"{{\"lesson_details.title\": {{ \"$regex\": \"{escapedTitle}\", \"$options\": \"i\" }} }}");
             }
 
+            // Filter by owner IDs (array or single)
             if (filter.OwnerIdInts is { Length: > 0 })
-                // Match owner_id in array of owner IDs
-                query.Add($"{{\"owner_id\": {{ \"$in\": [{string.Join(",", filter.OwnerIdInts)}] }} }}");
-            else if (filter.OwnerId != null) query.Add($"{{\"owner_id\": {filter.OwnerId}}}");
+            {
+                var owners = string.Join(",", filter.OwnerIdInts);
+                queryFragments.Add($"{{\"owner_id\": {{ \"$in\": [{owners}] }} }}");
+            }
+            else if (filter.OwnerId != null)
+            {
+                queryFragments.Add($"{{\"owner_id\": {filter.OwnerId} }}");
+            }
 
-            if (filter.LessonId != null)
-                query.Add($"{{\"lesson_details._id\": {filter.LessonId}}}");
+            // Filter by single lesson ID
+            if (filter.LessonId != null) queryFragments.Add($"{{\"lesson_details._id\": {filter.LessonId} }}");
 
+            // Filter by tags (must match all tags)
             if (filter.Tags is { Count: > 0 })
             {
-                var escapedTags = filter.Tags.Select(tag => JsonSerializer.Serialize(tag));
-                query.Add($"{{\"lesson_details.tags\": {{$all: [{string.Join(",", escapedTags)}]}}}}");
+                var tags = filter.Tags.Select(tag => JsonSerializer.Serialize(tag));
+                queryFragments.Add($"{{\"lesson_details.tags\": {{ \"$all\": [{string.Join(",", tags)}] }} }}");
             }
 
-            if (filter is { IsStarred: true, StarredLessons.Length: > 0 })
+            // Filter by starred lessons
+            if (filter.IsStarred == true && filter.StarredLessons?.Length > 0)
             {
-                var uploadIdList = string.Join(",", filter.StarredLessons);
-                query.Add($"{{\"upload_id\": {{ \"$in\": [{uploadIdList}] }} }}");
+                var starred = string.Join(",", filter.StarredLessons);
+                queryFragments.Add($"{{\"upload_id\": {{ \"$in\": [{starred}] }} }}");
             }
 
-            if (!string.IsNullOrEmpty(filter.SearchText))
+            // Full-text search
+            if (!string.IsNullOrWhiteSpace(filter.SearchText))
             {
-                var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
-                query.Add($@"{{
-        ""$or"": [
-            {{""lesson_details.title"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }},
-            {{""lesson_details.description"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}
-        ]
-    }}");
+                var escapedSearch = JsonSerializer.Serialize(filter.SearchText).Trim('"');
+                queryFragments.Add($@"{{
+                ""$or"": [
+                    {{ ""lesson_details.title"": {{ ""$regex"": ""{escapedSearch}"", ""$options"": ""i"" }} }},
+                    {{ ""lesson_details.description"": {{ ""$regex"": ""{escapedSearch}"", ""$options"": ""i"" }} }}
+                ]
+            }}");
             }
         }
 
-        var filterString = query.Count > 1
-            ? $"{{ \"$and\": [{string.Join(",", query)}] }}"
-            : query.FirstOrDefault() ?? "{}";
+        var filterString = queryFragments.Count switch
+        {
+            > 1 => $"{{ \"$and\": [{string.Join(",", queryFragments)}] }}",
+            1 => queryFragments[0],
+            _ => "{}"
+        };
 
-        if (filter is { PageNumber: not null, PageSize: not null })
+        // If paginated → return PagedResult<T>
+        if (filter?.PageNumber is not null and > 0 && filter.PageSize is not null and > 0)
         {
             var skip = (filter.PageNumber.Value - 1) * filter.PageSize.Value;
-            return database.Find<LessonDto>("lesson", filterString, skip, filter.PageSize);
+            var pageSize = filter.PageSize.Value;
+
+            var items = database.Find<LessonDto>("lesson", filterString, skip, pageSize);
+            var totalCount = database.Count("lesson", filterString);
+
+            return new PagedResult<LessonDto>
+            {
+                Items = items,
+                CurrentPage = filter.PageNumber.Value,
+                PageSize = pageSize,
+                TotalCount = (int)totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
         }
 
+        // Unpaged → return simple list
         return database.Find<LessonDto>("lesson", filterString);
     }
 
