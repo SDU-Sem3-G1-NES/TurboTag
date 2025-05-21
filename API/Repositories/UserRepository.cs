@@ -41,23 +41,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             "",
             parameters).FirstOrDefault();
 
-        // Add library access entries if the user has accessible libraries
-        if (user.AccessibleLibraryIds.Count > 0 && userId != 0)
-            foreach (var libraryId in user.AccessibleLibraryIds)
-            {
-                var libraryParameters = new Dictionary<string, object>
-                {
-                    { "@userId", userId },
-                    { "@libraryId", libraryId }
-                };
-
-                var libraryAccessSql = @"
-                    INSERT INTO user_library_access (user_id, library_id)
-                    VALUES (@userId, @libraryId);";
-
-                sqlDbAccess.ExecuteNonQuery(_databaseName, libraryAccessSql, libraryParameters);
-            }
-
         return userId;
     }
 
@@ -103,29 +86,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             "",
             parameters).FirstOrDefault();
 
-        if (user != null)
-        {
-            // Get accessible libraries
-            var libraryParams = new Dictionary<string, object>
-            {
-                { "@userId", userId }
-            };
-
-            var librarySql = @"
-                SELECT library_id
-                FROM user_library_access
-                WHERE user_id = @userId";
-
-            var libraryIds = sqlDbAccess.ExecuteQuery<int>(
-                _databaseName,
-                librarySql,
-                "",
-                "",
-                libraryParams).ToList();
-
-            user.AccessibleLibraryIds = libraryIds;
-        }
-
         if (user == null) throw new InvalidOperationException($"User with email {userId} not found");
 
         return user;
@@ -156,29 +116,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             fromWhereSql,
             "",
             parameters).FirstOrDefault();
-
-        if (user != null)
-        {
-            // Get accessible libraries
-            var libraryParams = new Dictionary<string, object>
-            {
-                { "@userId", user.Id }
-            };
-
-            var librarySql = @"
-                SELECT library_id
-                FROM user_library_access
-                WHERE user_id = @userId";
-
-            var libraryIds = sqlDbAccess.ExecuteQuery<int>(
-                _databaseName,
-                librarySql,
-                "",
-                "",
-                libraryParams).ToList();
-
-            user.AccessibleLibraryIds = libraryIds;
-        }
 
         return user;
     }
@@ -223,15 +160,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             {
                 parameters.Add("@email", $"%{filter.Email}%");
                 fromWhereSql += " AND u.user_email LIKE @email";
-            }
-
-            if (filter.LibraryId.HasValue)
-            {
-                fromWhereSql += @" AND EXISTS (
-                    SELECT 1 FROM user_library_access ula 
-                    WHERE ula.user_id = u.user_id 
-                    AND ula.library_id = @libraryId)";
-                parameters.Add("@libraryId", filter.LibraryId.Value);
             }
         }
 
@@ -298,28 +226,6 @@ public class UserRepository(ISqlDbAccess sqlDbAccess) : IUserRepository
             WHERE user_id = @userId";
 
         sqlDbAccess.ExecuteNonQuery(_databaseName, updateSql, parameters);
-
-        // Update library access - first delete existing entries
-        var deleteLibraryAccess = @"DELETE FROM user_library_access WHERE user_id = @userId";
-        sqlDbAccess.ExecuteNonQuery(_databaseName, deleteLibraryAccess,
-            new Dictionary<string, object> { { "@userId", user.Id } });
-
-        // Then add new entries
-        if (user.AccessibleLibraryIds.Count > 0)
-            foreach (var libraryId in user.AccessibleLibraryIds)
-            {
-                var libraryParameters = new Dictionary<string, object>
-                {
-                    { "@userId", user.Id },
-                    { "@libraryId", libraryId }
-                };
-
-                var libraryAccessSql = @"
-                    INSERT INTO user_library_access (user_id, library_id)
-                    VALUES (@userId, @libraryId);";
-
-                sqlDbAccess.ExecuteNonQuery(_databaseName, libraryAccessSql, libraryParameters);
-            }
     }
 
     public void UpdateUserCredentials(HashedUserCredentialsDto userCredentials)
@@ -373,7 +279,6 @@ public class UserFilter : PaginationFilter
         UserTypeIds = userTypeIds;
         Name = name;
         Email = email;
-        LibraryId = libraryId;
         PageNumber = pageNumber;
         PageSize = pageSize;
     }
@@ -386,7 +291,6 @@ public class UserFilter : PaginationFilter
     public List<int>? UserTypeIds { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
-    public int? LibraryId { get; set; }
     public int? PageNumber { get; set; }
     public int? PageSize { get; set; }
 }

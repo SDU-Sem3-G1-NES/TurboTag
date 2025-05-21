@@ -16,12 +16,6 @@ public class ContentLibraryController(ILibraryService libraryService) : Controll
     {
         return Ok(libraryService.GetAllLibraries(filter));
     }
-
-    [HttpPost("GetUserLibraries")]
-    public ActionResult<IEnumerable<LibraryDto>> GetUserLibraries([FromBody] (UserDto user, LibraryFilter filter) parameters)
-    {
-        return Ok(libraryService.GetLibrariesByUser(parameters.user, parameters.filter));
-    }
     
     [HttpGet("GetLibraryById")]
     public ActionResult<LibraryDto> GetLibraryById(int libraryId)
