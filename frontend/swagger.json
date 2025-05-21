@@ -675,6 +675,45 @@
         }
       }
     },
+    "/Lesson/GetTranscriptionByObjectId": {
+      "get": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_GetTranscriptionByObjectId",
+        "parameters": [
+          {
+            "name": "objectId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Lesson/GetLessonByObjectId": {
       "get": {
         "tags": [

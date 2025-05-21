@@ -840,6 +840,10 @@ url_ = url_.replace(/[?&]$/, "");
              * @param objectId (optional) 
              * @return OK
              */
+            getTranscriptionByObjectId(objectId?: string | undefined): Promise<string>                    /**
+             * @param objectId (optional) 
+             * @return OK
+             */
             getLessonByObjectId(objectId?: string | undefined): Promise<LessonDto>                    /**
              * @param uploadId (optional) 
              * @return OK
@@ -1235,6 +1239,63 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<LessonDto>(null as any);
+}
+    
+
+        /**
+         * @param objectId (optional) 
+         * @return OK
+         */
+        getTranscriptionByObjectId(objectId?: string | undefined, cancelToken?: CancelToken): Promise<string> {        let url_ = this.baseUrl + "/Lesson/GetTranscriptionByObjectId?";
+if (objectId === null)
+    throw new Error("The parameter 'objectId' cannot be null.");
+else if (objectId !== undefined)
+    url_ += "objectId=" + encodeURIComponent("" + objectId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetTranscriptionByObjectId(_response);
+                });
+        }
+
+    protected processGetTranscriptionByObjectId(response: AxiosResponse): Promise<string> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = resultData200 as string;
+        
+        return Promise.resolve<string>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<string>(null as any);
 }
     
 
@@ -4116,7 +4177,7 @@ export class PagedResult_OptionDto implements IPagedResult_OptionDto {
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
-                data["items"].push(item ? item.toJSON() : <any>null);
+                data["items"].push(item.toJSON());
         }
         data["totalCount"] = this.totalCount !== undefined ? this.totalCount : <any>null;
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;

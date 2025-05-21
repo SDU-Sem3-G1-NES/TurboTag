@@ -18,6 +18,7 @@ public interface ILessonService : IServiceBase
     void DeleteLessonByObjectId(string objectId);
     void StarLesson(int lessonId, int userId);
     void UnstarLesson(int lessonId, int userId);
+    public string? GetTranscriptionByObjectId(string objectId);
     Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter);
     Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter);
 }
@@ -30,6 +31,14 @@ internal class LessonService(
     public void AddLesson(LessonDto lesson)
     {
         lessonRepository.AddLesson(lesson);
+    }
+    
+    public string? GetTranscriptionByObjectId(string objectId)
+    {
+        var transcription = lessonRepository.GetTranscriptionByObjectId(objectId);
+        if (transcription is null) return null;
+
+        return transcription;
     }
 
     public List<LessonDto> GetLessonsByTags(string[] tags)

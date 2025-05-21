@@ -19,7 +19,7 @@ namespace API.Controllers
         [HttpPost("generate")]
         public async Task<GenerationResult> Generate([FromBody] string request)
         {
-            var pythonResponse = await _httpClient.PostAsJsonAsync("http://localhost:8000/generate-content", new { text = request });
+            var pythonResponse = await _httpClient.PostAsJsonAsync("http://localhost:8001/generate-content", new { text = request });
 
             if (!pythonResponse.IsSuccessStatusCode)
                 throw new HttpRequestException($"Failed to generate content. Status code: {(int)pythonResponse.StatusCode}");

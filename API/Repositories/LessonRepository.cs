@@ -18,6 +18,7 @@ public interface ILessonRepository : IRepositoryBase
     void UpdateLesson(LessonDto lesson);
     void DeleteLessonById(int lessonId);
     void DeleteLessonByObjectId(string objectId);
+    public string? GetTranscriptionByObjectId(string objectId);
 
     Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter);
     Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter);
@@ -29,6 +30,26 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
     {
         lesson.GenerateMongoId();
         database.Insert("lesson", lesson.ToBsonDocument());
+    }
+    
+    public string? GetTranscriptionByObjectId(string objectId)
+    {
+        if (!ObjectId.TryParse(objectId, out _))
+        {
+            Console.WriteLine("Invalid ObjectId format.");
+            return null;
+        }
+
+        var results = database.Find<BsonDocument>(
+            "fs.files",
+            $"{{\"_id\": ObjectId(\"{objectId}\")}}"
+        );
+
+        var document = results.FirstOrDefault();
+        if (document == null || !document.Contains("transcription"))
+            return null;
+
+        return document["transcription"].AsString;
     }
 
     public IEnumerable<LessonDto> GetAllLessons(LessonFilter? filter = null)

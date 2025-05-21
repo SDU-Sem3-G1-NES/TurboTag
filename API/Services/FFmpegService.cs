@@ -44,7 +44,7 @@ public class FFmpegService : IFFmpegService
         
         if (deleteInputFile)
         {
-            File.Delete(videoPath);
+           // File.Delete(videoPath);
         }
         
         return (audioPaths);

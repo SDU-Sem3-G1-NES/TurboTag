@@ -56,7 +56,7 @@
       context: ./setup/python
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8000"
     networks:
       - turbotag
     depends_on:
