@@ -124,10 +124,6 @@ export interface IContentLibraryClient {
              * @return OK
              */
             getAllLibraries(body?: LibraryFilter | undefined): Promise<PagedResult<LibraryDto> | LibraryDto[]>                    /**
-             * @param body (optional) 
-             * @return OK
-             */
-            getUserLibraries(body?: UserDtoLibraryFilterValueTuple | undefined): Promise<PagedResult<LibraryDto> | LibraryDto[]>                    /**
              * @param libraryId (optional) 
              * @return OK
              */
@@ -189,71 +185,6 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     protected processGetAllLibraries(response: AxiosResponse): Promise<PagedResult<LibraryDto> | LibraryDto[]> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                if (Array.isArray(resultData200)) {
-            result200 = [] as any;
-            for (let item of resultData200)
-                result200!.push(LibraryDto.fromJS(item));
-        } else if (isPagedResult<LibraryDto>(resultData200)) {
-            result200 = resultData200 as PagedResult<LibraryDto>;
-        } else {
-            result200 = <any>null;
-        }
-        
-        return Promise.resolve<PagedResult<LibraryDto> | LibraryDto[]>(result200);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<PagedResult<LibraryDto> | LibraryDto[]>(null as any);
-}
-    
-
-        /**
-         * @param body (optional) 
-         * @return OK
-         */
-        getUserLibraries(body?: UserDtoLibraryFilterValueTuple | undefined, cancelToken?: CancelToken): Promise<PagedResult<LibraryDto> | LibraryDto[]> {        let url_ = this.baseUrl + "/ContentLibrary/GetUserLibraries";
-url_ = url_.replace(/[?&]$/, "");
-
-                    const content_ = JSON.stringify(body);
-
-                let options_: AxiosRequestConfig = {
-                    data: content_,
-                        method: "POST",
-        url: url_,
-        headers: {
-                            "Content-Type": "application/json-patch+json",
-                            "Accept": "application/json"
-                },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processGetUserLibraries(_response);
-                });
-        }
-
-    protected processGetUserLibraries(response: AxiosResponse): Promise<PagedResult<LibraryDto> | LibraryDto[]> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -4531,7 +4462,6 @@ export class UserDto implements IUserDto {
     userTypeId?: number;
     name?: string | null;
     email?: string | null;
-    accessibleLibraryIds?: number[] | null;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -4548,14 +4478,6 @@ export class UserDto implements IUserDto {
             this.userTypeId = _data["userTypeId"] !== undefined ? _data["userTypeId"] : <any>null;
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
-            if (Array.isArray(_data["accessibleLibraryIds"])) {
-                this.accessibleLibraryIds = [] as any;
-                for (let item of _data["accessibleLibraryIds"])
-                    this.accessibleLibraryIds!.push(item);
-            }
-            else {
-                this.accessibleLibraryIds = <any>null;
-            }
         }
     }
 
@@ -4572,11 +4494,6 @@ export class UserDto implements IUserDto {
         data["userTypeId"] = this.userTypeId !== undefined ? this.userTypeId : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
-        if (Array.isArray(this.accessibleLibraryIds)) {
-            data["accessibleLibraryIds"] = [];
-            for (let item of this.accessibleLibraryIds)
-                data["accessibleLibraryIds"].push(item);
-        }
         return data;
     }
 }
@@ -4586,37 +4503,6 @@ export interface IUserDto {
     userTypeId?: number;
     name?: string | null;
     email?: string | null;
-    accessibleLibraryIds?: number[] | null;
-}
-
-export class UserDtoLibraryFilterValueTuple implements IUserDtoLibraryFilterValueTuple {
-
-    constructor(data?: IUserDtoLibraryFilterValueTuple) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): UserDtoLibraryFilterValueTuple {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserDtoLibraryFilterValueTuple();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
-}
-
-export interface IUserDtoLibraryFilterValueTuple {
 }
 
 export class UserDtoUploadFilterValueTuple implements IUserDtoUploadFilterValueTuple {
@@ -4654,7 +4540,6 @@ export class UserFilter implements IUserFilter {
     userTypeIds?: number[] | null;
     name?: string | null;
     email?: string | null;
-    libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
 
@@ -4687,7 +4572,6 @@ export class UserFilter implements IUserFilter {
             }
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
-            this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
             this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
             this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
         }
@@ -4714,7 +4598,6 @@ export class UserFilter implements IUserFilter {
         }
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
-        data["libraryId"] = this.libraryId !== undefined ? this.libraryId : <any>null;
         data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
         return data;
@@ -4726,7 +4609,6 @@ export interface IUserFilter {
     userTypeIds?: number[] | null;
     name?: string | null;
     email?: string | null;
-    libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
 }
