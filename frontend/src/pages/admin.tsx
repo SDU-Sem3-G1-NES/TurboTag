@@ -5,24 +5,14 @@ import {
   UserDto,
   UserRequest,
   UserTypeDto,
-  UserFilter,
+  UserFilter
 } from '../api/apiClient.ts'
-import {
-  Layout,
-  Table,
-  Button,
-  Modal,
-  notification,
-  Form,
-  Input,
-  Select,
-} from 'antd'
+import { Layout, Table, Button, Modal, notification, Form, Input, Select } from 'antd'
 import { UserAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 const { Content } = Layout
 
 const AdminPage: React.FC = () => {
-
   // Users state
   const [users, setUsers] = useState<UserDto[]>([])
   const [userPage, setUserPage] = useState(1)
