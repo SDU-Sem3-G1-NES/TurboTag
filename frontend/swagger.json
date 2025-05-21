@@ -49,50 +49,6 @@
         }
       }
     },
-    "/ContentLibrary/GetUserLibraries": {
-      "post": {
-        "tags": [
-          "ContentLibrary"
-        ],
-        "operationId": "ContentLibrary_GetUserLibraries",
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserDtoLibraryFilterValueTuple"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedResult_LibraryDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/ContentLibrary/GetLibraryById": {
       "get": {
         "tags": [
@@ -1054,6 +1010,112 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/Options/GetTagOptions": {
+      "get": {
+        "tags": [
+          "Options"
+        ],
+        "operationId": "Options_GetTagOptions",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "UserId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_OptionDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Options/GetUploaderOptions": {
+      "get": {
+        "tags": [
+          "Options"
+        ],
+        "operationId": "Options_GetUploaderOptions",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "UserId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_OptionDto"
+                }
+              }
+            }
           }
         }
       }
@@ -2024,6 +2086,14 @@
             "format": "int32",
             "nullable": true
           },
+          "ownerIdInts": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
           "userId": {
             "type": "integer",
             "format": "int32",
@@ -2113,6 +2183,20 @@
         },
         "additionalProperties": false
       },
+      "OptionDto": {
+        "type": "object",
+        "properties": {
+          "displayText": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedResult_LessonDto": {
         "type": "object",
         "properties": {
@@ -2147,6 +2231,33 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LibraryDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_OptionDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionDto"
             }
           },
           "totalCount": {
@@ -2494,20 +2605,8 @@
           "email": {
             "type": "string",
             "nullable": true
-          },
-          "accessibleLibraryIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
           }
         },
-        "additionalProperties": false
-      },
-      "UserDtoLibraryFilterValueTuple": {
-        "type": "object",
         "additionalProperties": false
       },
       "UserDtoUploadFilterValueTuple": {
@@ -2539,11 +2638,6 @@
           },
           "email": {
             "type": "string",
-            "nullable": true
-          },
-          "libraryId": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           },
           "pageNumber": {

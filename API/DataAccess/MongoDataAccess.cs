@@ -21,7 +21,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
                 findFluent = findFluent.Skip(skip.Value);
             if (limit.HasValue)
                 findFluent = findFluent.Limit(limit.Value);
-            
+
             return findFluent.ToList();
         }
         catch (Exception e)
@@ -30,6 +30,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             return new List<T>();
         }
     }
+
 
     public void Insert<T>(string collectionName, T document)
     {
@@ -74,7 +75,7 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             Console.WriteLine(e);
         }
     }
-    
+
     public async Task<string?> UploadFile(string bucketName, IFormFile file)
     {
         var database = _client.GetDatabase(GetDatabaseName());
@@ -115,11 +116,10 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, fileName);
             var existingFile = bucket.Find(filter).FirstOrDefault();
 
-            string fileNameToUse = fileName;
+            var fileNameToUse = fileName;
             if (existingFile != null)
-            {
-                fileNameToUse = $"{Path.GetFileNameWithoutExtension(fileName)}_{Guid.NewGuid()}{Path.GetExtension(fileName)}";
-            }
+                fileNameToUse =
+                    $"{Path.GetFileNameWithoutExtension(fileName)}_{Guid.NewGuid()}{Path.GetExtension(fileName)}";
 
             await using var uploadStream = await bucket.OpenUploadStreamAsync(fileNameToUse);
             await stream.CopyToAsync(uploadStream);
@@ -174,6 +174,33 @@ public class MongoDataAccess(string connectionString) : IMongoDataAccess
             Console.WriteLine(e);
         }
     }
+
+    public List<BsonDocument> Aggregate(string collectionName, IEnumerable<BsonDocument> pipelineStages)
+    {
+        var database = _client.GetDatabase(GetDatabaseName());
+        try
+        {
+            var collection = database.GetCollection<BsonDocument>(collectionName);
+
+            // Convert List<BsonDocument> to PipelineDefinition
+            var pipeline = PipelineDefinition<BsonDocument, BsonDocument>.Create(pipelineStages);
+
+            return collection.Aggregate(pipeline).ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Aggregation error: {e.Message}");
+            return new List<BsonDocument>();
+        }
+    }
+
+    public long Count(string collectionName, string filterJson)
+    {
+        var database = _client.GetDatabase(GetDatabaseName());
+        var filter = BsonDocument.Parse(filterJson);
+        return database.GetCollection<BsonDocument>(collectionName).CountDocuments(filter);
+    }
+
 
     private GridFSFileInfo? FindFile(GridFSBucket bucket, string id)
     {

@@ -29,82 +29,81 @@ export class ApiConfiguration {
     // Request interceptor for authentication
     this.instance.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem('authToken')
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          config.headers.Authorization = `Bearer ${token}`
         }
-        return config;
+        return config
       },
       (error) => Promise.reject(error)
-    );
+    )
 
     // Response interceptor for handling auth errors and token refresh
     this.instance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const originalRequest = error.config;
+        const originalRequest = error.config
 
         // Handle unauthorized errors (401) for token refresh
-        if (error.response?.status === 401 && !originalRequest._retry && window.location.pathname !== "/login") {
-          originalRequest._retry = true;
+        if (error.response?.status === 401 && !originalRequest._retry && window.location.pathname !== '/login') {
+          originalRequest._retry = true
 
           try {
             // Attempt to refresh the token
-            const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
-            const accessToken = localStorage.getItem("authToken");
+            const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken')
+            const accessToken = localStorage.getItem('authToken')
             if (!refreshToken) {
               // No refresh token available, redirect to login
-              this.redirectToLogin();
-              return Promise.reject(error);
+              this.redirectToLogin()
+              return Promise.reject(error)
             }
 
             // Call your token refresh endpoint
             const response = await axios.post(`${baseUrl}/Login/refresh-token`, {
               accessToken, refreshToken
-            });
+            })
 
             // If successful, update stored tokens
-            if (localStorage.getItem("refreshToken")) {
-              localStorage.setItem("refreshToken", response.data.refreshToken);
+            if (localStorage.getItem('refreshToken')) {
+              localStorage.setItem('refreshToken', response.data.refreshToken)
+            } else {
+              sessionStorage.setItem('refreshToken', response.data.refreshToken)
             }
-            else {
-              sessionStorage.setItem("refreshToken", response.data.refreshToken);
-            }
-            localStorage.setItem("authToken", response.data.accessToken);
+            localStorage.setItem('authToken', response.data.accessToken)
 
             // Update the authorization header and retry
-            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
-            return axios(originalRequest);
+            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`
+            return axios(originalRequest)
           } catch (refreshError) {
             // If refresh fails, redirect to login
-            this.redirectToLogin();
-            return Promise.reject(refreshError);
+            this.redirectToLogin()
+            return Promise.reject(refreshError)
           }
         }
 
         // Handle forbidden errors (403)
         if (error.response?.status === 403) {
           // Handle access denied - could redirect to forbidden page or show message
-          window.location.href = "/forbidden";
-          console.error("Access forbidden");
+          window.location.href = '/forbidden'
+          console.error('Access forbidden')
         }
 
-        return Promise.reject(error);
+        return Promise.reject(error)
       }
-    );
+    )
   }
 
   private redirectToLogin(): void {
     // Clear authentication data
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    sessionStorage.removeItem("refreshToken");
-    localStorage.removeItem("userType");
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userId')
+    localStorage.removeItem('userName')
+    sessionStorage.removeItem('refreshToken')
+    localStorage.removeItem('userType')
 
     // Redirect to login page - adjust based on your routing setup
-    window.location.href = "/login";
+    window.location.href = '/login'
   }
 }
 
@@ -124,10 +123,6 @@ export interface IContentLibraryClient {
              * @return OK
              */
             getAllLibraries(body?: LibraryFilter | undefined): Promise<PagedResult<LibraryDto> | LibraryDto[]>                    /**
-             * @param body (optional) 
-             * @return OK
-             */
-            getUserLibraries(body?: UserDtoLibraryFilterValueTuple | undefined): Promise<PagedResult<LibraryDto> | LibraryDto[]>                    /**
              * @param libraryId (optional) 
              * @return OK
              */
@@ -189,71 +184,6 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     protected processGetAllLibraries(response: AxiosResponse): Promise<PagedResult<LibraryDto> | LibraryDto[]> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (const k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                if (Array.isArray(resultData200)) {
-            result200 = [] as any;
-            for (let item of resultData200)
-                result200!.push(LibraryDto.fromJS(item));
-        } else if (isPagedResult<LibraryDto>(resultData200)) {
-            result200 = resultData200 as PagedResult<LibraryDto>;
-        } else {
-            result200 = <any>null;
-        }
-        
-        return Promise.resolve<PagedResult<LibraryDto> | LibraryDto[]>(result200);
-        
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<PagedResult<LibraryDto> | LibraryDto[]>(null as any);
-}
-    
-
-        /**
-         * @param body (optional) 
-         * @return OK
-         */
-        getUserLibraries(body?: UserDtoLibraryFilterValueTuple | undefined, cancelToken?: CancelToken): Promise<PagedResult<LibraryDto> | LibraryDto[]> {        let url_ = this.baseUrl + "/ContentLibrary/GetUserLibraries";
-url_ = url_.replace(/[?&]$/, "");
-
-                    const content_ = JSON.stringify(body);
-
-                let options_: AxiosRequestConfig = {
-                    data: content_,
-                        method: "POST",
-        url: url_,
-        headers: {
-                            "Content-Type": "application/json-patch+json",
-                            "Accept": "application/json"
-                },
-            cancelToken
-        };
-
-                    return this.instance.request(options_).catch((_error: any) => {
-                if (isAxiosError(_error) && _error.response) {
-        return _error.response;
-        } else {
-        throw _error;
-        }
-        }).then((_response: AxiosResponse) => {
-                    return this.processGetUserLibraries(_response);
-                });
-        }
-
-    protected processGetUserLibraries(response: AxiosResponse): Promise<PagedResult<LibraryDto> | LibraryDto[]> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -1858,6 +1788,195 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<void>(null as any);
+}
+        }
+
+            export interface IOptionsClient {
+                    /**
+             * @param pageNumber (optional) 
+             * @param pageSize (optional) 
+             * @param userId (optional) 
+             * @param searchText (optional) 
+             * @return OK
+             */
+            getTagOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined): Promise<PagedResult<OptionDto> | OptionDto[]>                    /**
+             * @param pageNumber (optional) 
+             * @param pageSize (optional) 
+             * @param userId (optional) 
+             * @param searchText (optional) 
+             * @return OK
+             */
+            getUploaderOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined): Promise<PagedResult<OptionDto> | OptionDto[]>        }
+
+    export class OptionsClient extends BaseApiClient implements IOptionsClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param pageNumber (optional) 
+         * @param pageSize (optional) 
+         * @param userId (optional) 
+         * @param searchText (optional) 
+         * @return OK
+         */
+        getTagOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined, cancelToken?: CancelToken): Promise<PagedResult<OptionDto> | OptionDto[]> {        let url_ = this.baseUrl + "/Options/GetTagOptions?";
+if (pageNumber === null)
+    throw new Error("The parameter 'pageNumber' cannot be null.");
+else if (pageNumber !== undefined)
+    url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+if (pageSize === null)
+    throw new Error("The parameter 'pageSize' cannot be null.");
+else if (pageSize !== undefined)
+    url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+if (userId === null)
+    throw new Error("The parameter 'userId' cannot be null.");
+else if (userId !== undefined)
+    url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+if (searchText === null)
+    throw new Error("The parameter 'searchText' cannot be null.");
+else if (searchText !== undefined)
+    url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "application/json"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetTagOptions(_response);
+                });
+        }
+
+    protected processGetTagOptions(response: AxiosResponse): Promise<PagedResult<OptionDto> | OptionDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push(OptionDto.fromJS(item));
+        } else if (isPagedResult<OptionDto>(resultData200)) {
+            result200 = resultData200 as PagedResult<OptionDto>;
+        } else {
+            result200 = <any>null;
+        }
+        
+        return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(null as any);
+}
+    
+
+        /**
+         * @param pageNumber (optional) 
+         * @param pageSize (optional) 
+         * @param userId (optional) 
+         * @param searchText (optional) 
+         * @return OK
+         */
+        getUploaderOptions(pageNumber?: number | undefined, pageSize?: number | undefined, userId?: number | undefined, searchText?: string | undefined, cancelToken?: CancelToken): Promise<PagedResult<OptionDto> | OptionDto[]> {        let url_ = this.baseUrl + "/Options/GetUploaderOptions?";
+if (pageNumber === null)
+    throw new Error("The parameter 'pageNumber' cannot be null.");
+else if (pageNumber !== undefined)
+    url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+if (pageSize === null)
+    throw new Error("The parameter 'pageSize' cannot be null.");
+else if (pageSize !== undefined)
+    url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+if (userId === null)
+    throw new Error("The parameter 'userId' cannot be null.");
+else if (userId !== undefined)
+    url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+if (searchText === null)
+    throw new Error("The parameter 'searchText' cannot be null.");
+else if (searchText !== undefined)
+    url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "application/json"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetUploaderOptions(_response);
+                });
+        }
+
+    protected processGetUploaderOptions(response: AxiosResponse): Promise<PagedResult<OptionDto> | OptionDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push(OptionDto.fromJS(item));
+        } else if (isPagedResult<OptionDto>(resultData200)) {
+            result200 = resultData200 as PagedResult<OptionDto>;
+        } else {
+            result200 = <any>null;
+        }
+        
+        return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<PagedResult<OptionDto> | OptionDto[]>(null as any);
 }
         }
 
@@ -3533,6 +3652,7 @@ export class LessonFilter implements ILessonFilter {
     title?: string | null;
     tags?: string[] | null;
     ownerId?: number | null;
+    ownerIdInts?: number[] | null;
     userId?: number | null;
     uploadIds?: number[] | null;
     lessonId?: number | null;
@@ -3563,6 +3683,14 @@ export class LessonFilter implements ILessonFilter {
                 this.tags = <any>null;
             }
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+            if (Array.isArray(_data["ownerIdInts"])) {
+                this.ownerIdInts = [] as any;
+                for (let item of _data["ownerIdInts"])
+                    this.ownerIdInts!.push(item);
+            }
+            else {
+                this.ownerIdInts = <any>null;
+            }
             this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
             if (Array.isArray(_data["uploadIds"])) {
                 this.uploadIds = [] as any;
@@ -3604,6 +3732,11 @@ export class LessonFilter implements ILessonFilter {
                 data["tags"].push(item);
         }
         data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        if (Array.isArray(this.ownerIdInts)) {
+            data["ownerIdInts"] = [];
+            for (let item of this.ownerIdInts)
+                data["ownerIdInts"].push(item);
+        }
         data["userId"] = this.userId !== undefined ? this.userId : <any>null;
         if (Array.isArray(this.uploadIds)) {
             data["uploadIds"] = [];
@@ -3628,6 +3761,7 @@ export interface ILessonFilter {
     title?: string | null;
     tags?: string[] | null;
     ownerId?: number | null;
+    ownerIdInts?: number[] | null;
     userId?: number | null;
     uploadIds?: number[] | null;
     lessonId?: number | null;
@@ -3735,6 +3869,46 @@ export interface ILibraryFilter {
     libraryName?: string | null;
     pageSize?: number | null;
     pageNumber?: number | null;
+}
+
+export class OptionDto implements IOptionDto {
+    displayText?: string | null;
+    value?: string | null;
+
+    constructor(data?: IOptionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.displayText = _data["displayText"] !== undefined ? _data["displayText"] : <any>null;
+            this.value = _data["value"] !== undefined ? _data["value"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): OptionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OptionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["displayText"] = this.displayText !== undefined ? this.displayText : <any>null;
+        data["value"] = this.value !== undefined ? this.value : <any>null;
+        return data;
+    }
+}
+
+export interface IOptionDto {
+    displayText?: string | null;
+    value?: string | null;
 }
 
 export class PagedResult_LessonDto implements IPagedResult_LessonDto {
@@ -3879,6 +4053,81 @@ export class PagedResult_LibraryDto implements IPagedResult_LibraryDto {
 
 export interface IPagedResult_LibraryDto {
     items?: LibraryDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+}
+
+export class PagedResult_OptionDto implements IPagedResult_OptionDto {
+    items?: OptionDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResult_OptionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(OptionDto.fromJS(item));
+            }
+            else {
+                this.items = <any>null;
+            }
+            this.totalCount = _data["totalCount"] !== undefined ? _data["totalCount"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+            this.currentPage = _data["currentPage"] !== undefined ? _data["currentPage"] : <any>null;
+            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PagedResult_OptionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResult_OptionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item ? item.toJSON() : <any>null);
+        }
+        data["totalCount"] = this.totalCount !== undefined ? this.totalCount : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        data["currentPage"] = this.currentPage !== undefined ? this.currentPage : <any>null;
+        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
+        return data;
+    }
+}
+
+export interface IPagedResult_OptionDto {
+    items?: OptionDto[];
     totalCount?: number;
     pageSize?: number;
     currentPage?: number;
@@ -4647,7 +4896,6 @@ export class UserDto implements IUserDto {
     userTypeId?: number;
     name?: string | null;
     email?: string | null;
-    accessibleLibraryIds?: number[] | null;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -4664,14 +4912,6 @@ export class UserDto implements IUserDto {
             this.userTypeId = _data["userTypeId"] !== undefined ? _data["userTypeId"] : <any>null;
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
-            if (Array.isArray(_data["accessibleLibraryIds"])) {
-                this.accessibleLibraryIds = [] as any;
-                for (let item of _data["accessibleLibraryIds"])
-                    this.accessibleLibraryIds!.push(item);
-            }
-            else {
-                this.accessibleLibraryIds = <any>null;
-            }
         }
     }
 
@@ -4688,11 +4928,6 @@ export class UserDto implements IUserDto {
         data["userTypeId"] = this.userTypeId !== undefined ? this.userTypeId : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
-        if (Array.isArray(this.accessibleLibraryIds)) {
-            data["accessibleLibraryIds"] = [];
-            for (let item of this.accessibleLibraryIds)
-                data["accessibleLibraryIds"].push(item);
-        }
         return data;
     }
 }
@@ -4702,37 +4937,6 @@ export interface IUserDto {
     userTypeId?: number;
     name?: string | null;
     email?: string | null;
-    accessibleLibraryIds?: number[] | null;
-}
-
-export class UserDtoLibraryFilterValueTuple implements IUserDtoLibraryFilterValueTuple {
-
-    constructor(data?: IUserDtoLibraryFilterValueTuple) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): UserDtoLibraryFilterValueTuple {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserDtoLibraryFilterValueTuple();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
-}
-
-export interface IUserDtoLibraryFilterValueTuple {
 }
 
 export class UserDtoUploadFilterValueTuple implements IUserDtoUploadFilterValueTuple {
@@ -4770,7 +4974,6 @@ export class UserFilter implements IUserFilter {
     userTypeIds?: number[] | null;
     name?: string | null;
     email?: string | null;
-    libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
 
@@ -4803,7 +5006,6 @@ export class UserFilter implements IUserFilter {
             }
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
-            this.libraryId = _data["libraryId"] !== undefined ? _data["libraryId"] : <any>null;
             this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
             this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
         }
@@ -4830,7 +5032,6 @@ export class UserFilter implements IUserFilter {
         }
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
-        data["libraryId"] = this.libraryId !== undefined ? this.libraryId : <any>null;
         data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
         return data;
@@ -4842,7 +5043,6 @@ export interface IUserFilter {
     userTypeIds?: number[] | null;
     name?: string | null;
     email?: string | null;
-    libraryId?: number | null;
     pageNumber?: number | null;
     pageSize?: number | null;
 }
@@ -5081,6 +5281,7 @@ export interface PagedResult<T> {
   totalCount: number;
   pageSize: number;
   currentPage: number;
+  totalPages: number;
 }
 
 export function isPagedResult<T>(result: unknown): result is PagedResult<T> {
@@ -5089,5 +5290,5 @@ export function isPagedResult<T>(result: unknown): result is PagedResult<T> {
     result !== null &&
     Array.isArray((result as PagedResult<T>).items) &&
     typeof (result as PagedResult<T>).totalCount === 'number'
-  );
+  )
 }

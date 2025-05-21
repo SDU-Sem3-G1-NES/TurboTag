@@ -1,3 +1,4 @@
+using Api.Controllers;
 using API.DTOs;
 using API.Repositories;
 
@@ -6,7 +7,7 @@ namespace API.Services;
 public interface ILessonService : IServiceBase
 {
     void AddLesson(LessonDto lesson);
-    List<LessonDto> GetAllLessons(LessonFilter? filter);
+    IEnumerable<LessonDto> GetAllLessons(LessonFilter? filter);
     public List<LessonDto> GetLessonsByTags(string[] tags);
     public List<LessonDto> GetLessonsByTitle(string title);
     LessonDto? GetLessonById(int lessonId);
@@ -17,6 +18,8 @@ public interface ILessonService : IServiceBase
     void DeleteLessonByObjectId(string objectId);
     void StarLesson(int lessonId, int userId);
     void UnstarLesson(int lessonId, int userId);
+    Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter);
+    Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter);
 }
 
 internal class LessonService(
@@ -29,19 +32,14 @@ internal class LessonService(
         lessonRepository.AddLesson(lesson);
     }
 
-    public List<LessonDto> GetAllLessons(LessonFilter? filter)
-    {
-        return AddOwnersAndStars(lessonRepository.GetAllLessons(AddStarredLessonsToFilter(filter)), filter);
-    }
-
     public List<LessonDto> GetLessonsByTags(string[] tags)
     {
-        return AddOwnersAndStars(lessonRepository.GetLessonsByTags(tags));
+        return AddOwnersAndStars(lessonRepository.GetLessonsByTags(tags)).ToList();
     }
 
     public List<LessonDto> GetLessonsByTitle(string title)
     {
-        return AddOwnersAndStars(lessonRepository.GetLessonsByTitle(title));
+        return AddOwnersAndStars(lessonRepository.GetLessonsByTitle(title)).ToList();
     }
 
     public LessonDto? GetLessonById(int lessonId)
@@ -94,7 +92,22 @@ internal class LessonService(
         uploadRepository.UnstarUpload(lessonId, userId);
     }
 
-    private List<LessonDto> AddOwnersAndStars(List<LessonDto> lessons, LessonFilter? filter = null)
+    public Dictionary<string, int[]> TagOptions(BaseOptionsFilter filter)
+    {
+        return lessonRepository.TagOptions(filter);
+    }
+
+    public Dictionary<int, string> UploaderOptions(BaseOptionsFilter filter)
+    {
+        return lessonRepository.UploaderOptions(filter);
+    }
+
+    public IEnumerable<LessonDto> GetAllLessons(LessonFilter? filter)
+    {
+        return AddOwnersAndStars(lessonRepository.GetAllLessons(AddStarredLessonsToFilter(filter)), filter);
+    }
+
+    private IEnumerable<LessonDto> AddOwnersAndStars(IEnumerable<LessonDto> lessons, LessonFilter? filter = null)
     {
         var ownerIds = lessons
             .Select(l => l.OwnerId)

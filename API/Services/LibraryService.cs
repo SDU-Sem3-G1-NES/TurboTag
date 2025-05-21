@@ -4,7 +4,6 @@ using API.Repositories;
 namespace API.Services;
 public interface ILibraryService : IServiceBase
 {
-    IEnumerable<LibraryDto> GetLibrariesByUser(UserDto user, LibraryFilter filter);
     IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter? filter);
     LibraryDto GetLibraryById(int libraryId);
     void CreateNewLibrary(LibraryDto library);
@@ -13,11 +12,6 @@ public interface ILibraryService : IServiceBase
 }
 public class LibraryService(ILibraryRepository libraryRepository) : ILibraryService
 {
-    public IEnumerable<LibraryDto> GetLibrariesByUser(UserDto user, LibraryFilter filter)
-    {
-        filter.LibraryIds = user.AccessibleLibraryIds;
-        return libraryRepository.GetAllLibraries(filter);
-    }
     
     public IEnumerable<LibraryDto> GetAllLibraries(LibraryFilter? filter)
     {

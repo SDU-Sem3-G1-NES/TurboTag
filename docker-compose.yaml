@@ -61,6 +61,17 @@
       - turbotag
     depends_on:
       - ollama
+        
+  fasterwhisper:
+    build:
+      context: ./setup/fasterWhisper
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp:/host-tmp
+    ports:
+      - "8000:8000"
+    networks:
+      - turbotag
 
   ollama:
     image: ollama/ollama

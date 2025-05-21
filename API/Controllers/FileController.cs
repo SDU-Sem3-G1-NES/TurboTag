@@ -8,7 +8,7 @@ namespace API.Controllers;
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class FileController(IFileService fileService, IFFmpegService ffmpegService, IMediaProcessingService mediaProcessingService) : ControllerBase
+public class FileController(IFileService fileService, IFFmpegService ffmpegService, IAudioTranscriptionService audioTranscriptionService) : ControllerBase
 {
     
     #region UploadFile
@@ -25,7 +25,6 @@ public class FileController(IFileService fileService, IFFmpegService ffmpegServi
         }
         
         var filePath = await ffmpegService.SaveFileToTemp(file, fileId);
-        BackgroundJob.Enqueue(() => mediaProcessingService.ProcessMediaAsync(ffmpegService.GetVideoAudioAndSnapshots(filePath, fileId, true).Result));
 
         return Ok(fileId);
     }
@@ -162,7 +161,8 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
             await using var finalStream = System.IO.File.OpenRead(outputPath);
 
             var fileId = await fileService.UploadChunkedFile(finalStream, finaliseUploadDto.FileName);
-            
+            var audioPaths = await ffmpegService.GetVideoAudio(outputPath, fileId!, true);
+            var transcription = await audioTranscriptionService.AudioTranscriptionAsync(audioPaths);
             
             try
             {

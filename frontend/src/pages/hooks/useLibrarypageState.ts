@@ -1,77 +1,68 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { LessonClient, LessonDto, LessonFilter, OptionDto } from '../../api/apiClient'
+import {
+  isPagedResult,
+  LessonClient,
+  LessonDto,
+  LessonFilter,
+  OptionDto
+} from '../../api/apiClient'
 
-export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean) => {
-  const [ownerLessons, setOwnerLessons] = useState<LessonDto[]>([])
-  const [starredLessons, setStarredLessons] = useState<LessonDto[]>([])
+export const useLibraryPageState = () => {
+  const [lessons, setLessons] = useState<LessonDto[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<OptionDto[]>([])
   const [selectedUploaderIds, setSelectedUploaderIds] = useState<OptionDto[]>([])
-
-  const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
+  const [page, setPage] = useState<number>(1)
+  const [totalCount, setTotalCount] = useState<number>(0)
+  const [totalPages, setTotalPages] = useState<number>(1)
+  const pageSize = 10
 
   const [filterValues, setFilterValues] = useState<Partial<LessonFilter>>({
-    ownerId,
-    userId: ownerId,
     searchText: '',
-    tags: []
+    userId: parseInt(localStorage.getItem('userId') ?? '0', 10),
+    tags: [],
+    pageSize: pageSize,
+    pageNumber: 1
   })
 
-  const filterValuesJson = useMemo(() => JSON.stringify(filterValues), [filterValues])
-
   const filter = useMemo(() => {
-    const baseFilter = JSON.parse(filterValuesJson)
-    if (!showAllOwner) {
-      return new LessonFilter({ ...baseFilter, pageSize: 4 })
-    }
-    return new LessonFilter(baseFilter)
-  }, [filterValuesJson, showAllOwner])
-
-  const starredFilter = useMemo(() => {
-    const base = JSON.parse(filterValuesJson)
-    if (!showAllStarred) {
-      return new LessonFilter({
-        ...base,
-        ownerId: null,
-        isStarred: true,
-        userId: ownerId,
-        pageSize: 4
-      })
-    }
     return new LessonFilter({
-      ...base,
-      ownerId: null,
-      isStarred: true,
-      userId: ownerId
+      ...filterValues,
+      pageSize: pageSize,
+      pageNumber: page
     })
-  }, [filterValuesJson, ownerId, showAllStarred])
+  }, [filterValues, page])
 
   const lessonClient = useMemo(() => new LessonClient(), [])
 
   const loadLessons = useCallback(async () => {
     setLoading(true)
     try {
-      const [all] = await Promise.all([lessonClient.getAllLessons(filter)])
-      const [starred] = await Promise.all([lessonClient.getAllLessons(starredFilter)])
+      const result = await lessonClient.getAllLessons(filter)
 
-      const allList = Array.isArray(all) ? all : (all?.items ?? [])
-      const starredList = Array.isArray(starred) ? starred : (starred?.items ?? [])
-
-      setOwnerLessons(allList)
-      setStarredLessons(starredList)
+      if (isPagedResult<LessonDto>(result)) {
+        setLessons(result.items)
+        setTotalCount(result.totalCount)
+        setTotalPages(result.totalPages ?? 1)
+      } else {
+        setLessons([])
+        setTotalCount(0)
+        setTotalPages(1)
+      }
     } catch (error) {
-      console.error('Error fetching lesson data:', error)
+      console.error('Error fetching lessons:', error)
     } finally {
       setLoading(false)
     }
-  }, [lessonClient, filter, starredFilter])
+  }, [filter, lessonClient])
 
   useEffect(() => {
     loadLessons()
-  }, [loadLessons, showAllOwner, showAllStarred])
+  }, [filter, loadLessons])
 
   const handleSearch = useCallback((text: string) => {
+    setPage(1)
     setFilterValues((prev) => {
       if (prev.searchText === text) return prev
       return { ...prev, searchText: text }
@@ -79,7 +70,6 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
   }, [])
 
   const isFirstRender = useRef(true)
-
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false
@@ -98,6 +88,7 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
       .map((tag) => tag.value)
       .filter((v): v is string => v !== null && v !== undefined)
 
+    setPage(1)
     setFilterValues((prev) => ({
       ...prev,
       tags
@@ -109,6 +100,7 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
       .map((uploader) => parseInt(uploader.value as string, 10))
       .filter((v) => !isNaN(v))
 
+    setPage(1)
     setFilterValues((prev) => ({
       ...prev,
       ownerIdInts: uploaderIds
@@ -116,8 +108,7 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
   }, [selectedUploaderIds])
 
   return {
-    ownerLessons,
-    starredLessons,
+    lessons,
     loading,
     search,
     setSearch,
@@ -126,6 +117,10 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
     selectedTags,
     setSelectedTags,
     selectedUploaderIds,
-    setSelectedUploaderIds
+    setSelectedUploaderIds,
+    page,
+    setPage,
+    totalCount,
+    totalPages
   }
 }
