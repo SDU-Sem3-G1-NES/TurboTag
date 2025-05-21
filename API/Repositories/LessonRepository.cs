@@ -46,8 +46,10 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
                 query.Add($"{{\"lesson_details.title\": {{$regex: \"{escapedTitle}\", $options: \"i\"}}}}");
             }
 
-            if (filter.OwnerId != null)
-                query.Add($"{{\"owner_id\": {filter.OwnerId}}}");
+            if (filter.OwnerIdInts is { Length: > 0 })
+                // Match owner_id in array of owner IDs
+                query.Add($"{{\"owner_id\": {{ \"$in\": [{string.Join(",", filter.OwnerIdInts)}] }} }}");
+            else if (filter.OwnerId != null) query.Add($"{{\"owner_id\": {filter.OwnerId}}}");
 
             if (filter.LessonId != null)
                 query.Add($"{{\"lesson_details._id\": {filter.LessonId}}}");
@@ -68,14 +70,13 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
             {
                 var escapedSearchText = JsonSerializer.Serialize(filter.SearchText).Trim('"');
                 query.Add($@"{{
-            ""$or"": [
-                {{""lesson_details.title"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }},
-                {{""lesson_details.description"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}
-            ]
-        }}");
+        ""$or"": [
+            {{""lesson_details.title"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }},
+            {{""lesson_details.description"": {{""$regex"": ""{escapedSearchText}"", ""$options"": ""i""}} }}
+        ]
+    }}");
             }
         }
-
 
         var filterString = query.Count > 1
             ? $"{{ \"$and\": [{string.Join(",", query)}] }}"
@@ -89,6 +90,7 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
 
         return database.Find<LessonDto>("lesson", filterString);
     }
+
 
     public List<LessonDto> GetLessonsByTags(string[] tags)
     {
@@ -241,12 +243,14 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
 
         var results = database.Aggregate("lesson", pipeline);
 
-        return results
+        var dict = results
             .Where(doc => doc.Contains("_id") && doc.Contains("owner_name"))
             .ToDictionary(
                 doc => doc["_id"].AsInt32,
                 doc => doc["owner_name"].AsString
             );
+
+        return dict;
     }
 }
 
@@ -284,6 +288,7 @@ public class LessonFilter : PaginationFilter
     public string? Title { get; set; }
     public List<string>? Tags { get; set; }
     public int? OwnerId { get; set; }
+    public int[]? OwnerIdInts { get; set; }
     public int? UserId { get; set; }
     public List<int>? UploadIds { get; set; }
     public int? LessonId { get; set; }

@@ -3606,6 +3606,7 @@ export class LessonFilter implements ILessonFilter {
     title?: string | null;
     tags?: string[] | null;
     ownerId?: number | null;
+    ownerIdInts?: number[] | null;
     userId?: number | null;
     uploadIds?: number[] | null;
     lessonId?: number | null;
@@ -3636,6 +3637,14 @@ export class LessonFilter implements ILessonFilter {
                 this.tags = <any>null;
             }
             this.ownerId = _data["ownerId"] !== undefined ? _data["ownerId"] : <any>null;
+            if (Array.isArray(_data["ownerIdInts"])) {
+                this.ownerIdInts = [] as any;
+                for (let item of _data["ownerIdInts"])
+                    this.ownerIdInts!.push(item);
+            }
+            else {
+                this.ownerIdInts = <any>null;
+            }
             this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
             if (Array.isArray(_data["uploadIds"])) {
                 this.uploadIds = [] as any;
@@ -3677,6 +3686,11 @@ export class LessonFilter implements ILessonFilter {
                 data["tags"].push(item);
         }
         data["ownerId"] = this.ownerId !== undefined ? this.ownerId : <any>null;
+        if (Array.isArray(this.ownerIdInts)) {
+            data["ownerIdInts"] = [];
+            for (let item of this.ownerIdInts)
+                data["ownerIdInts"].push(item);
+        }
         data["userId"] = this.userId !== undefined ? this.userId : <any>null;
         if (Array.isArray(this.uploadIds)) {
             data["uploadIds"] = [];
@@ -3701,6 +3715,7 @@ export interface ILessonFilter {
     title?: string | null;
     tags?: string[] | null;
     ownerId?: number | null;
+    ownerIdInts?: number[] | null;
     userId?: number | null;
     uploadIds?: number[] | null;
     lessonId?: number | null;

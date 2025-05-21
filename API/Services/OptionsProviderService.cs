@@ -48,7 +48,7 @@ public class OptionsProviderProviderService(ILessonService lessonService, IUserS
 
     public IEnumerable<OptionDto> GetUploaderOptions(BaseOptionsFilter filter)
     {
-        var uploaders = lessonService.UploaderOptions(filter);
+        var uploaders = lessonService.UploaderOptions(filter); // Dictionary<int, string>
 
         if (filter.UserId is not null)
         {
@@ -67,16 +67,16 @@ public class OptionsProviderProviderService(ILessonService lessonService, IUserS
                 .Where(x => userOwnedLessons.Contains(x.Key) || userStarredLessons.Contains(x.Key))
                 .Select(x => new OptionDto
                 {
-                    DisplayText = x.ToString(),
-                    Value = x.ToString()
+                    Value = x.Key.ToString(),
+                    DisplayText = x.Value
                 });
         }
 
         return uploaders
             .Select(x => new OptionDto
             {
-                DisplayText = x.ToString(),
-                Value = x.ToString()
+                Value = x.Key.ToString(),
+                DisplayText = x.Value
             });
     }
 }

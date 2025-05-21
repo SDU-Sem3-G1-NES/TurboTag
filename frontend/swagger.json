@@ -2062,6 +2062,14 @@
             "format": "int32",
             "nullable": true
           },
+          "ownerIdInts": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
           "userId": {
             "type": "integer",
             "format": "int32",

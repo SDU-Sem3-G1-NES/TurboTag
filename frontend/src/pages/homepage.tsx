@@ -4,6 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons'
 import { useHomePageState } from './hooks/useHomepageState'
 import LessonCard from '../components/lessonCard'
 import TagSelectFilter from '../components/Filters/TagSelectFilter'
+import UploaderSelectFilter from '../components/Filters/UploaderSelectFilter'
 
 const HomePage: React.FC = () => {
   const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
@@ -20,7 +21,9 @@ const HomePage: React.FC = () => {
     handleSearch,
     reload,
     selectedTags,
-    setSelectedTags
+    setSelectedTags,
+    selectedUploaderIds,
+    setSelectedUploaderIds
   } = useHomePageState(showAllOwner, showAllStarred)
 
   const renderSection = (
@@ -78,11 +81,22 @@ const HomePage: React.FC = () => {
       />
 
       <div style={{ width: '50%', marginBottom: 24 }}>
-        <TagSelectFilter
-          userId={ownerId}
-          selectedTags={selectedTags}
-          setSelectedTags={setSelectedTags}
-        />
+        <Row gutter={8}>
+          <Col flex="auto">
+            <TagSelectFilter
+              userId={ownerId}
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+            />
+          </Col>
+          <Col flex="auto">
+            <UploaderSelectFilter
+              userId={ownerId}
+              selectedUploaders={selectedUploaderIds}
+              setSelectedUploaders={setSelectedUploaderIds}
+            />
+          </Col>
+        </Row>
       </div>
 
       {loading ? (

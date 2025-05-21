@@ -7,6 +7,7 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<OptionDto[]>([])
+  const [selectedUploaderIds, setSelectedUploaderIds] = useState<OptionDto[]>([])
 
   const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
 
@@ -103,6 +104,17 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
     }))
   }, [selectedTags])
 
+  useEffect(() => {
+    const uploaderIds = selectedUploaderIds
+      .map((uploader) => parseInt(uploader.value as string, 10))
+      .filter((v) => !isNaN(v))
+
+    setFilterValues((prev) => ({
+      ...prev,
+      ownerIdInts: uploaderIds
+    }))
+  }, [selectedUploaderIds])
+
   return {
     ownerLessons,
     starredLessons,
@@ -112,6 +124,8 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
     handleSearch,
     reload: loadLessons,
     selectedTags,
-    setSelectedTags
+    setSelectedTags,
+    selectedUploaderIds,
+    setSelectedUploaderIds
   }
 }
