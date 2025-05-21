@@ -1004,6 +1004,112 @@
         }
       }
     },
+    "/Options/GetTagOptions": {
+      "get": {
+        "tags": [
+          "Options"
+        ],
+        "operationId": "Options_GetTagOptions",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "UserId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_OptionDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Options/GetUploaderOptions": {
+      "get": {
+        "tags": [
+          "Options"
+        ],
+        "operationId": "Options_GetUploaderOptions",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "UserId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResult_OptionDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Settings/GetAllSettings": {
       "get": {
         "tags": [
@@ -2045,6 +2151,20 @@
         },
         "additionalProperties": false
       },
+      "OptionDto": {
+        "type": "object",
+        "properties": {
+          "displayText": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedResult_LessonDto": {
         "type": "object",
         "properties": {
@@ -2079,6 +2199,33 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LibraryDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResult_OptionDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionDto"
             }
           },
           "totalCount": {

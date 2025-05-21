@@ -1,38 +1,47 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Checkbox, Col, Input, Row, Spin } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 import { useHomePageState } from './hooks/useHomepageState'
 import LessonCard from '../components/lessonCard'
+import TagSelectFilter from '../components/Filters/TagSelectFilter'
 
 const HomePage: React.FC = () => {
-  const { ownerLessons, starredLessons, loading, search, setSearch, handleSearch, reload } =
-    useHomePageState()
+  const ownerId = useMemo(() => parseInt(localStorage.getItem('userId') ?? '0', 10), [])
 
-  // Local state to track if showing all lessons for each section
-  const [showAllOwner, setShowAllOwner] = useState(false)
-  const [showAllStarred, setShowAllStarred] = useState(false)
+  const [showAllOwner, setShowAllOwner] = useState(true)
+  const [showAllStarred, setShowAllStarred] = useState(true)
+
+  const {
+    ownerLessons,
+    starredLessons,
+    loading,
+    search,
+    setSearch,
+    handleSearch,
+    reload,
+    selectedTags,
+    setSelectedTags
+  } = useHomePageState(showAllOwner, showAllStarred)
 
   const renderSection = (
     title: string,
     lessons: typeof ownerLessons,
-    showAll: boolean,
-    setShowAll: React.Dispatch<React.SetStateAction<boolean>>
+    limit: boolean,
+    setLimit: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    // Limit to 4 lessons if showAll is false
-    const displayedLessons = showAll ? lessons : lessons.slice(0, 4)
+    const displayedLessons = limit ? lessons.slice(0, 4) : lessons
 
     return (
       <>
         <Row
           align="middle"
           gutter={[16, 16]}
-          style={{ width: '75%', marginBottom: 8, justifyContent: 'space-between' }}
-        >
+          style={{ width: '75%', marginBottom: 8, justifyContent: 'space-between' }}>
           <Col>
             <h1 style={{ textAlign: 'left', margin: 0 }}>{title}</h1>
           </Col>
           <Col>
-            <Checkbox checked={showAll} onChange={() => setShowAll(!showAll)}>
+            <Checkbox checked={!limit} onChange={(e) => setLimit(!e.target.checked)}>
               Show All
             </Checkbox>
           </Col>
@@ -56,8 +65,7 @@ const HomePage: React.FC = () => {
         flexDirection: 'column',
         alignItems: 'center',
         overflow: 'hidden' // No scroll
-      }}
-    >
+      }}>
       <Input.Search
         placeholder="Search by title or description"
         value={search}
@@ -66,6 +74,14 @@ const HomePage: React.FC = () => {
         style={{ width: '50%', marginBottom: 24 }}
         allowClear
       />
+
+      <div style={{ width: '50%', marginBottom: 24 }}>
+        <TagSelectFilter
+          userId={ownerId}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
+        />
+      </div>
 
       {loading ? (
         <Spin
