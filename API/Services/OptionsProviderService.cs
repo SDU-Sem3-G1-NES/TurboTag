@@ -10,7 +10,7 @@ public interface IOptionsProviderService : IServiceBase
     IEnumerable<OptionDto> GetUploaderOptions(BaseOptionsFilter filter);
 }
 
-public class OptionsProviderProviderService(ILessonService lessonService, IUserService userService)
+public class OptionsProviderProviderService(ILessonService lessonService)
     : IOptionsProviderService
 {
     public IEnumerable<OptionDto> GetTagOptions(BaseOptionsFilter filter)
