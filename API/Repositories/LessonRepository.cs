@@ -276,8 +276,8 @@ public class LessonRepository(IMongoDataAccess database) : ILessonRepository
         var results = database.Aggregate("lesson", pipeline);
 
         var dict = results
-            .Where(doc => doc.Contains("_id") && doc.Contains("owner_name"))
-            .ToDictionary(
+            .Where(doc => doc.Contains("_id") && doc.Contains("owner_name") && doc["_id"].IsInt32 && doc["owner_name"].IsString)
+    .ToDictionary(
                 doc => doc["_id"].AsInt32,
                 doc => doc["owner_name"].AsString
             );
