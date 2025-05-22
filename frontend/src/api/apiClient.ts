@@ -5224,6 +5224,7 @@ function isAxiosError(obj: any): obj is AxiosError {
 }
 
 /* tslint:disable */
+/* eslint-disable */
 
 // ReSharper disable InconsistentNaming
 export interface PagedResult<T> {
