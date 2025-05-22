@@ -115,7 +115,6 @@ const UploadPage: React.FC = () => {
     return fileId
   }
 
-
   const handleSubmit = async () => {
     if (!file) return
 
@@ -124,14 +123,14 @@ const UploadPage: React.FC = () => {
       const duration = await getFileDuration(file)
 
       //const testID = "682e182d4b4fbca18b7b1048"
-      
+
       const text = await lessonClient.getTranscriptionByObjectId(fileId)
-      
+
       setGenerating(true)
       const result = await contentGenerationClient.generate(text)
 
-      let generatedDescription = '';
-      let tagsList: string[] = [];
+      let generatedDescription = ''
+      let tagsList: string[] = []
 
       if (result != null) {
         tagsList = (result.tags ?? '')
@@ -139,7 +138,6 @@ const UploadPage: React.FC = () => {
           .map((tag) => tag.trim())
           .filter((tag) => tag !== '')
 
-        
         generatedDescription = result.description ?? ''
         setDescription(generatedDescription)
         setTags(tagsList)
@@ -163,7 +161,6 @@ const UploadPage: React.FC = () => {
       }
       setGenerating(false)
 
-      
       const uploadDTO = new UploadDto()
       uploadDTO.init({
         id: null,
@@ -178,9 +175,9 @@ const UploadPage: React.FC = () => {
       const lessonDetailsDTO = new LessonDetailsDto()
       lessonDetailsDTO.init({
         id: uploadID,
-        title: title, 
-        description: generatedDescription, 
-        tags: tagsList 
+        title: title,
+        description: generatedDescription,
+        tags: tagsList
       })
 
       const fileMetadataDTO = new FileMetadataDto()
@@ -262,17 +259,14 @@ const UploadPage: React.FC = () => {
           </Upload.Dragger>
         </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-        >
+        <Form.Item label="Description" name="description">
           <TextArea maxLength={100} disabled />
         </Form.Item>
 
         <Form.Item label="Tags" name="tags">
           <Tags tags={tags} setTags={setTags} />
         </Form.Item>
-        
+
         <Form.Item>
           <div className="upload-button-wrapper">
             {generating ? (
