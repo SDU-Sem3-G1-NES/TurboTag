@@ -68,7 +68,7 @@ public class FFmpegService : IFFmpegService
             File.Delete(thumbnailPath);
             return mongoId;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return String.Empty;
         }
