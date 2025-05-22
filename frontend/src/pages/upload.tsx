@@ -272,29 +272,12 @@ const UploadPage: React.FC = () => {
         <Form.Item label="Tags" name="tags">
           <Tags tags={tags} setTags={setTags} />
         </Form.Item>
-
-        <Form.Item label="Content Generation" name="contentGeneration">
+        
+        <Form.Item>
           <div className="upload-button-wrapper">
             {generating ? (
               <Spin tip="Loading..." />
-            ) : (
-              //Need to put it in generateContention function after implentation of mp3 to text
-              /*file as File*/
-              <Button
-                type="primary"
-                className="upload-btn"
-                icon={<UploadOutlined />}
-              >
-                Generate Content
-              </Button>
-              
-            )}
-          </div>
-        </Form.Item>
-
-        <Form.Item>
-          <div className="upload-button-wrapper">
-            {uploading ? (
+            ) : uploading ? (
               <Progress percent={uploadProgress} status="active" />
             ) : (
               <Button
