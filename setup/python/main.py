@@ -18,11 +18,13 @@ OLLAMA_URL = "http://ollama:11434/api/generate"
 BASE_DIR = Path(__file__).resolve().parent
 TAG_CSV_PATH = os.getenv("TAG_CSV_PATH", str(BASE_DIR / "tags.csv"))
 
-# Load allowed tags once at startup
+# Load allowed tags once at startup (read the Tag Name column)
 try:
     with open(TAG_CSV_PATH, newline="", encoding="utf-8") as f:
-        reader = csv.reader(f)
-        allowed_tags = [tag.strip() for tag in next(reader) if tag.strip()]
+        reader = csv.DictReader(f)
+        allowed_tags = [row["Tag Name"].strip() for row in reader if row.get("Tag Name")]
+        if not allowed_tags:
+            raise ValueError("No tags found in CSV")
 except Exception as e:
     raise RuntimeError(f"Could not load tags from {TAG_CSV_PATH!r}: {e}")
 

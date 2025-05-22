@@ -123,9 +123,9 @@ const UploadPage: React.FC = () => {
       const fileId = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
 
-      const testID = "682e182d4b4fbca18b7b1048"
+      //const testID = "682e182d4b4fbca18b7b1048"
       
-      const text = await lessonClient.getTranscriptionByObjectId(testID)
+      const text = await lessonClient.getTranscriptionByObjectId(fileId)
       
       setGenerating(true)
       const result = await contentGenerationClient.generate(text)
