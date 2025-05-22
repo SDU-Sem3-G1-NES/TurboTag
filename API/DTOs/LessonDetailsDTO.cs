@@ -11,10 +11,11 @@ public class LessonDetailsDto
         Title = "";
         Description = "";
         Tags = new List<string>();
+        ThumbnailId = "";
     }
     
     [method: JsonConstructor]
-    public LessonDetailsDto(int? id, string? title, string? description, List<string>? tags)
+    public LessonDetailsDto(int? id, string? title, string? description, List<string>? tags, string? thumbnailId = "")
     {
         Id = id;
         Title = title;
@@ -29,4 +30,6 @@ public class LessonDetailsDto
     public string? Description { get; set; }
     [BsonElement("tags")]
     public List<string>? Tags { get; set; }
+    [BsonElement("thumbnail_id")]
+    public string? ThumbnailId { get; set; }
 }

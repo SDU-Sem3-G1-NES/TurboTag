@@ -105,17 +105,18 @@ const UploadPage: React.FC = () => {
     })
 
     const response = await fileClient['instance'].post('/File/FinalizeUpload', finalizeUploadDto)
-    const fileId = response.data as string
+    const fileId = response.data.fileId as string
+    const thumbnailId = response.data.thumbnailId as string
 
     setUploading(false)
-    return fileId
+    return { fileId, thumbnailId }
   }
 
   const handleSubmit = async () => {
     if (!file) return
 
     try {
-      const fileId = await handleChunkedUpload(file)
+      const { fileId, thumbnailId } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
 
       const uploadDTO = new UploadDto()
@@ -134,7 +135,8 @@ const UploadPage: React.FC = () => {
         id: uploadID,
         title: title,
         description: description,
-        tags: tags
+        tags: tags,
+        thumbnailId: thumbnailId
       })
 
       const fileMetadataDTO = new FileMetadataDto()

@@ -1,3 +1,4 @@
+using System.Drawing;
 using FFMpegCore;
 
 namespace API.Services;
@@ -6,12 +7,15 @@ public interface IFFmpegService : IServiceBase
 {
     public Task<String> SaveFileToTemp(IFormFile file, string fileId);
     public Task<List<String>> GetVideoAudio(string videoPath, string outputId, bool deleteInputFile);
+    public Task<String> MakeVideoThumbnail(string videoPath);
 }
 public class FFmpegService : IFFmpegService
 {
     private readonly string _tempFolderPath;
-    public FFmpegService()
+    private readonly IFileService _fileService;
+    public FFmpegService(IFileService fileService)
     {
+        _fileService = fileService;
         _tempFolderPath = Path.Combine(Path.GetTempPath(), "TurboTag");
         Directory.CreateDirectory(_tempFolderPath); // Ensure the folder exists
     }
@@ -48,6 +52,55 @@ public class FFmpegService : IFFmpegService
         }
         
         return (audioPaths);
+    }
+    
+    public async Task<String> MakeVideoThumbnail(string videoPath)
+    {
+        if (!File.Exists(videoPath))
+        {
+            return String.Empty;
+        }
+        try
+        {
+            var thumbnailPath = await GetVideoSnapshot(videoPath, Guid.NewGuid().ToString());
+            await using var thumbnailStream = System.IO.File.OpenRead(thumbnailPath);
+            var mongoId = await _fileService.UploadChunkedFile(thumbnailStream, $"thumbnail-{Guid.NewGuid().ToString()}.png") ?? "";
+            File.Delete(thumbnailPath);
+            return mongoId;
+        }
+        catch (Exception e)
+        {
+            return String.Empty;
+        }
+    }
+    
+    private async Task<String> GetVideoSnapshot(string videoPath, string outputId)
+    {
+        var outputFolderPath = Path.Combine(_tempFolderPath, outputId);
+        Directory.CreateDirectory(outputFolderPath);
+        var thumbnailPath = Path.Combine(outputFolderPath, $"snapshot-{outputId}.png");
+        try
+        {
+            var mediaInfo = await FFProbe.AnalyseAsync(videoPath);
+            if (mediaInfo.VideoStreams.Any())
+            {
+                var videoStream = mediaInfo.VideoStreams.First();
+                var originalWidth = videoStream.Width;
+                var originalHeight = videoStream.Height;
+                
+                int targetHeight = 160;
+                int targetWidth = (int)((double)originalWidth / originalHeight * targetHeight);
+
+                var thumbnailSize = new Size(targetWidth, targetHeight);
+                await FFMpeg.SnapshotAsync(videoPath, thumbnailPath, thumbnailSize,
+                    TimeSpan.FromSeconds(5));
+            }
+        }
+        catch (Exception)
+        {
+            return String.Empty;
+        }
+        return thumbnailPath;
     }
     
     public async Task<String> SaveFileToTemp(IFormFile file, string fileId)

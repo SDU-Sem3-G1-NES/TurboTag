@@ -161,7 +161,9 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
             await using var finalStream = System.IO.File.OpenRead(outputPath);
 
             var fileId = await fileService.UploadChunkedFile(finalStream, finaliseUploadDto.FileName);
-            var audioPaths = await ffmpegService.GetVideoAudio(outputPath, fileId!, true);
+
+            var thumbnailId = await ffmpegService.MakeVideoThumbnail(outputPath);
+            var audioPaths = await ffmpegService.GetVideoAudio(outputPath, fileId!, false);
             var transcription = await audioTranscriptionService.AudioTranscriptionAsync(audioPaths);
             
             try
@@ -174,7 +176,7 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                 Console.WriteLine($"Cleanup error: {cleanupEx.Message}");
             }
             
-            return Ok(fileId);
+            return Ok(new {fileId, thumbnailId});
         }
         catch (Exception ioEx)
         {
@@ -187,7 +189,22 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
     }
 }
     #endregion
+    #region GetLessonThumbnail
     
+    [HttpGet("GetImage")]
+    [Produces("image/png")]
+    [ProducesResponseType(typeof(FileContentResult), 200)]
+    public async Task<IActionResult> GetImage(string id)
+    {
+        var stream = await fileService.GetFileById(id);
+        if (stream == null) return NotFound();
+
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        
+        return File(memoryStream.ToArray(), "image/png");
+    }
+    #endregion
 }
 
 public class FormFileDto
