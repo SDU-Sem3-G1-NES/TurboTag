@@ -6,9 +6,10 @@ import { StarFilled, StarOutlined } from '@ant-design/icons'
 interface LessonCardProps {
   lesson: LessonDto
   onStarToggled?: () => void
+  onClick: () => void
 }
 
-const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
+const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled, onClick }) => {
   const [isStarred, setIsStarred] = useState<boolean>(lesson.isStarred ?? false)
 
   const userId = parseInt(localStorage.getItem('userId') ?? '0', 10)
@@ -34,7 +35,7 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
   }
 
   return (
-    <Card hoverable style={{ margin: 8, position: 'relative' }} bodyStyle={{ paddingRight: 32 }}>
+    <Card onClick={onClick} hoverable style={{ margin: 8, position: 'relative' }} bodyStyle={{ paddingRight: 32 }}>
       <div
         style={{
           position: 'absolute',

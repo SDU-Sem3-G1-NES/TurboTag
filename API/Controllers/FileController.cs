@@ -1,5 +1,4 @@
 using API.Services;
-using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +9,21 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class FileController(IFileService fileService, IFFmpegService ffmpegService, IAudioTranscriptionService audioTranscriptionService) : ControllerBase
 {
-    
+    [HttpGet("StreamVideo/{id}")]
+    [Produces("video/mp4")]
+    [ProducesResponseType(typeof(FileStream), 200)]
+    public async Task<IActionResult> StreamVideo(string id)
+    {
+        var stream = await fileService.GetFileById(id);
+        if (stream == null)
+            return NotFound();
+
+        var mimeType = "video/mp4";
+
+        Response.Headers.Append("Accept-Ranges", "bytes");
+        return File(stream, mimeType, enableRangeProcessing: true);
+    }
+
     #region UploadFile
     [DisableRequestSizeLimit]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
