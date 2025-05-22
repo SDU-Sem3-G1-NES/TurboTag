@@ -9,14 +9,16 @@ import {
   FileMetadataDto,
   FileClient,
   UploadChunkDto,
-  FinaliseUploadDto
+  FinaliseUploadDto,
+  GenerationClient
 } from '../api/apiClient.ts'
-import { Button, Form, Input, notification, Progress, Upload, UploadProps } from 'antd'
+import { Button, Form, Input, notification, Progress, Upload, UploadProps, Spin } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import TextArea from 'antd/es/input/TextArea'
 
 const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false)
+  const [generating, setGenerating] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
@@ -25,7 +27,9 @@ const UploadPage: React.FC = () => {
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
   const lessonClient = new LessonClient()
+  const contentGenerationClient = new GenerationClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
+  const [form] = Form.useForm()
 
   const ownerId = Number(localStorage.getItem('userId'))
   const ownerName = localStorage.getItem('userName')
@@ -119,6 +123,45 @@ const UploadPage: React.FC = () => {
       const { fileId, thumbnailId } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
 
+      //const testID = "682e182d4b4fbca18b7b1048"
+
+      const text = await lessonClient.getTranscriptionByObjectId(fileId)
+
+      setGenerating(true)
+      const result = await contentGenerationClient.generate(text)
+
+      let generatedDescription = ''
+      let tagsList: string[] = []
+
+      if (result != null) {
+        tagsList = (result.tags ?? '')
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== '')
+
+        generatedDescription = result.description ?? ''
+        setDescription(generatedDescription)
+        setTags(tagsList)
+        form.setFieldsValue({ description: generatedDescription })
+
+        notification.success({
+          message: 'Content Generation successful',
+          description: 'Your lecture content has been generated successfully',
+          placement: 'topRight',
+          duration: 2
+        })
+        console.log('Content Generation successful')
+      } else {
+        notification.error({
+          message: 'Content Generation failed',
+          description: 'Your lecture content could not be generated',
+          placement: 'topRight',
+          duration: 2
+        })
+        console.error('Content Generation failed')
+      }
+      setGenerating(false)
+
       const uploadDTO = new UploadDto()
       uploadDTO.init({
         id: null,
@@ -134,8 +177,8 @@ const UploadPage: React.FC = () => {
       lessonDetailsDTO.init({
         id: uploadID,
         title: title,
-        description: description,
-        tags: tags,
+        description: generatedDescription,
+        tags: tagsList,
         thumbnailId: thumbnailId
       })
 
@@ -185,7 +228,12 @@ const UploadPage: React.FC = () => {
 
   return (
     <div className="form-container">
-      <Form layout="vertical" onFinish={handleSubmit}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{ description: description }}
+      >
         <Form.Item
           label="Title"
           name="title"
@@ -213,17 +261,8 @@ const UploadPage: React.FC = () => {
           </Upload.Dragger>
         </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: 'Please input your description!' }]}
-        >
-          <TextArea
-            maxLength={100}
-            value={title}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Optional short description"
-          />
+        <Form.Item label="Description" name="description">
+          <TextArea maxLength={100} disabled />
         </Form.Item>
 
         <Form.Item label="Tags" name="tags">
@@ -232,7 +271,9 @@ const UploadPage: React.FC = () => {
 
         <Form.Item>
           <div className="upload-button-wrapper">
-            {uploading ? (
+            {generating ? (
+              <Spin tip="Loading..." />
+            ) : uploading ? (
               <Progress percent={uploadProgress} status="active" />
             ) : (
               <Button

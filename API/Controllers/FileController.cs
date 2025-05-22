@@ -85,7 +85,7 @@ public class FileController(IFileService fileService, IFFmpegService ffmpegServi
     }
     
     #endregion
-    #region FinalizeUpload
+     #region FinalizeUpload
     [HttpPost("FinalizeUpload")]
 public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUploadDto)
 {
@@ -147,7 +147,6 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                     {
                         using var chunkStream = System.IO.File.OpenRead(chunkPath);
                         await chunkStream.CopyToAsync(outputStream);
-                        // Close stream before deleting
                         chunkStream.Close();
                         System.IO.File.Delete(chunkPath);
                     }
@@ -168,8 +167,8 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
             
             try
             {
-                System.IO.File.Delete(outputPath);
-                Directory.Delete(tempDir, true);
+                //System.IO.File.Delete(outputPath);
+                //Directory.Delete(tempDir, true);
             }
             catch (Exception cleanupEx)
             {

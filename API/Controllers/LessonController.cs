@@ -51,6 +51,14 @@ public class LessonController(ILessonService lessonService) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("GetTranscriptionByObjectId")]
+    public string GetTranscriptionByObjectId(string objectId)
+    {
+        var result = lessonService.GetTranscriptionByObjectId(objectId);
+        if (result == null) return "";
+        return result;
+    }
+
     [HttpGet("GetLessonByObjectId")]
     public ActionResult<LessonDto> GetLessonByObjectId(string objectId)
     {
