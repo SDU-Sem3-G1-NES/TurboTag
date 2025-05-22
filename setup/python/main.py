@@ -14,9 +14,11 @@ app = FastAPI(
 # Ollama endpoint inside Docker
 OLLAMA_URL = "http://ollama:11434/api/generate"
 
+# Locate tags.csv next to this script, with optional env override
 BASE_DIR = Path(__file__).resolve().parent
 TAG_CSV_PATH = os.getenv("TAG_CSV_PATH", str(BASE_DIR / "tags.csv"))
 
+# Load allowed tags once at startup
 try:
     with open(TAG_CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
@@ -32,12 +34,13 @@ class GenerationResponse(BaseModel):
     description: str
 
 def call_ollama(prompt: str, model: str = "gemma:2b") -> str:
+    """Send a prompt to Ollama and return its raw response."""
     payload = {"model": model, "prompt": prompt, "stream": False}
     try:
         resp = requests.post(OLLAMA_URL, json=payload, timeout=300)
         resp.raise_for_status()
         return resp.json().get("response", "").strip()
-    except requests.RequestException as exc:
+    except requests.RequestException:
         raise HTTPException(status_code=500, detail="AI generation failed")
 
 @app.post("/generate-content", response_model=GenerationResponse, tags=["Generation"])
@@ -51,7 +54,8 @@ Allowed tags:
 {allowed_list_str}
 
 Return exactly 5 tags from the list above that best match the input.
-Output a comma-separated list only.
+Do not invent new tags or include any commentary.
+Output a single comma-separated list and nothing else.
 
 Input:
 {text}
@@ -60,7 +64,8 @@ Tags:""".strip()
 
     # Prompt for description
     desc_prompt = f"""
-Return one concise sentence describing the input.
+Based solely on the input below, write exactly one clear, factual sentence summarizing it.
+Do not introduce filler, explanations, or any extra information.
 Output only that sentence.
 
 Input:
@@ -68,10 +73,17 @@ Input:
 
 Description:""".strip()
 
+    # Generate raw outputs
     raw_tags = call_ollama(tag_prompt)
     raw_desc = call_ollama(desc_prompt)
 
-    # Clean and enforce allowed-tags constraint
+    # Strip anything before the first colon in the description
+    if ":" in raw_desc:
+        description = raw_desc.split(":", 1)[1].strip()
+    else:
+        description = raw_desc.strip()
+
+    # Clean & enforce allowed-tags constraint
     candidates = [
         tag.strip()
         for tag in raw_tags.replace("\n", ",").split(",")
@@ -85,7 +97,7 @@ Description:""".strip()
         if len(final_tags) == 5:
             break
 
-    # Pad with additional allowed tags if fewer than 5
+    # Pad with additional tags if needed
     for tag in allowed_tags:
         if len(final_tags) == 5:
             break
@@ -94,5 +106,5 @@ Description:""".strip()
 
     return GenerationResponse(
         tags=", ".join(final_tags),
-        description=raw_desc
+        description=description
     )
