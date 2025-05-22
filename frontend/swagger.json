@@ -374,6 +374,36 @@
         }
       }
     },
+    "/File/GetImage": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_GetImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Generation/generate": {
       "post": {
         "tags": [
@@ -2064,6 +2094,10 @@
             "items": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "thumbnailId": {
+            "type": "string",
             "nullable": true
           }
         },
