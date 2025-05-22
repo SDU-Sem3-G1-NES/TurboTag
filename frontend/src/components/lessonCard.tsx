@@ -13,27 +13,27 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
 
   const userId = parseInt(localStorage.getItem('userId') ?? '0', 10)
   const lessonClient = new LessonClient()
-  const [imageUrl, setImageUrl] = useState<string>('https://placehold.co/100x100');
+  const [imageUrl, setImageUrl] = useState<string>('https://placehold.co/100x100')
 
   useEffect(() => {
     const fileClient = new FileClient()
-    const thumbnailId = lesson.lessonDetails?.thumbnailId;
-    if (!thumbnailId) return;
+    const thumbnailId = lesson.lessonDetails?.thumbnailId
+    if (!thumbnailId) return
 
     const loadImage = async () => {
       try {
-        const response = await fileClient.getImage(thumbnailId);
-        const blob = response.data;
-        const url = URL.createObjectURL(blob);
-        setImageUrl(url);
+        const response = await fileClient.getImage(thumbnailId)
+        const blob = response.data
+        const url = URL.createObjectURL(blob)
+        setImageUrl(url)
       } catch (err) {
-        console.error("Failed to fetch image", err);
+        console.error('Failed to fetch image', err)
       }
-    };
+    }
 
-    void loadImage();
-  }, [lesson.lessonDetails?.thumbnailId]);
-  
+    void loadImage()
+  }, [lesson.lessonDetails?.thumbnailId])
+
   const toggleStar = async () => {
     try {
       if (isStarred) {
@@ -54,7 +54,11 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
   }
 
   return (
-    <Card hoverable style={{ margin: 8, position: 'relative' }} styles={{ body: { paddingRight: 32 } }}>
+    <Card
+      hoverable
+      style={{ margin: 8, position: 'relative' }}
+      styles={{ body: { paddingRight: 32 } }}
+    >
       <div
         style={{
           position: 'absolute',
@@ -73,7 +77,14 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled }) => {
         <Image
           src={imageUrl}
           preview={false}
-          style={{ width: 100, height: 100, maxWidth: '100%', maxHeight: '100%', marginRight: 16, objectFit: 'cover' }}
+          style={{
+            width: 100,
+            height: 100,
+            maxWidth: '100%',
+            maxHeight: '100%',
+            marginRight: 16,
+            objectFit: 'cover'
+          }}
         />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <Typography.Text style={{ fontSize: 16, fontWeight: 'bold' }}>
