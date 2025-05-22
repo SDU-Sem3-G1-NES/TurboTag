@@ -733,6 +733,82 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
+            export interface IGenerationClient {
+                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            generate(body?: string | undefined): Promise<GenerationResult>        }
+
+    export class GenerationClient extends BaseApiClient implements IGenerationClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        generate(body?: string | undefined, cancelToken?: CancelToken): Promise<GenerationResult> {        let url_ = this.baseUrl + "/api/Generation/generate";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGenerate(_response);
+                });
+        }
+
+    protected processGenerate(response: AxiosResponse): Promise<GenerationResult> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = GenerationResult.fromJS(resultData200);
+        
+        return Promise.resolve<GenerationResult>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<GenerationResult>(null as any);
+}
+        }
+
             export interface ILessonClient {
                     /**
              * @param body (optional) 
@@ -761,6 +837,10 @@ url_ = url_.replace(/[?&]$/, "");
              * @return OK
              */
             getLessonById(lessonId?: number | undefined): Promise<LessonDto>                    /**
+             * @param objectId (optional) 
+             * @return OK
+             */
+            getTranscriptionByObjectId(objectId?: string | undefined): Promise<string>                    /**
              * @param objectId (optional) 
              * @return OK
              */
@@ -1159,6 +1239,63 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<LessonDto>(null as any);
+}
+    
+
+        /**
+         * @param objectId (optional) 
+         * @return OK
+         */
+        getTranscriptionByObjectId(objectId?: string | undefined, cancelToken?: CancelToken): Promise<string> {        let url_ = this.baseUrl + "/Lesson/GetTranscriptionByObjectId?";
+if (objectId === null)
+    throw new Error("The parameter 'objectId' cannot be null.");
+else if (objectId !== undefined)
+    url_ += "objectId=" + encodeURIComponent("" + objectId) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                        method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetTranscriptionByObjectId(_response);
+                });
+        }
+
+    protected processGetTranscriptionByObjectId(response: AxiosResponse): Promise<string> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = resultData200 as string;
+        
+        return Promise.resolve<string>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<string>(null as any);
 }
     
 
@@ -3400,6 +3537,46 @@ export class FinaliseUploadDto implements IFinaliseUploadDto {
 export interface IFinaliseUploadDto {
     uploadId?: string | null;
     fileName?: string | null;
+}
+
+export class GenerationResult implements IGenerationResult {
+    tags?: string | null;
+    description?: string | null;
+
+    constructor(data?: IGenerationResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tags = _data["tags"] !== undefined ? _data["tags"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): GenerationResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new GenerationResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tags"] = this.tags !== undefined ? this.tags : <any>null;
+        data["description"] = this.description !== undefined ? this.description : <any>null;
+        return data;
+    }
+}
+
+export interface IGenerationResult {
+    tags?: string | null;
+    description?: string | null;
 }
 
 export class LessonDetailsDto implements ILessonDetailsDto {
