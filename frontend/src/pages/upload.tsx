@@ -108,17 +108,18 @@ const UploadPage: React.FC = () => {
     })
 
     const response = await fileClient['instance'].post('/File/FinalizeUpload', finalizeUploadDto)
-    const fileId = response.data as string
+    const fileId = response.data.fileId as string
+    const thumbnailId = response.data.thumbnailId as string
 
     setUploading(false)
-    return fileId
+    return { fileId, thumbnailId }
   }
 
   const handleSubmit = async () => {
     if (!file) return
 
     try {
-      const fileId = await handleChunkedUpload(file)
+      const { fileId, thumbnailId } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
 
       //Test ID for Windows. It's for Oskar Testing purpose only.
@@ -176,7 +177,8 @@ const UploadPage: React.FC = () => {
         id: uploadID,
         title: title,
         description: generatedDescription,
-        tags: tagsList
+        tags: tagsList,
+        thumbnailId: thumbnailId
       })
 
       const fileMetadataDTO = new FileMetadataDto()
