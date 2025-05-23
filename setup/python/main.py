@@ -39,7 +39,7 @@ def call_ollama(prompt: str, model: str = "gemma:2b") -> str:
     """Send a prompt to Ollama and return its raw response."""
     payload = {"model": model, "prompt": prompt, "stream": False}
     try:
-        resp = requests.post(OLLAMA_URL, json=payload, timeout=300)
+        resp = requests.post(OLLAMA_URL, json=payload)
         resp.raise_for_status()
         return resp.json().get("response", "").strip()
     except requests.RequestException:
@@ -52,19 +52,18 @@ def generate_content(req: GenerationRequest):
 
     # Prompt for tags
     tag_prompt = f"""
-Allowed tags:
-{allowed_list_str}
+You are a tagging assistant.
 
-Return exactly 5 tags from the list above that best match the input.
-Do not invent new tags or include any commentary.
-Output a single comma-separated list and nothing else.
+Given a list of allowed tags and an input text, return the 5 tags from the allowed list that are the most semantically relevant to the content. The tags must be chosen only from the allowed list—do not make up or rephrase any.
 
-Input:
-{text}
+Only output a single comma-separated list of exactly 5 tags. No commentary, no bullet points, no numbering.
 
+Allowed tags: {allowed_list_str}
+Input: {text}
 Tags:""".strip()
 
-    # Prompt for description
+
+# Prompt for description
     desc_prompt = f"""
 Based solely on the input below, write exactly one clear, factual sentence summarizing it.
 Do not introduce filler, explanations, or any extra information.

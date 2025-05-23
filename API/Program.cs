@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient("OllamaClient", client =>
 {
-    client.Timeout = TimeSpan.FromMinutes(5);
+    client.Timeout = TimeSpan.FromMinutes(15);
 });
 builder.Services.AddSwaggerGen(options =>
 {
