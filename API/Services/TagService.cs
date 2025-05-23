@@ -19,8 +19,20 @@ public class TagService(ITagRepository tagRepository) : ITagService
 
     public bool AddTag(TagDto tag)
     {
-        return tagRepository.AddTag(tag);
+        var added = tagRepository.AddTag(tag);
+        if (!added)
+            return false;
+
+        var allTags = tagRepository.GetAllTags();
+
+        var csvPath = Path.Combine("..", "setup", "python", "tags.csv");
+        using var writer = new StreamWriter(csvPath, false);
+        writer.WriteLine("Tag ID,Tag Name");
+        foreach (var t in allTags.OrderBy(t => t.TagId)) writer.WriteLine($"{t.TagId},{t.TagName}");
+
+        return true;
     }
+
 
     public void DeleteTags(TagFilter? filter)
     {

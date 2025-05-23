@@ -6,7 +6,7 @@ namespace API.Repositories;
 
 public interface ITagRepository : IRepositoryBase
 {
-    IEnumerable<TagDto> GetAllTags(TagFilter? filter);
+    IEnumerable<TagDto> GetAllTags(TagFilter? filter = null);
     bool AddTag(TagDto tag);
     void DeleteTags(TagFilter? filter);
 }
