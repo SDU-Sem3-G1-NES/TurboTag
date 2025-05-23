@@ -4,21 +4,21 @@ from pathlib import Path
 import requests
 import csv
 import os
+from sentence_transformers import SentenceTransformer, util
+from typing import List
 
 app = FastAPI(
     title="Content Generator API (Ollama)",
-    description="Generates tags (from a fixed CSV list) and descriptions using the Ollama gemma:2b model.",
-    version="2.0.0"
+    description="Generates tags (from CSV) and descriptions using Ollama + semantic similarity.",
+    version="2.1.0"
 )
 
-# Ollama endpoint inside Docker
 OLLAMA_URL = "http://ollama:11434/api/generate"
 
-# Locate tags.csv next to this script, with optional env override
 BASE_DIR = Path(__file__).resolve().parent
 TAG_CSV_PATH = os.getenv("TAG_CSV_PATH", str(BASE_DIR / "tags.csv"))
 
-# Load allowed tags once at startup (read the Tag Name column)
+# Load allowed tags from CSV
 try:
     with open(TAG_CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -28,6 +28,9 @@ try:
 except Exception as e:
     raise RuntimeError(f"Could not load tags from {TAG_CSV_PATH!r}: {e}")
 
+# Load transformer model once
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+
 class GenerationRequest(BaseModel):
     text: str
 
@@ -36,34 +39,28 @@ class GenerationResponse(BaseModel):
     description: str
 
 def call_ollama(prompt: str, model: str = "gemma:2b") -> str:
-    """Send a prompt to Ollama and return its raw response."""
+    """Send prompt to Ollama and return response."""
     payload = {"model": model, "prompt": prompt, "stream": False}
     try:
-        resp = requests.post(OLLAMA_URL, json=payload)
+        resp = requests.post(OLLAMA_URL, json=payload, timeout=300)
         resp.raise_for_status()
         return resp.json().get("response", "").strip()
-    except requests.RequestException:
-        raise HTTPException(status_code=500, detail="AI generation failed")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {e}")
+
+def get_top_tags_by_similarity(text: str, tags: List[str], top_n=5) -> List[str]:
+    """Rank tags using semantic similarity and return top N."""
+    input_emb = embedding_model.encode(text, convert_to_tensor=True)
+    tag_embs = embedding_model.encode(tags, convert_to_tensor=True)
+    scores = util.cos_sim(input_emb, tag_embs)[0]
+    ranked = sorted(zip(tags, scores), key=lambda x: x[1], reverse=True)
+    return [tag for tag, _ in ranked[:top_n]]
 
 @app.post("/generate-content", response_model=GenerationResponse, tags=["Generation"])
 def generate_content(req: GenerationRequest):
     text = req.text.strip()
-    allowed_list_str = ", ".join(allowed_tags)
 
-    # Prompt for tags
-    tag_prompt = f"""
-You are a tagging assistant.
-
-Given a list of allowed tags and an input text, return the 5 tags from the allowed list that are the most semantically relevant to the content. The tags must be chosen only from the allowed list—do not make up or rephrase any.
-
-Only output a single comma-separated list of exactly 5 tags. No commentary, no bullet points, no numbering.
-
-Allowed tags: {allowed_list_str}
-Input: {text}
-Tags:""".strip()
-
-
-# Prompt for description
+    # Use AI to generate a short description
     desc_prompt = f"""
 Based solely on the input below, write exactly one clear, factual sentence summarizing it.
 Do not introduce filler, explanations, or any extra information.
@@ -73,37 +70,13 @@ Input:
 {text}
 
 Description:""".strip()
-
-    # Generate raw outputs
-    raw_tags = call_ollama(tag_prompt)
     raw_desc = call_ollama(desc_prompt)
 
-    # Strip anything before the first colon in the description
-    if ":" in raw_desc:
-        description = raw_desc.split(":", 1)[1].strip()
-    else:
-        description = raw_desc.strip()
+    # Clean description (remove possible "Description: ...")
+    description = raw_desc.split(":", 1)[1].strip() if ":" in raw_desc else raw_desc.strip()
 
-    # Clean & enforce allowed-tags constraint
-    candidates = [
-        tag.strip()
-        for tag in raw_tags.replace("\n", ",").split(",")
-        if tag.strip()
-    ]
-
-    final_tags = []
-    for tag in candidates:
-        if tag in allowed_tags and tag not in final_tags:
-            final_tags.append(tag)
-        if len(final_tags) == 5:
-            break
-
-    # Pad with additional tags if needed
-    for tag in allowed_tags:
-        if len(final_tags) == 5:
-            break
-        if tag not in final_tags:
-            final_tags.append(tag)
+    # Use embeddings to find top 5 tags
+    final_tags = get_top_tags_by_similarity(text, allowed_tags, top_n=5)
 
     return GenerationResponse(
         tags=", ".join(final_tags),

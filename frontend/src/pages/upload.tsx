@@ -123,9 +123,9 @@ const UploadPage: React.FC = () => {
       const duration = await getFileDuration(file)
 
       //Test ID for Windows. It's for Oskar Testing purpose only.
-      //const testID = "682e182d4b4fbca18b7b1048"
+      const testID = "682e182d4b4fbca18b7b1048"
 
-      const text = await lessonClient.getTranscriptionByObjectId(fileId)
+      const text = await lessonClient.getTranscriptionByObjectId(testID)
 
       setGenerating(true)
       const result = await contentGenerationClient.generate(text)
