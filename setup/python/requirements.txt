@@ -1,3 +1,7 @@
 fastapi
 uvicorn
 requests
+sentence-transformers
+torch
+hf_xet
+

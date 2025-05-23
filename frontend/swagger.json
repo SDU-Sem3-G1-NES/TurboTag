@@ -186,6 +186,37 @@
         }
       }
     },
+    "/File/StreamVideo/{id}": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_StreamVideo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/File/UploadFile": {
       "post": {
         "tags": [
@@ -370,6 +401,36 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/File/GetImage": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_GetImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
           }
         }
       }
@@ -2182,6 +2243,10 @@
             "items": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "thumbnailId": {
+            "type": "string",
             "nullable": true
           }
         },

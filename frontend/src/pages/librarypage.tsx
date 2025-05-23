@@ -5,6 +5,7 @@ import { useLibraryPageState } from './hooks/useLibrarypageState'
 import LessonCard from '../components/lessonCard'
 import TagSelectFilter from '../components/Filters/TagSelectFilter'
 import UploaderSelectFilter from '../components/Filters/UploaderSelectFilter'
+import { useNavigate } from 'react-router-dom'
 
 const LibraryPage: React.FC = () => {
   const {
@@ -24,6 +25,7 @@ const LibraryPage: React.FC = () => {
     totalPages
   } = useLibraryPageState()
 
+  const navigate = useNavigate()
   return (
     <div
       style={{
@@ -68,7 +70,7 @@ const LibraryPage: React.FC = () => {
           <Row gutter={[16, 16]} style={{ width: '75%' }}>
             {lessons.map((lesson) => (
               <Col key={lesson.mongoId} span={12}>
-                <LessonCard lesson={lesson} onStarToggled={reload} />
+                <LessonCard lesson={lesson} onStarToggled={reload} onClick={() => navigate(`/lesson/${lesson.uploadId}`)} />
               </Col>
             ))}
           </Row>

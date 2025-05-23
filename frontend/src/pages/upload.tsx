@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Tags from '../components/tags'
 import {
   UploadClient,
   LessonClient,
@@ -14,7 +13,7 @@ import {
 } from '../api/apiClient.ts'
 import { Button, Form, Input, notification, Progress, Upload, UploadProps, Spin } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import TextArea from 'antd/es/input/TextArea'
+import { useNavigate } from 'react-router-dom'
 
 const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false)
@@ -23,13 +22,14 @@ const UploadPage: React.FC = () => {
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
-  const [tags, setTags] = useState<string[]>([])
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
   const lessonClient = new LessonClient()
   const contentGenerationClient = new GenerationClient()
   const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
   const [form] = Form.useForm()
+  const navigate = useNavigate()
+
 
   const ownerId = Number(localStorage.getItem('userId'))
   const ownerName = localStorage.getItem('userName')
@@ -109,19 +109,21 @@ const UploadPage: React.FC = () => {
     })
 
     const response = await fileClient['instance'].post('/File/FinalizeUpload', finalizeUploadDto)
-    const fileId = response.data as string
+    const fileId = response.data.fileId as string
+    const thumbnailId = response.data.thumbnailId as string
 
     setUploading(false)
-    return fileId
+    return { fileId, thumbnailId }
   }
 
   const handleSubmit = async () => {
     if (!file) return
 
     try {
-      const fileId = await handleChunkedUpload(file)
+      const { fileId, thumbnailId } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
 
+      //Test ID for Windows. It's for Oskar Testing purpose only.
       //const testID = "682e182d4b4fbca18b7b1048"
 
       const text = await lessonClient.getTranscriptionByObjectId(fileId)
@@ -140,7 +142,7 @@ const UploadPage: React.FC = () => {
 
         generatedDescription = result.description ?? ''
         setDescription(generatedDescription)
-        setTags(tagsList)
+
         form.setFieldsValue({ description: generatedDescription })
 
         notification.success({
@@ -177,7 +179,8 @@ const UploadPage: React.FC = () => {
         id: uploadID,
         title: title,
         description: generatedDescription,
-        tags: tagsList
+        tags: tagsList,
+        thumbnailId: thumbnailId
       })
 
       const fileMetadataDTO = new FileMetadataDto()
@@ -201,8 +204,15 @@ const UploadPage: React.FC = () => {
         ownerId: ownerId,
         ownerName: ownerName
       })
-
+      
+      
+      
+      
       await lessonClient.addLesson(lessonDTO)
+
+      navigate(`/lesson/${uploadID}`)
+      
+      
 
       notification.success({
         message: 'Upload successful',
@@ -257,14 +267,6 @@ const UploadPage: React.FC = () => {
             <p className="ant-upload-text">Click or drag file to this area to upload</p>
             <p className="ant-upload-hint">Supported file formats: mp4, mov, avi, wmv</p>
           </Upload.Dragger>
-        </Form.Item>
-
-        <Form.Item label="Description" name="description">
-          <TextArea maxLength={100} disabled />
-        </Form.Item>
-
-        <Form.Item label="Tags" name="tags">
-          <Tags tags={tags} setTags={setTags} />
         </Form.Item>
 
         <Form.Item>

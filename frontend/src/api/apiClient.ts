@@ -429,6 +429,9 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface IFileClient {
                     /**
+             * @return OK
+             */
+            streamVideo(id: string): Promise<FileResponse>                    /**
              * @param file (optional) 
              * @return OK
              */
@@ -448,7 +451,11 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            finalizeUpload(body?: FinaliseUploadDto | undefined): Promise<void>        }
+            finalizeUpload(body?: FinaliseUploadDto | undefined): Promise<void>                    /**
+             * @param id (optional) 
+             * @return OK
+             */
+            getImage(id?: string | undefined): Promise<FileResponse>        }
 
     export class FileClient extends BaseApiClient implements IFileClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -460,6 +467,62 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     
+    
+
+        /**
+         * @return OK
+         */
+        streamVideo(id: string, cancelToken?: CancelToken): Promise<FileResponse> {        let url_ = this.baseUrl + "/File/StreamVideo/{id}";
+if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+url_ = url_.replace("{id}", encodeURIComponent("" + id));
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                            responseType: "blob",
+                method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "video/mp4"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processStreamVideo(_response);
+                });
+        }
+
+    protected processStreamVideo(response: AxiosResponse): Promise<FileResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = FileResponse.fromJS(resultData200);
+        
+        return Promise.resolve<FileResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<FileResponse>(null as any);
+}
     
 
         /**
@@ -730,6 +793,140 @@ url_ = url_.replace(/[?&]$/, "");
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param id (optional) 
+         * @return OK
+         */
+        getImage(id?: string | undefined, cancelToken?: CancelToken): Promise<FileResponse> {        let url_ = this.baseUrl + "/File/GetImage?";
+if (id === null)
+    throw new Error("The parameter 'id' cannot be null.");
+else if (id !== undefined)
+    url_ += "id=" + encodeURIComponent("" + id) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                            responseType: "blob",
+                method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "image/png"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetImage(_response);
+                });
+        }
+
+    protected processGetImage(response: AxiosResponse): Promise<FileResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = FileResponse.fromJS(resultData200);
+        
+        return Promise.resolve<FileResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<FileResponse>(null as any);
+}
+        }
+
+            export interface IGenerationClient {
+                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            generate(body?: string | undefined): Promise<GenerationResult>        }
+
+    export class GenerationClient extends BaseApiClient implements IGenerationClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        generate(body?: string | undefined, cancelToken?: CancelToken): Promise<GenerationResult> {        let url_ = this.baseUrl + "/api/Generation/generate";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGenerate(_response);
+                });
+        }
+
+    protected processGenerate(response: AxiosResponse): Promise<GenerationResult> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = GenerationResult.fromJS(resultData200);
+        
+        return Promise.resolve<GenerationResult>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<GenerationResult>(null as any);
 }
         }
 
@@ -3778,6 +3975,7 @@ export class LessonDetailsDto implements ILessonDetailsDto {
     title?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    thumbnailId?: string | null;
 
     constructor(data?: ILessonDetailsDto) {
         if (data) {
@@ -3801,6 +3999,7 @@ export class LessonDetailsDto implements ILessonDetailsDto {
             else {
                 this.tags = <any>null;
             }
+            this.thumbnailId = _data["thumbnailId"] !== undefined ? _data["thumbnailId"] : <any>null;
         }
     }
 
@@ -3821,6 +4020,7 @@ export class LessonDetailsDto implements ILessonDetailsDto {
             for (let item of this.tags)
                 data["tags"].push(item);
         }
+        data["thumbnailId"] = this.thumbnailId !== undefined ? this.thumbnailId : <any>null;
         return data;
     }
 }
@@ -3830,6 +4030,7 @@ export interface ILessonDetailsDto {
     title?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    thumbnailId?: string | null;
 }
 
 export class LessonDto implements ILessonDto {
@@ -5714,6 +5915,7 @@ function isAxiosError(obj: any): obj is AxiosError {
 }
 
 /* tslint:disable */
+/* eslint-disable */
 
 // ReSharper disable InconsistentNaming
 export interface PagedResult<T> {
@@ -5731,4 +5933,20 @@ export function isPagedResult<T>(result: unknown): result is PagedResult<T> {
     Array.isArray((result as PagedResult<T>).items) &&
     typeof (result as PagedResult<T>).totalCount === 'number'
   )
+}
+
+export class FileResponse {
+    data: Blob;
+
+    constructor(data: Blob) {
+        this.data = data;
+    }
+
+    static fromJS(data: any): FileResponse {
+        return new FileResponse(data);
+    }
+
+    toJSON(): any {
+        return this.data;
+    }
 }
