@@ -159,7 +159,7 @@ const UploadPage: React.FC = () => {
         ownerName
       })
 
-      await lessonClient.addLessonAndTriggerGeneration(lessonDTO)
+      await lessonClient.addLessonAndTriggerGeneration(fileId ,lessonDTO )
       navigate(`/lesson/${uploadID}`)
 
       notification.success({

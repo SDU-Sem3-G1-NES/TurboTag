@@ -964,10 +964,11 @@ url_ = url_.replace(/[?&]$/, "");
              * @return OK
              */
             getLessonByUploadId(uploadId?: number | undefined): Promise<LessonDto>                    /**
+             * @param id (optional) 
              * @param body (optional) 
              * @return OK
              */
-            addLessonAndTriggerGeneration(body?: LessonDto | undefined): Promise<number>                    /**
+            addLessonAndTriggerGeneration(id?: string | undefined, body?: LessonDto | undefined): Promise<number>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -1533,10 +1534,15 @@ url_ = url_.replace(/[?&]$/, "");
     
 
         /**
+         * @param id (optional) 
          * @param body (optional) 
          * @return OK
          */
-        addLessonAndTriggerGeneration(body?: LessonDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Lesson/AddLesson";
+        addLessonAndTriggerGeneration(id?: string | undefined, body?: LessonDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Lesson/AddLesson?";
+if (id === null)
+    throw new Error("The parameter 'id' cannot be null.");
+else if (id !== undefined)
+    url_ += "id=" + encodeURIComponent("" + id) + "&";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);

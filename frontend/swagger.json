@@ -843,6 +843,15 @@
           "Lesson"
         ],
         "operationId": "Lesson_AddLessonAndTriggerGeneration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json-patch+json": {
