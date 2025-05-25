@@ -8,7 +8,8 @@ import {
   FileMetadataDto,
   FileClient,
   UploadChunkDto,
-  FinaliseUploadDto
+  FinaliseUploadDto,
+  LessonUploadRequest
 } from '../api/apiClient.ts'
 import { Button, Form, Input, notification, Progress, Upload, UploadProps } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
@@ -105,19 +106,19 @@ const UploadPage: React.FC = () => {
     const response = await fileClient['instance'].post('/File/FinalizeUpload', finalizeUploadDto)
     const fileId = response.data.fileId as string
     const thumbnailId = response.data.thumbnailId as string
+    const outputPath = response.data.outputPath as string
 
     setUploading(false)
-    return { fileId, thumbnailId }
+    return { fileId, thumbnailId, outputPath }
   }
 
   const handleSubmit = async () => {
     if (!file) return
 
     try {
-      const { fileId, thumbnailId } = await handleChunkedUpload(file)
+      const { fileId, thumbnailId, outputPath } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
-
-      // Step 1: Create Upload
+      
       const uploadDTO = new UploadDto()
       uploadDTO.init({
         id: null,
@@ -128,8 +129,7 @@ const UploadPage: React.FC = () => {
       })
 
       const uploadID = await uploadClient.addUpload(uploadDTO)
-
-      // Step 2: Create metadata and lesson
+      
       const fileMetadataDTO = new FileMetadataDto()
       fileMetadataDTO.init({
         id: fileId,
@@ -158,8 +158,15 @@ const UploadPage: React.FC = () => {
         ownerId,
         ownerName
       })
+      
+      const lessonUploadRequest = new LessonUploadRequest()
+      lessonUploadRequest.init({
+        lesson: lessonDTO,
+        fileId: fileId,
+        outputPath: outputPath
+      })
 
-      await lessonClient.addLessonAndTriggerGeneration(fileId ,lessonDTO )
+      await lessonClient.addLessonAndTriggerGeneration(lessonUploadRequest)
       navigate(`/lesson/${uploadID}`)
 
       notification.success({

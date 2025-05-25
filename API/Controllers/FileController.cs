@@ -7,7 +7,7 @@ namespace API.Controllers;
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class FileController(IFileService fileService, IFFmpegService ffmpegService, IAudioTranscriptionService audioTranscriptionService) : ControllerBase
+public class FileController(IFileService fileService, IFFmpegService ffmpegService) : ControllerBase
 {
     [HttpGet("StreamVideo/{id}")]
     [Produces("video/mp4")]
@@ -175,8 +175,7 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
             var fileId = await fileService.UploadChunkedFile(finalStream, finaliseUploadDto.FileName);
 
             var thumbnailId = await ffmpegService.MakeVideoThumbnail(outputPath);
-            var audioPaths = await ffmpegService.GetVideoAudio(outputPath, fileId!, false);
-            var transcription = await audioTranscriptionService.AudioTranscriptionAsync(audioPaths);
+            
             
             try
             {
@@ -188,7 +187,7 @@ public async Task<IActionResult> FinalizeUpload(FinaliseUploadDto finaliseUpload
                 Console.WriteLine($"Cleanup error: {cleanupEx.Message}");
             }
             
-            return Ok(new {fileId, thumbnailId});
+            return Ok(new {fileId, thumbnailId, outputPath});
         }
         catch (Exception ioEx)
         {

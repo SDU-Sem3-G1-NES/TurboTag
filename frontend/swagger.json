@@ -837,41 +837,32 @@
         }
       }
     },
-    "/Lesson/AddLesson": {
+    "/Lesson/AddLessonAndTriggerGeneration": {
       "post": {
         "tags": [
           "Lesson"
         ],
         "operationId": "Lesson_AddLessonAndTriggerGeneration",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             }
           }
@@ -2425,6 +2416,23 @@
               "type": "integer",
               "format": "int32"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LessonUploadRequest": {
+        "type": "object",
+        "properties": {
+          "lesson": {
+            "$ref": "#/components/schemas/LessonDto"
+          },
+          "fileId": {
+            "type": "string",
+            "nullable": true
+          },
+          "outputPath": {
+            "type": "string",
             "nullable": true
           }
         },

@@ -16,6 +16,8 @@ const LessonPage: React.FC = () => {
     const [file, setFile] = useState<string>();
 
     useEffect(() => {
+        let intervalId: NodeJS.Timeout | null = null;
+
         const fetchLesson = async () => {
             try {
                 const data = await lessonCLient.getLessonByUploadId(Number(uploadId));
@@ -26,7 +28,7 @@ const LessonPage: React.FC = () => {
                   (data.lessonDetails?.tags?.length ?? 0) === 0;
 
                 if (isGenerating) {
-                    const interval = setInterval(async () => {
+                    intervalId = setInterval(async () => {
                         try {
                             const refreshed = await lessonCLient.getLessonByUploadId(Number(uploadId));
 
@@ -35,7 +37,7 @@ const LessonPage: React.FC = () => {
                               refreshed.lessonDetails.tags?.length > 0
                             ) {
                                 setLesson(refreshed);
-                                clearInterval(interval);
+                                if (intervalId) clearInterval(intervalId);
 
                                 notification.success({
                                     message: "Content generation complete",
@@ -48,8 +50,6 @@ const LessonPage: React.FC = () => {
                             console.error("Error polling for updates:", err);
                         }
                     }, 5000);
-
-                    return () => clearInterval(interval);
                 }
             } catch (error) {
                 console.error("Error fetching lesson:", error);
@@ -59,6 +59,10 @@ const LessonPage: React.FC = () => {
         };
 
         fetchLesson();
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, [uploadId]);
 
     const isGenerating =

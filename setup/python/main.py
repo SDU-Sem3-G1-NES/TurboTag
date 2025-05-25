@@ -15,12 +15,7 @@ BACKEND_CALLBACK_URL = "http://host.docker.internal:5088/Lesson/CompleteGenerati
 BASE_DIR = Path(__file__).resolve().parent
 TAG_CSV_PATH = os.getenv("TAG_CSV_PATH", str(BASE_DIR / "tags.csv"))
 
-try:
-    with open(TAG_CSV_PATH, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        allowed_tags = [row["Tag Name"].strip() for row in reader if row.get("Tag Name")]
-except Exception as e:
-    raise RuntimeError(f"Could not load tags from {TAG_CSV_PATH!r}: {e}")
+
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -43,6 +38,13 @@ def get_top_tags_by_similarity(text: str, tags: List[str], top_n=5) -> List[str]
 
 @app.post("/generate-async")
 def generate_async(req: AsyncGenerationRequest):
+    try:
+        with open(TAG_CSV_PATH, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            allowed_tags = [row["Tag Name"].strip() for row in reader if row.get("Tag Name")]
+    except Exception as e:
+        raise RuntimeError(f"Could not load tags from {TAG_CSV_PATH!r}: {e}")
+    
     text = req.text.strip()
     upload_id = req.uploadId
 

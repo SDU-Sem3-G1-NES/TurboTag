@@ -964,11 +964,10 @@ url_ = url_.replace(/[?&]$/, "");
              * @return OK
              */
             getLessonByUploadId(uploadId?: number | undefined): Promise<LessonDto>                    /**
-             * @param id (optional) 
              * @param body (optional) 
              * @return OK
              */
-            addLessonAndTriggerGeneration(id?: string | undefined, body?: LessonDto | undefined): Promise<number>                    /**
+            addLessonAndTriggerGeneration(body?: LessonUploadRequest | undefined): Promise<number>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -1534,15 +1533,10 @@ url_ = url_.replace(/[?&]$/, "");
     
 
         /**
-         * @param id (optional) 
          * @param body (optional) 
          * @return OK
          */
-        addLessonAndTriggerGeneration(id?: string | undefined, body?: LessonDto | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Lesson/AddLesson?";
-if (id === null)
-    throw new Error("The parameter 'id' cannot be null.");
-else if (id !== undefined)
-    url_ += "id=" + encodeURIComponent("" + id) + "&";
+        addLessonAndTriggerGeneration(body?: LessonUploadRequest | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Lesson/AddLessonAndTriggerGeneration";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -4255,6 +4249,50 @@ export interface ILessonFilter {
     searchText?: string | null;
     isStarred?: boolean | null;
     starredLessons?: number[] | null;
+}
+
+export class LessonUploadRequest implements ILessonUploadRequest {
+    lesson?: LessonDto;
+    fileId?: string | null;
+    outputPath?: string | null;
+
+    constructor(data?: ILessonUploadRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lesson = _data["lesson"] ? LessonDto.fromJS(_data["lesson"]) : <any>null;
+            this.fileId = _data["fileId"] !== undefined ? _data["fileId"] : <any>null;
+            this.outputPath = _data["outputPath"] !== undefined ? _data["outputPath"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): LessonUploadRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new LessonUploadRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lesson"] = this.lesson ? this.lesson.toJSON() : <any>null;
+        data["fileId"] = this.fileId !== undefined ? this.fileId : <any>null;
+        data["outputPath"] = this.outputPath !== undefined ? this.outputPath : <any>null;
+        return data;
+    }
+}
+
+export interface ILessonUploadRequest {
+    lesson?: LessonDto;
+    fileId?: string | null;
+    outputPath?: string | null;
 }
 
 export class LibraryDto implements ILibraryDto {
