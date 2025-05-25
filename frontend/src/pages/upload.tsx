@@ -30,6 +30,7 @@ const UploadPage: React.FC = () => {
   const [form] = Form.useForm()
   const navigate = useNavigate()
 
+
   const ownerId = Number(localStorage.getItem('userId'))
   const ownerName = localStorage.getItem('userName')
 
@@ -123,9 +124,9 @@ const UploadPage: React.FC = () => {
       const duration = await getFileDuration(file)
 
       //Test ID for Windows. It's for Oskar Testing purpose only.
-      const testID = "682e182d4b4fbca18b7b1048"
+      //const testID = "682e182d4b4fbca18b7b1048"
 
-      const text = await lessonClient.getTranscriptionByObjectId(testID)
+      const text = await lessonClient.getTranscriptionByObjectId(fileId)
 
       setGenerating(true)
       const result = await contentGenerationClient.generate(text)
@@ -141,6 +142,7 @@ const UploadPage: React.FC = () => {
 
         generatedDescription = result.description ?? ''
         setDescription(generatedDescription)
+
         form.setFieldsValue({ description: generatedDescription })
 
         notification.success({
@@ -266,7 +268,7 @@ const UploadPage: React.FC = () => {
             <p className="ant-upload-hint">Supported file formats: mp4, mov, avi, wmv</p>
           </Upload.Dragger>
         </Form.Item>
-        
+
         <Form.Item>
           <div className="upload-button-wrapper">
             {generating ? (

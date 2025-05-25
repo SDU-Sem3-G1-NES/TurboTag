@@ -4,6 +4,7 @@ from pathlib import Path
 import requests
 import csv
 import os
+
 from sentence_transformers import SentenceTransformer, util
 from typing import List
 
@@ -27,6 +28,7 @@ try:
             raise ValueError("No tags found in CSV")
 except Exception as e:
     raise RuntimeError(f"Could not load tags from {TAG_CSV_PATH!r}: {e}")
+
 
 # Load transformer model once
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -56,6 +58,7 @@ def get_top_tags_by_similarity(text: str, tags: List[str], top_n=5) -> List[str]
     ranked = sorted(zip(tags, scores), key=lambda x: x[1], reverse=True)
     return [tag for tag, _ in ranked[:top_n]]
 
+
 @app.post("/generate-content", response_model=GenerationResponse, tags=["Generation"])
 def generate_content(req: GenerationRequest):
     text = req.text.strip()
@@ -70,6 +73,7 @@ Input:
 {text}
 
 Description:""".strip()
+
     raw_desc = call_ollama(desc_prompt)
 
     # Clean description (remove possible "Description: ...")

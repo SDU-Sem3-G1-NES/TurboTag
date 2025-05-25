@@ -930,6 +930,82 @@ url_ = url_.replace(/[?&]$/, "");
 }
         }
 
+            export interface IGenerationClient {
+                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            generate(body?: string | undefined): Promise<GenerationResult>        }
+
+    export class GenerationClient extends BaseApiClient implements IGenerationClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        generate(body?: string | undefined, cancelToken?: CancelToken): Promise<GenerationResult> {        let url_ = this.baseUrl + "/api/Generation/generate";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGenerate(_response);
+                });
+        }
+
+    protected processGenerate(response: AxiosResponse): Promise<GenerationResult> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = GenerationResult.fromJS(resultData200);
+        
+        return Promise.resolve<GenerationResult>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<GenerationResult>(null as any);
+}
+        }
+
             export interface ILessonClient {
                     /**
              * @param body (optional) 
@@ -2446,6 +2522,200 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     protected processDeleteSettingById(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+        }
+
+            export interface ITagClient {
+                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            getAllTags(body?: TagFilter | undefined): Promise<PagedResult<TagDto> | TagDto[]>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            addTag(body?: TagDto | undefined): Promise<void>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            deleteTagById(body?: TagFilter | undefined): Promise<void>        }
+
+    export class TagClient extends BaseApiClient implements ITagClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        getAllTags(body?: TagFilter | undefined, cancelToken?: CancelToken): Promise<PagedResult<TagDto> | TagDto[]> {        let url_ = this.baseUrl + "/Tag/GetAllTags";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "application/json"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetAllTags(_response);
+                });
+        }
+
+    protected processGetAllTags(response: AxiosResponse): Promise<PagedResult<TagDto> | TagDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push(TagDto.fromJS(item));
+        } else if (isPagedResult<TagDto>(resultData200)) {
+            result200 = resultData200 as PagedResult<TagDto>;
+        } else {
+            result200 = <any>null;
+        }
+        
+        return Promise.resolve<PagedResult<TagDto> | TagDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<PagedResult<TagDto> | TagDto[]>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        addTag(body?: TagDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Tag/AddTag";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processAddTag(_response);
+                });
+        }
+
+    protected processAddTag(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        deleteTagById(body?: TagFilter | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Tag/DeleteTagById";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "DELETE",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processDeleteTagById(_response);
+                });
+        }
+
+    protected processDeleteTagById(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -4397,6 +4667,81 @@ export interface IPagedResult_SettingsDto {
     [key: string]: any;
 }
 
+export class PagedResult_TagDto implements IPagedResult_TagDto {
+    items?: TagDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResult_TagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(TagDto.fromJS(item));
+            }
+            else {
+                this.items = <any>null;
+            }
+            this.totalCount = _data["totalCount"] !== undefined ? _data["totalCount"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+            this.currentPage = _data["currentPage"] !== undefined ? _data["currentPage"] : <any>null;
+            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PagedResult_TagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResult_TagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount !== undefined ? this.totalCount : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        data["currentPage"] = this.currentPage !== undefined ? this.currentPage : <any>null;
+        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
+        return data;
+    }
+}
+
+export interface IPagedResult_TagDto {
+    items?: TagDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+}
+
 export class PagedResult_UploadDto implements IPagedResult_UploadDto {
     items?: UploadDto[];
     totalCount?: number;
@@ -4791,6 +5136,116 @@ export interface ISignInResponse {
     userId?: number;
     name?: string | null;
     userType?: string | null;
+}
+
+export class TagDto implements ITagDto {
+    tagId?: number;
+    tagName?: string | null;
+
+    constructor(data?: ITagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tagId = _data["tagId"] !== undefined ? _data["tagId"] : <any>null;
+            this.tagName = _data["tagName"] !== undefined ? _data["tagName"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tagId"] = this.tagId !== undefined ? this.tagId : <any>null;
+        data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
+        return data;
+    }
+}
+
+export interface ITagDto {
+    tagId?: number;
+    tagName?: string | null;
+}
+
+export class TagFilter implements ITagFilter {
+    ids?: number[] | null;
+    names?: string[] | null;
+    pageSize?: number | null;
+    pageNumber?: number | null;
+
+    constructor(data?: ITagFilter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["ids"])) {
+                this.ids = [] as any;
+                for (let item of _data["ids"])
+                    this.ids!.push(item);
+            }
+            else {
+                this.ids = <any>null;
+            }
+            if (Array.isArray(_data["names"])) {
+                this.names = [] as any;
+                for (let item of _data["names"])
+                    this.names!.push(item);
+            }
+            else {
+                this.names = <any>null;
+            }
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TagFilter {
+        data = typeof data === 'object' ? data : {};
+        let result = new TagFilter();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.ids)) {
+            data["ids"] = [];
+            for (let item of this.ids)
+                data["ids"].push(item);
+        }
+        if (Array.isArray(this.names)) {
+            data["names"] = [];
+            for (let item of this.names)
+                data["names"].push(item);
+        }
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        return data;
+    }
+}
+
+export interface ITagFilter {
+    ids?: number[] | null;
+    names?: string[] | null;
+    pageSize?: number | null;
+    pageNumber?: number | null;
 }
 
 export class TokenModel implements ITokenModel {
