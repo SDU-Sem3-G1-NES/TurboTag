@@ -435,56 +435,39 @@
         }
       }
     },
-    "/api/Generation/generate": {
+    "/api/Generation/StartGenerationJob": {
       "post": {
         "tags": [
           "Generation"
         ],
-        "operationId": "Generation_Generate",
+        "operationId": "Generation_StartGenerationJob",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "type": "string"
+                "$ref": "#/components/schemas/GenerationJobRequest"
               }
             },
             "application/json": {
               "schema": {
-                "type": "string"
+                "$ref": "#/components/schemas/GenerationJobRequest"
               }
             },
             "text/json": {
               "schema": {
-                "type": "string"
+                "$ref": "#/components/schemas/GenerationJobRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "type": "string"
+                "$ref": "#/components/schemas/GenerationJobRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenerationResult"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenerationResult"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenerationResult"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -854,32 +837,89 @@
         }
       }
     },
-    "/Lesson/AddLesson": {
+    "/Lesson/AddLessonAndTriggerGeneration": {
       "post": {
         "tags": [
           "Lesson"
         ],
-        "operationId": "Lesson_AddLesson",
+        "operationId": "Lesson_AddLessonAndTriggerGeneration",
         "requestBody": {
           "content": {
             "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LessonDto"
+                "$ref": "#/components/schemas/LessonUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Lesson/CompleteGeneration": {
+      "post": {
+        "tags": [
+          "Lesson"
+        ],
+        "operationId": "Lesson_CompleteGeneration",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonCompletionDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonCompletionDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonCompletionDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LessonCompletionDto"
               }
             }
           }
@@ -2208,9 +2248,27 @@
         },
         "additionalProperties": false
       },
-      "GenerationResult": {
+      "GenerationJobRequest": {
         "type": "object",
         "properties": {
+          "uploadId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LessonCompletionDto": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "tags": {
             "type": "string",
             "nullable": true
@@ -2358,6 +2416,23 @@
               "type": "integer",
               "format": "int32"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LessonUploadRequest": {
+        "type": "object",
+        "properties": {
+          "lesson": {
+            "$ref": "#/components/schemas/LessonDto"
+          },
+          "fileId": {
+            "type": "string",
+            "nullable": true
+          },
+          "outputPath": {
+            "type": "string",
             "nullable": true
           }
         },
