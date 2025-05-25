@@ -8,35 +8,30 @@ import {
   FileMetadataDto,
   FileClient,
   UploadChunkDto,
-  FinaliseUploadDto,
-  GenerationClient
+  FinaliseUploadDto
 } from '../api/apiClient.ts'
-import { Button, Form, Input, notification, Progress, Upload, UploadProps, Spin } from 'antd'
+import { Button, Form, Input, notification, Progress, Upload, UploadProps } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 
 const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false)
-  const [generating, setGenerating] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [title, setTitle] = useState<string>('')
-  const [description, setDescription] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const uploadClient = new UploadClient()
   const fileClient = new FileClient()
   const lessonClient = new LessonClient()
-  const contentGenerationClient = new GenerationClient()
-  const CHUNK_SIZE = 1048576 * 15 // 15MB Chunk size
+  const CHUNK_SIZE = 1048576 * 15 // 15MB
   const [form] = Form.useForm()
   const navigate = useNavigate()
-
 
   const ownerId = Number(localStorage.getItem('userId'))
   const ownerName = localStorage.getItem('userName')
 
   const handleFileChange: UploadProps['beforeUpload'] = (file) => {
     setFile(file)
-    return false // prevent auto-upload
+    return false
   }
 
   const getFileDuration = (file: File): Promise<number | null> => {
@@ -98,7 +93,6 @@ const UploadPage: React.FC = () => {
       })
 
       await fileClient.uploadChunk(uploadChunkDto)
-
       setUploadProgress(Math.round(((i + 1) / totalChunks) * 100))
     }
 
@@ -123,46 +117,7 @@ const UploadPage: React.FC = () => {
       const { fileId, thumbnailId } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
 
-      //Test ID for Windows. It's for Oskar Testing purpose only.
-      //const testID = "682e182d4b4fbca18b7b1048"
-
-      const text = await lessonClient.getTranscriptionByObjectId(fileId)
-
-      setGenerating(true)
-      const result = await contentGenerationClient.generate(text)
-
-      let generatedDescription = ''
-      let tagsList: string[] = []
-
-      if (result != null) {
-        tagsList = (result.tags ?? '')
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag !== '')
-
-        generatedDescription = result.description ?? ''
-        setDescription(generatedDescription)
-
-        form.setFieldsValue({ description: generatedDescription })
-
-        notification.success({
-          message: 'Content Generation successful',
-          description: 'Your lecture content has been generated successfully',
-          placement: 'topRight',
-          duration: 2
-        })
-        console.log('Content Generation successful')
-      } else {
-        notification.error({
-          message: 'Content Generation failed',
-          description: 'Your lecture content could not be generated',
-          placement: 'topRight',
-          duration: 2
-        })
-        console.error('Content Generation failed')
-      }
-      setGenerating(false)
-
+      // Step 1: Create Upload
       const uploadDTO = new UploadDto()
       uploadDTO.init({
         id: null,
@@ -174,74 +129,59 @@ const UploadPage: React.FC = () => {
 
       const uploadID = await uploadClient.addUpload(uploadDTO)
 
-      const lessonDetailsDTO = new LessonDetailsDto()
-      lessonDetailsDTO.init({
-        id: uploadID,
-        title: title,
-        description: generatedDescription,
-        tags: tagsList,
-        thumbnailId: thumbnailId
-      })
-
+      // Step 2: Create metadata and lesson
       const fileMetadataDTO = new FileMetadataDto()
       fileMetadataDTO.init({
         id: fileId,
         fileType: file.type,
         fileName: file.name,
         fileSize: file.size,
-        duration: duration === null ? null : Math.round(duration),
+        duration: duration ? Math.round(duration) : 0,
         date: new Date(),
         checksum: null
       })
 
-      const fileMetadataArray = Array.isArray(fileMetadataDTO) ? fileMetadataDTO : [fileMetadataDTO]
+      const lessonDetailsDTO = new LessonDetailsDto()
+      lessonDetailsDTO.init({
+        id: uploadID,
+        title: title,
+        description: "",
+        tags: [],
+        thumbnailId: thumbnailId
+      })
 
       const lessonDTO = new LessonDto()
       lessonDTO.init({
         uploadId: uploadID,
         lessonDetails: lessonDetailsDTO,
-        fileMetadata: fileMetadataArray,
-        ownerId: ownerId,
-        ownerName: ownerName
+        fileMetadata: [fileMetadataDTO],
+        ownerId,
+        ownerName
       })
-      
-      
-      
-      
-      await lessonClient.addLesson(lessonDTO)
 
+      await lessonClient.addLessonAndTriggerGeneration(lessonDTO)
       navigate(`/lesson/${uploadID}`)
-      
-      
 
       notification.success({
-        message: 'Upload successful',
-        description: 'Your lecture and file have been uploaded successfully',
+        message: 'Upload complete',
+        description: 'Your file was uploaded and content is generating in background',
         placement: 'topRight',
         duration: 2
       })
-
-      console.log('Upload successful')
     } catch (error) {
       notification.error({
         message: 'Upload failed',
-        description: 'Your lecture could not be uploaded',
+        description: 'Upload or generation request failed',
         placement: 'topRight',
         duration: 2
       })
-
       console.error('Upload failed', error)
     }
   }
 
   return (
     <div className="form-container">
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{ description: description }}
-      >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label="Title"
           name="title"
@@ -265,15 +205,13 @@ const UploadPage: React.FC = () => {
               <UploadOutlined />
             </p>
             <p className="ant-upload-text">Click or drag file to this area to upload</p>
-            <p className="ant-upload-hint">Supported file formats: mp4, mov, avi, wmv</p>
+            <p className="ant-upload-hint">Supported formats: mp4, mov, avi, wmv</p>
           </Upload.Dragger>
         </Form.Item>
 
         <Form.Item>
           <div className="upload-button-wrapper">
-            {generating ? (
-              <Spin tip="Loading..." />
-            ) : uploading ? (
+            {uploading ? (
               <Progress percent={uploadProgress} status="active" />
             ) : (
               <Button
