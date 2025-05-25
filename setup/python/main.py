@@ -48,7 +48,15 @@ def generate_async(req: AsyncGenerationRequest):
     text = req.text.strip()
     upload_id = req.uploadId
 
-    desc_prompt = f"Based solely on the input below, write exactly one clear, factual sentence summarizing it.\n{text}\nDescription:"
+    desc_prompt = f"""
+Based solely on the input below, write exactly one clear, factual sentence summarizing it.
+Do not introduce filler, explanations, or any extra information.
+Output only that sentence.
+
+Input:
+{text}
+
+Description:""".strip()
     raw_desc = call_ollama(desc_prompt)
     description = raw_desc.split(":", 1)[1].strip() if ":" in raw_desc else raw_desc.strip()
 
