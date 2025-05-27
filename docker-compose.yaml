@@ -77,6 +77,7 @@
       dockerfile: Dockerfile
     volumes:
       - /tmp:/host-tmp
+      - ${LOCALAPPDATA_TEMP}:/win-tmp
     ports:
       - "8000:8000"
     networks:
@@ -90,9 +91,7 @@
       - turbotag
     volumes:
       - ollama_data:/root/.ollama
-    entrypoint: [ "/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull gemma:2b && wait" ]
-
-
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull gemma:2b && wait"]
 
 volumes:
   db_data:
