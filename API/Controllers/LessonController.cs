@@ -9,7 +9,10 @@ namespace API.Controllers;
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class LessonController(ILessonService lessonService, IFileService fileService, IFFmpegService ffmpegService, IAudioTranscriptionService audioTranscriptionService) : ControllerBase
+public class LessonController(
+    ILessonService lessonService,
+    IFFmpegService ffmpegService,
+    IAudioTranscriptionService audioTranscriptionService) : ControllerBase
 {
     [HttpPost("GetAllLessons")]
     public ActionResult<IEnumerable<LessonDto>> GetAllLessons([FromBody] LessonFilter? filter)
@@ -80,7 +83,7 @@ public class LessonController(ILessonService lessonService, IFileService fileSer
     {
         var lesson = request.Lesson;
         lessonService.AddLesson(lesson);
-        
+
         _ = Task.Run(async () =>
         {
             try
@@ -109,7 +112,7 @@ public class LessonController(ILessonService lessonService, IFileService fileSer
                 Console.WriteLine($"Background generation failed: {e.Message}");
             }
         });
-        
+
         return Ok(lesson.UploadId);
     }
 
@@ -120,7 +123,7 @@ public class LessonController(ILessonService lessonService, IFileService fileSer
         try
         {
             var lesson = lessonService.GetLessonByUploadId(result.UploadId);
-            if (lesson == null) return NotFound();
+            if (lesson is { LessonDetails: null } or null) return NotFound();
 
             lesson.LessonDetails.Description = result.Description ?? "";
 
@@ -164,9 +167,9 @@ public class LessonCompletionDto
     public string? Description { get; set; }
 }
 
-public class LessonUploadRequest
+public class LessonUploadRequest(LessonDto lesson, string fileId, string outputPath)
 {
-    public LessonDto Lesson { get; set; }
-    public string FileId { get; set; }
-    public string OutputPath { get; set; }
+    public LessonDto Lesson { get; set; } = lesson;
+    public string FileId { get; set; } = fileId;
+    public string OutputPath { get; set; } = outputPath;
 }
