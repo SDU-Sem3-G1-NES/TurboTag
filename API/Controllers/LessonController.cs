@@ -101,7 +101,7 @@ public class LessonController(
                     var payload = new
                     {
                         uploadId = lesson.UploadId,
-                        text = " Sound like a pro on the piano in less than 30 seconds. Let's go.  First, you're going to play these three notes just like this.  And then you're going to speed it up.  Then in the left hand, you're going to play A, G, F, and E just like this."
+                        text = transcription
                     };
 
                     await httpClient.PostAsJsonAsync("http://localhost:8001/generate-async", payload);
