@@ -53,7 +53,6 @@ export const useHomePageState = (showAllOwner: boolean, showAllStarred: boolean)
     setLoading(true)
     try {
       const [all] = await Promise.all([lessonClient.getAllLessons(filter)])
-      console.log('all', all)
       const [starred] = await Promise.all([lessonClient.getAllLessons(starredFilter)])
 
       const allList = Array.isArray(all) ? all : (all?.items ?? [])

@@ -10,10 +10,8 @@ const { Title, Paragraph } = Typography;
 const LessonPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const lessonCLient = useMemo(() => new LessonClient(), []);
-    const fileClient = useMemo(() => new FileClient(), []);
     const { uploadId } = useParams<{ uploadId: string }>();
     const [lesson, setLesson] = useState<LessonDto>();
-    const [file, setFile] = useState<string>();
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout | null = null;
@@ -86,10 +84,10 @@ const LessonPage: React.FC = () => {
     }
 
     return (
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
-          <Card style={{ width: 1000 }}>
-              <VideoPlayer videoId={lesson.fileMetadata?.[0]?.id ?? ""} />
-              <div style={{ marginTop: 20 }}>
+      <div style={{ display: "flex", flexDirection:'column', justifyContent: "center", marginTop: 20, gap: 10}}>
+          <VideoPlayer videoId={lesson.fileMetadata?.[0]?.id ?? ""} />
+          <Card style={{ width: '100%' }}>
+              <div>
                   <Title level={3}>{lesson.lessonDetails?.title}</Title>
                   {isGenerating ? (
                     <Spin indicator={<LoadingOutlined />} style={{ marginLeft: 8 }} />
@@ -101,8 +99,8 @@ const LessonPage: React.FC = () => {
                     ))
                   )}
               </div>
-              <Card style={{ height: 100, backgroundColor: "lightGray", marginTop: 20 }}>
-                  <Title level={5}>Description</Title>
+              <Card style={{ backgroundColor: "lightGray", marginTop: 20, boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
+                  <Title level={5}>Summary</Title>
                   {isGenerating ? (
                     <Spin indicator={<LoadingOutlined />} />
                   ) : (

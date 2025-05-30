@@ -30,15 +30,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId }) => {
     }, [videoId]);
 
     return (
-        <Card style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
+        <Card>
+        <div style={{
+            position: 'relative',
+            width: '100%',
+            paddingTop: '56.25%'
+        }}>
             <video
                 ref={videoRef}
                 src={videoSrc}
                 controls
-                style={{ width: '100%' }}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
+                }}
                 preload="auto"
             />
-        </Card>
+        </div>
+    </Card>
     );
 };
 
