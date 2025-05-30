@@ -8,6 +8,11 @@ import logging
 from typing import List
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
+import urllib3
+
+# Disable SSL warnings for development purposes
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 app = FastAPI()
 
@@ -183,7 +188,7 @@ def generate_async(req: AsyncGenerationRequest):
     }
 
     try:
-        resp = requests.post(BACKEND_CALLBACK_URL, json=payload, timeout=10)
+        resp = requests.post(BACKEND_CALLBACK_URL, json=payload, timeout=10, verify=False)
         resp.raise_for_status()
     except Exception as e:
         logger.error("Callback failed: %s", e)
