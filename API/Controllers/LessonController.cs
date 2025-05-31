@@ -9,7 +9,10 @@ namespace API.Controllers;
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class LessonController(ILessonService lessonService) : ControllerBase
+public class LessonController(
+    ILessonService lessonService,
+    IFFmpegService ffmpegService,
+    IAudioTranscriptionService audioTranscriptionService) : ControllerBase
 {
     [HttpPost("GetAllLessons")]
     public ActionResult<IEnumerable<LessonDto>> GetAllLessons([FromBody] LessonFilter? filter)
@@ -75,11 +78,64 @@ public class LessonController(ILessonService lessonService) : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("AddLesson")]
-    public ActionResult AddLesson([FromBody] LessonDto lesson)
+    [HttpPost("AddLessonAndTriggerGeneration")]
+    public ActionResult<int> AddLessonAndTriggerGeneration([FromBody] LessonUploadRequest request)
     {
+        var lesson = request.Lesson;
         lessonService.AddLesson(lesson);
-        return Ok();
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var audioPaths = await ffmpegService.GetVideoAudio(request.OutputPath, request.FileId, false);
+                var transcription = await audioTranscriptionService.AudioTranscriptionAsync(audioPaths);
+
+                if (!string.IsNullOrWhiteSpace(transcription))
+                {
+                    using var httpClient = new HttpClient
+                    {
+                        Timeout = TimeSpan.FromMinutes(5)
+                    };
+
+                    var payload = new
+                    {
+                        uploadId = lesson.UploadId,
+                        text = transcription
+                    };
+
+                    await httpClient.PostAsJsonAsync("http://localhost:8001/generate-async", payload);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Background generation failed: {e.Message}");
+            }
+        });
+
+        return Ok(lesson.UploadId);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("CompleteGeneration")]
+    public IActionResult CompleteGeneration([FromBody] LessonCompletionDto result)
+    {
+        try
+        {
+            var lesson = lessonService.GetLessonByUploadId(result.UploadId);
+            if (lesson is { LessonDetails: null } or null) return NotFound();
+
+            lesson.LessonDetails.Description = result.Description ?? "";
+
+            lesson.LessonDetails.Tags = result.Tags?.Split(',').Select(t => t.Trim()).ToList() ?? [];
+
+            lessonService.UpdateLesson(lesson);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error completing generation: {ex.Message}");
+        }
     }
 
     [HttpPut("UpdateLesson")]
@@ -102,4 +158,18 @@ public class LessonController(ILessonService lessonService) : ControllerBase
         lessonService.DeleteLessonByObjectId(objectId);
         return Ok();
     }
+}
+
+public class LessonCompletionDto
+{
+    public int UploadId { get; set; }
+    public string? Tags { get; set; }
+    public string? Description { get; set; }
+}
+
+public class LessonUploadRequest(LessonDto lesson, string fileId, string outputPath)
+{
+    public LessonDto Lesson { get; set; } = lesson;
+    public string FileId { get; set; } = fileId;
+    public string OutputPath { get; set; } = outputPath;
 }

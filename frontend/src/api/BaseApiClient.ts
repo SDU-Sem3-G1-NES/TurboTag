@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* eslint-disable */
 
 // ReSharper disable InconsistentNaming
 export interface PagedResult<T> {
@@ -122,4 +123,19 @@ export class ApiConfiguration {
     // Redirect to login page - adjust based on your routing setup
     window.location.href = '/login'
   }
+}
+export class FileResponse {
+    data: Blob;
+
+    constructor(data: Blob) {
+        this.data = data;
+    }
+
+    static fromJS(data: any): FileResponse {
+        return new FileResponse(data);
+    }
+
+    toJSON(): any {
+        return this.data;
+    }
 }

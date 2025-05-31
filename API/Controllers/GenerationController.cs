@@ -1,6 +1,5 @@
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -16,26 +15,20 @@ namespace API.Controllers
             _httpClient = httpClientFactory.CreateClient("OllamaClient");
         }
 
-        [HttpPost("generate")]
-        public async Task<GenerationResult> Generate([FromBody] string request)
+        [HttpPost("StartGenerationJob")]
+        public async Task<IActionResult> StartGenerationJob([FromBody] GenerationJobRequest request)
         {
-            var pythonResponse = await _httpClient.PostAsJsonAsync("http://localhost:8001/generate-content", new { text = request });
+            var response = await _httpClient.PostAsJsonAsync("http://localhost:8001/generate-async", request);
+            if (!response.IsSuccessStatusCode)
+                return StatusCode((int)response.StatusCode, "Failed to start generation job");
 
-            if (!pythonResponse.IsSuccessStatusCode)
-                throw new HttpRequestException($"Failed to generate content. Status code: {(int)pythonResponse.StatusCode}");
-
-            var result = await pythonResponse.Content.ReadFromJsonAsync<GenerationResult>();
-
-            if (result == null)
-                throw new HttpRequestException("Invalid response from the server");
-
-            return result;
+            return Ok();
         }
     }
 
-    public class GenerationResult
+    public class GenerationJobRequest
     {
-        public string? Tags { get; set; }
-        public string? Description { get; set; }
+        public int UploadId { get; set; }
+        public string Text { get; set; } = "";
     }
 }

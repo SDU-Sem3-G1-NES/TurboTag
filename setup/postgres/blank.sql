@@ -93,6 +93,14 @@ CREATE TABLE IF NOT EXISTS "starred_uploads" (
     UNIQUE (user_id, upload_id)
     );
 
+CREATE TABLE IF NOT EXISTS "tags" (
+    tag_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT unique_tag_name
+      UNIQUE (name)
+);
+
 -- Insert default data into tables
 
 DO

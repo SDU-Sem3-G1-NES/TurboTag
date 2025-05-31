@@ -429,6 +429,9 @@ url_ = url_.replace(/[?&]$/, "");
 
             export interface IFileClient {
                     /**
+             * @return OK
+             */
+            streamVideo(id: string): Promise<FileResponse>                    /**
              * @param file (optional) 
              * @return OK
              */
@@ -448,7 +451,11 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            finalizeUpload(body?: FinaliseUploadDto | undefined): Promise<void>        }
+            finalizeUpload(body?: FinaliseUploadDto | undefined): Promise<void>                    /**
+             * @param id (optional) 
+             * @return OK
+             */
+            getImage(id?: string | undefined): Promise<FileResponse>        }
 
     export class FileClient extends BaseApiClient implements IFileClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -460,6 +467,62 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     
+    
+
+        /**
+         * @return OK
+         */
+        streamVideo(id: string, cancelToken?: CancelToken): Promise<FileResponse> {        let url_ = this.baseUrl + "/File/StreamVideo/{id}";
+if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+url_ = url_.replace("{id}", encodeURIComponent("" + id));
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                            responseType: "blob",
+                method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "video/mp4"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processStreamVideo(_response);
+                });
+        }
+
+    protected processStreamVideo(response: AxiosResponse): Promise<FileResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = FileResponse.fromJS(resultData200);
+        
+        return Promise.resolve<FileResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<FileResponse>(null as any);
+}
     
 
         /**
@@ -731,6 +794,64 @@ url_ = url_.replace(/[?&]$/, "");
     }
     return Promise.resolve<void>(null as any);
 }
+    
+
+        /**
+         * @param id (optional) 
+         * @return OK
+         */
+        getImage(id?: string | undefined, cancelToken?: CancelToken): Promise<FileResponse> {        let url_ = this.baseUrl + "/File/GetImage?";
+if (id === null)
+    throw new Error("The parameter 'id' cannot be null.");
+else if (id !== undefined)
+    url_ += "id=" + encodeURIComponent("" + id) + "&";
+url_ = url_.replace(/[?&]$/, "");
+
+                let options_: AxiosRequestConfig = {
+                            responseType: "blob",
+                method: "GET",
+        url: url_,
+        headers: {
+                                    "Accept": "image/png"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetImage(_response);
+                });
+        }
+
+    protected processGetImage(response: AxiosResponse): Promise<FileResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = FileResponse.fromJS(resultData200);
+        
+        return Promise.resolve<FileResponse>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<FileResponse>(null as any);
+}
         }
 
             export interface IGenerationClient {
@@ -738,7 +859,7 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            generate(body?: string | undefined): Promise<GenerationResult>        }
+            startGenerationJob(body?: GenerationJobRequest | undefined): Promise<void>        }
 
     export class GenerationClient extends BaseApiClient implements IGenerationClient {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -756,7 +877,7 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        generate(body?: string | undefined, cancelToken?: CancelToken): Promise<GenerationResult> {        let url_ = this.baseUrl + "/api/Generation/generate";
+        startGenerationJob(body?: GenerationJobRequest | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/api/Generation/StartGenerationJob";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -767,8 +888,7 @@ url_ = url_.replace(/[?&]$/, "");
         url: url_,
         headers: {
                             "Content-Type": "application/json-patch+json",
-                            "Accept": "text/plain"
-                },
+                        },
             cancelToken
         };
 
@@ -779,11 +899,11 @@ url_ = url_.replace(/[?&]$/, "");
         throw _error;
         }
         }).then((_response: AxiosResponse) => {
-                    return this.processGenerate(_response);
+                    return this.processStartGenerationJob(_response);
                 });
         }
 
-    protected processGenerate(response: AxiosResponse): Promise<GenerationResult> {
+    protected processStartGenerationJob(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -794,18 +914,13 @@ url_ = url_.replace(/[?&]$/, "");
         }
     }
     if (status === 200) {
-                const _responseText = response.data;
-        let result200: any = null;
-        let resultData200 = _responseText;
-                result200 = GenerationResult.fromJS(resultData200);
-        
-        return Promise.resolve<GenerationResult>(result200);
+                return Promise.resolve<void>(null as any);
         
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
-    return Promise.resolve<GenerationResult>(null as any);
+    return Promise.resolve<void>(null as any);
 }
         }
 
@@ -852,7 +967,11 @@ url_ = url_.replace(/[?&]$/, "");
              * @param body (optional) 
              * @return OK
              */
-            addLesson(body?: LessonDto | undefined): Promise<void>                    /**
+            addLessonAndTriggerGeneration(body?: LessonUploadRequest | undefined): Promise<number>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            completeGeneration(body?: LessonCompletionDto | undefined): Promise<void>                    /**
              * @param body (optional) 
              * @return OK
              */
@@ -1417,7 +1536,64 @@ url_ = url_.replace(/[?&]$/, "");
          * @param body (optional) 
          * @return OK
          */
-        addLesson(body?: LessonDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/AddLesson";
+        addLessonAndTriggerGeneration(body?: LessonUploadRequest | undefined, cancelToken?: CancelToken): Promise<number> {        let url_ = this.baseUrl + "/Lesson/AddLessonAndTriggerGeneration";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "text/plain"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processAddLessonAndTriggerGeneration(_response);
+                });
+        }
+
+    protected processAddLessonAndTriggerGeneration(response: AxiosResponse): Promise<number> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                result200 = resultData200 as number;
+        
+        return Promise.resolve<number>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<number>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        completeGeneration(body?: LessonCompletionDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Lesson/CompleteGeneration";
 url_ = url_.replace(/[?&]$/, "");
 
                     const content_ = JSON.stringify(body);
@@ -1439,11 +1615,11 @@ url_ = url_.replace(/[?&]$/, "");
         throw _error;
         }
         }).then((_response: AxiosResponse) => {
-                    return this.processAddLesson(_response);
+                    return this.processCompleteGeneration(_response);
                 });
         }
 
-    protected processAddLesson(response: AxiosResponse): Promise<void> {
+    protected processCompleteGeneration(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -2325,6 +2501,200 @@ url_ = url_.replace(/[?&]$/, "");
         }
 
     protected processDeleteSettingById(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+        }
+
+            export interface ITagClient {
+                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            getAllTags(body?: TagFilter | undefined): Promise<PagedResult<TagDto> | TagDto[]>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            addTag(body?: TagDto | undefined): Promise<void>                    /**
+             * @param body (optional) 
+             * @return OK
+             */
+            deleteTagById(body?: TagFilter | undefined): Promise<void>        }
+
+    export class TagClient extends BaseApiClient implements ITagClient {
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+        constructor(configuration: ApiConfiguration = new ApiConfiguration()) {
+
+            super(configuration);
+
+        }
+
+    
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        getAllTags(body?: TagFilter | undefined, cancelToken?: CancelToken): Promise<PagedResult<TagDto> | TagDto[]> {        let url_ = this.baseUrl + "/Tag/GetAllTags";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                            "Accept": "application/json"
+                },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processGetAllTags(_response);
+                });
+        }
+
+    protected processGetAllTags(response: AxiosResponse): Promise<PagedResult<TagDto> | TagDto[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                const _responseText = response.data;
+        let result200: any = null;
+        let resultData200 = _responseText;
+                if (Array.isArray(resultData200)) {
+            result200 = [] as any;
+            for (let item of resultData200)
+                result200!.push(TagDto.fromJS(item));
+        } else if (isPagedResult<TagDto>(resultData200)) {
+            result200 = resultData200 as PagedResult<TagDto>;
+        } else {
+            result200 = <any>null;
+        }
+        
+        return Promise.resolve<PagedResult<TagDto> | TagDto[]>(result200);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<PagedResult<TagDto> | TagDto[]>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        addTag(body?: TagDto | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Tag/AddTag";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "POST",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processAddTag(_response);
+                });
+        }
+
+    protected processAddTag(response: AxiosResponse): Promise<void> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (const k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+                return Promise.resolve<void>(null as any);
+        
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<void>(null as any);
+}
+    
+
+        /**
+         * @param body (optional) 
+         * @return OK
+         */
+        deleteTagById(body?: TagFilter | undefined, cancelToken?: CancelToken): Promise<void> {        let url_ = this.baseUrl + "/Tag/DeleteTagById";
+url_ = url_.replace(/[?&]$/, "");
+
+                    const content_ = JSON.stringify(body);
+
+                let options_: AxiosRequestConfig = {
+                    data: content_,
+                        method: "DELETE",
+        url: url_,
+        headers: {
+                            "Content-Type": "application/json-patch+json",
+                        },
+            cancelToken
+        };
+
+                    return this.instance.request(options_).catch((_error: any) => {
+                if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+        } else {
+        throw _error;
+        }
+        }).then((_response: AxiosResponse) => {
+                    return this.processDeleteTagById(_response);
+                });
+        }
+
+    protected processDeleteTagById(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -3539,11 +3909,11 @@ export interface IFinaliseUploadDto {
     fileName?: string | null;
 }
 
-export class GenerationResult implements IGenerationResult {
-    tags?: string | null;
-    description?: string | null;
+export class GenerationJobRequest implements IGenerationJobRequest {
+    uploadId?: number;
+    text?: string | null;
 
-    constructor(data?: IGenerationResult) {
+    constructor(data?: IGenerationJobRequest) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -3554,27 +3924,71 @@ export class GenerationResult implements IGenerationResult {
 
     init(_data?: any) {
         if (_data) {
-            this.tags = _data["tags"] !== undefined ? _data["tags"] : <any>null;
-            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
+            this.text = _data["text"] !== undefined ? _data["text"] : <any>null;
         }
     }
 
-    static fromJS(data: any): GenerationResult {
+    static fromJS(data: any): GenerationJobRequest {
         data = typeof data === 'object' ? data : {};
-        let result = new GenerationResult();
+        let result = new GenerationJobRequest();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
+        data["text"] = this.text !== undefined ? this.text : <any>null;
+        return data;
+    }
+}
+
+export interface IGenerationJobRequest {
+    uploadId?: number;
+    text?: string | null;
+}
+
+export class LessonCompletionDto implements ILessonCompletionDto {
+    uploadId?: number;
+    tags?: string | null;
+    description?: string | null;
+
+    constructor(data?: ILessonCompletionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.uploadId = _data["uploadId"] !== undefined ? _data["uploadId"] : <any>null;
+            this.tags = _data["tags"] !== undefined ? _data["tags"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): LessonCompletionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LessonCompletionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["uploadId"] = this.uploadId !== undefined ? this.uploadId : <any>null;
         data["tags"] = this.tags !== undefined ? this.tags : <any>null;
         data["description"] = this.description !== undefined ? this.description : <any>null;
         return data;
     }
 }
 
-export interface IGenerationResult {
+export interface ILessonCompletionDto {
+    uploadId?: number;
     tags?: string | null;
     description?: string | null;
 }
@@ -3584,6 +3998,7 @@ export class LessonDetailsDto implements ILessonDetailsDto {
     title?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    thumbnailId?: string | null;
 
     constructor(data?: ILessonDetailsDto) {
         if (data) {
@@ -3607,6 +4022,7 @@ export class LessonDetailsDto implements ILessonDetailsDto {
             else {
                 this.tags = <any>null;
             }
+            this.thumbnailId = _data["thumbnailId"] !== undefined ? _data["thumbnailId"] : <any>null;
         }
     }
 
@@ -3627,6 +4043,7 @@ export class LessonDetailsDto implements ILessonDetailsDto {
             for (let item of this.tags)
                 data["tags"].push(item);
         }
+        data["thumbnailId"] = this.thumbnailId !== undefined ? this.thumbnailId : <any>null;
         return data;
     }
 }
@@ -3636,6 +4053,7 @@ export interface ILessonDetailsDto {
     title?: string | null;
     description?: string | null;
     tags?: string[] | null;
+    thumbnailId?: string | null;
 }
 
 export class LessonDto implements ILessonDto {
@@ -3831,6 +4249,50 @@ export interface ILessonFilter {
     searchText?: string | null;
     isStarred?: boolean | null;
     starredLessons?: number[] | null;
+}
+
+export class LessonUploadRequest implements ILessonUploadRequest {
+    lesson?: LessonDto;
+    fileId?: string | null;
+    outputPath?: string | null;
+
+    constructor(data?: ILessonUploadRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lesson = _data["lesson"] ? LessonDto.fromJS(_data["lesson"]) : <any>null;
+            this.fileId = _data["fileId"] !== undefined ? _data["fileId"] : <any>null;
+            this.outputPath = _data["outputPath"] !== undefined ? _data["outputPath"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): LessonUploadRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new LessonUploadRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lesson"] = this.lesson ? this.lesson.toJSON() : <any>null;
+        data["fileId"] = this.fileId !== undefined ? this.fileId : <any>null;
+        data["outputPath"] = this.outputPath !== undefined ? this.outputPath : <any>null;
+        return data;
+    }
+}
+
+export interface ILessonUploadRequest {
+    lesson?: LessonDto;
+    fileId?: string | null;
+    outputPath?: string | null;
 }
 
 export class LibraryDto implements ILibraryDto {
@@ -4272,6 +4734,81 @@ export interface IPagedResult_SettingsDto {
     [key: string]: any;
 }
 
+export class PagedResult_TagDto implements IPagedResult_TagDto {
+    items?: TagDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResult_TagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(TagDto.fromJS(item));
+            }
+            else {
+                this.items = <any>null;
+            }
+            this.totalCount = _data["totalCount"] !== undefined ? _data["totalCount"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+            this.currentPage = _data["currentPage"] !== undefined ? _data["currentPage"] : <any>null;
+            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PagedResult_TagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResult_TagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item ? item.toJSON() : <any>null);
+        }
+        data["totalCount"] = this.totalCount !== undefined ? this.totalCount : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        data["currentPage"] = this.currentPage !== undefined ? this.currentPage : <any>null;
+        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
+        return data;
+    }
+}
+
+export interface IPagedResult_TagDto {
+    items?: TagDto[];
+    totalCount?: number;
+    pageSize?: number;
+    currentPage?: number;
+    totalPages?: number;
+
+    [key: string]: any;
+}
+
 export class PagedResult_UploadDto implements IPagedResult_UploadDto {
     items?: UploadDto[];
     totalCount?: number;
@@ -4666,6 +5203,116 @@ export interface ISignInResponse {
     userId?: number;
     name?: string | null;
     userType?: string | null;
+}
+
+export class TagDto implements ITagDto {
+    tagId?: number;
+    tagName?: string | null;
+
+    constructor(data?: ITagDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tagId = _data["tagId"] !== undefined ? _data["tagId"] : <any>null;
+            this.tagName = _data["tagName"] !== undefined ? _data["tagName"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TagDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TagDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tagId"] = this.tagId !== undefined ? this.tagId : <any>null;
+        data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
+        return data;
+    }
+}
+
+export interface ITagDto {
+    tagId?: number;
+    tagName?: string | null;
+}
+
+export class TagFilter implements ITagFilter {
+    ids?: number[] | null;
+    names?: string[] | null;
+    pageSize?: number | null;
+    pageNumber?: number | null;
+
+    constructor(data?: ITagFilter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["ids"])) {
+                this.ids = [] as any;
+                for (let item of _data["ids"])
+                    this.ids!.push(item);
+            }
+            else {
+                this.ids = <any>null;
+            }
+            if (Array.isArray(_data["names"])) {
+                this.names = [] as any;
+                for (let item of _data["names"])
+                    this.names!.push(item);
+            }
+            else {
+                this.names = <any>null;
+            }
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TagFilter {
+        data = typeof data === 'object' ? data : {};
+        let result = new TagFilter();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.ids)) {
+            data["ids"] = [];
+            for (let item of this.ids)
+                data["ids"].push(item);
+        }
+        if (Array.isArray(this.names)) {
+            data["names"] = [];
+            for (let item of this.names)
+                data["names"].push(item);
+        }
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        return data;
+    }
+}
+
+export interface ITagFilter {
+    ids?: number[] | null;
+    names?: string[] | null;
+    pageSize?: number | null;
+    pageNumber?: number | null;
 }
 
 export class TokenModel implements ITokenModel {
@@ -5335,6 +5982,7 @@ function isAxiosError(obj: any): obj is AxiosError {
 }
 
 /* tslint:disable */
+/* eslint-disable */
 
 // ReSharper disable InconsistentNaming
 export interface PagedResult<T> {
@@ -5352,4 +6000,20 @@ export function isPagedResult<T>(result: unknown): result is PagedResult<T> {
     Array.isArray((result as PagedResult<T>).items) &&
     typeof (result as PagedResult<T>).totalCount === 'number'
   )
+}
+
+export class FileResponse {
+    data: Blob;
+
+    constructor(data: Blob) {
+        this.data = data;
+    }
+
+    static fromJS(data: any): FileResponse {
+        return new FileResponse(data);
+    }
+
+    toJSON(): any {
+        return this.data;
+    }
 }

@@ -9,13 +9,23 @@ model = WhisperModel("tiny", device="cpu")
 async def transcribe_paths(paths: list[str] = Body(...)):
     all_text = []
     for path in paths:
-        container_path = path.replace("/tmp", "/host-tmp", 1)
+        if path.startswith("/tmp/"):
+            container_path = path.replace("/tmp", "/host-tmp", 1)
+            safe_root = "/host-tmp"
+        elif path.startswith("%localappdata%/Temp"):
+            container_path = path.replace("%localappdata%/Temp", "/win-tmp", 1)
+            safe_root = "/win-tmp"
+        else:
+            continue 
+
         container_path = os.path.normpath(container_path)
-        safe_root = "/host-tmp"
+
         if not container_path.startswith(safe_root):
             continue
         if not os.path.exists(container_path):
             continue
-        segments, info = model.transcribe(container_path, word_timestamps=True)
+
+        segments, _ = model.transcribe(container_path, word_timestamps=True)
         all_text.extend(segment.text for segment in segments)
+
     return " ".join(all_text)

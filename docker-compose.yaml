@@ -63,6 +63,8 @@
       - ollama
     volumes:
       - ./setup/python:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: >
       uvicorn main:app
       --host 0.0.0.0
@@ -75,6 +77,7 @@
       dockerfile: Dockerfile
     volumes:
       - /tmp:/host-tmp
+
     ports:
       - "8000:8000"
     networks:
@@ -88,9 +91,7 @@
       - turbotag
     volumes:
       - ollama_data:/root/.ollama
-    entrypoint: [ "/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull gemma:2b && wait" ]
-
-
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull gemma:2b && wait"]
 
 volumes:
   db_data:
