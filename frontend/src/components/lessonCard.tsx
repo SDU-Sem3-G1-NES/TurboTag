@@ -55,7 +55,12 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onStarToggled, onClick 
   }
 
   return (
-    <Card onClick={onClick} hoverable style={{ margin: 8, position: 'relative' }} bodyStyle={{ paddingRight: 32 }}>
+    <Card
+      onClick={onClick}
+      hoverable
+      style={{ margin: 8, position: 'relative' }}
+      bodyStyle={{ paddingRight: 32 }}
+    >
       <div
         style={{
           position: 'absolute',

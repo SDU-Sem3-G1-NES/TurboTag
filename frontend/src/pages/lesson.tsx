@@ -1,86 +1,86 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { LessonClient, LessonDto } from "../api/apiClient";
-import { Card, Spin, Typography, Tag, notification } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import VideoPlayer from "../components/videoPlayer";
+import React, { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { LessonClient, LessonDto } from '../api/apiClient'
+import { Card, Spin, Typography, Tag, notification } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
+import VideoPlayer from '../components/videoPlayer'
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph } = Typography
 
 const LessonPage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const lessonClient = useMemo(() => new LessonClient(), []);
-  const { uploadId } = useParams<{ uploadId: string }>();
-  const [lesson, setLesson] = useState<LessonDto>();
+  const [loading, setLoading] = useState(true)
+  const lessonClient = useMemo(() => new LessonClient(), [])
+  const { uploadId } = useParams<{ uploadId: string }>()
+  const [lesson, setLesson] = useState<LessonDto>()
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+    let intervalId: NodeJS.Timeout | null = null
 
     const fetchLesson = async () => {
       try {
-        const data = await lessonClient.getLessonByUploadId(Number(uploadId));
-        setLesson(data);
+        const data = await lessonClient.getLessonByUploadId(Number(uploadId))
+        setLesson(data)
 
         const isGenerating =
-          !data.lessonDetails?.description ||
-          (data.lessonDetails?.tags?.length ?? 0) === 0;
+          !data.lessonDetails?.description || (data.lessonDetails?.tags?.length ?? 0) === 0
 
         if (isGenerating) {
           intervalId = setInterval(async () => {
             try {
-              const refreshed = await lessonClient.getLessonByUploadId(Number(uploadId));
+              const refreshed = await lessonClient.getLessonByUploadId(Number(uploadId))
 
               if (
                 refreshed.lessonDetails?.description &&
                 refreshed.lessonDetails.tags?.length > 0
               ) {
-                setLesson(refreshed);
-                if (intervalId) clearInterval(intervalId);
+                setLesson(refreshed)
+                if (intervalId) clearInterval(intervalId)
 
                 notification.success({
-                  message: "Content generation complete",
-                  description: "Tags and description are now available.",
-                  placement: "topRight",
+                  message: 'Content generation complete',
+                  description: 'Tags and description are now available.',
+                  placement: 'topRight',
                   duration: 3
-                });
+                })
               }
             } catch (err) {
-              console.error("Error polling for updates:", err);
+              console.error('Error polling for updates:', err)
             }
-          }, 5000);
+          }, 5000)
         }
       } catch (error) {
-        console.error("Error fetching lesson:", error);
+        console.error('Error fetching lesson:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchLesson();
+    fetchLesson()
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [uploadId]);
+      if (intervalId) clearInterval(intervalId)
+    }
+  }, [uploadId])
 
   const isGenerating =
-    !lesson?.lessonDetails?.description ||
-    (lesson.lessonDetails?.tags?.length ?? 0) === 0;
+    !lesson?.lessonDetails?.description || (lesson.lessonDetails?.tags?.length ?? 0) === 0
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
+      <div
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}
+      >
         <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
       </div>
-    );
+    )
   }
 
   if (!lesson) {
     return (
-      <div style={{ textAlign: "center", marginTop: 40 }}>
+      <div style={{ textAlign: 'center', marginTop: 40 }}>
         <Title level={3}>404 Lesson not found</Title>
       </div>
-    );
+    )
   }
 
   return (
@@ -91,11 +91,11 @@ const LessonPage: React.FC = () => {
         margin: '20px auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: 16,
+        gap: 16
       }}
     >
       <div style={{ alignSelf: 'center', width: '100%' }}>
-        <VideoPlayer videoId={lesson.fileMetadata?.[0]?.id ?? ""} />
+        <VideoPlayer videoId={lesson.fileMetadata?.[0]?.id ?? ''} />
       </div>
 
       <Card style={{ width: '100%' }}>
@@ -118,7 +118,7 @@ const LessonPage: React.FC = () => {
           style={{
             backgroundColor: 'lightGray',
             marginTop: 0,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
           }}
         >
           <Title level={5}>Summary</Title>
@@ -130,7 +130,7 @@ const LessonPage: React.FC = () => {
         </Card>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default LessonPage;
+export default LessonPage

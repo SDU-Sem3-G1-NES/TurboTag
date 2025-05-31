@@ -8,7 +8,7 @@ import {
   UserRequest,
   UserTypeDto,
   UserFilter,
-  TagFilter,
+  TagFilter
 } from '../api/apiClient.ts'
 import {
   Layout,

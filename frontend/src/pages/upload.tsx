@@ -118,7 +118,7 @@ const UploadPage: React.FC = () => {
     try {
       const { fileId, thumbnailId, outputPath } = await handleChunkedUpload(file)
       const duration = await getFileDuration(file)
-      
+
       const uploadDTO = new UploadDto()
       uploadDTO.init({
         id: null,
@@ -129,7 +129,7 @@ const UploadPage: React.FC = () => {
       })
 
       const uploadID = await uploadClient.addUpload(uploadDTO)
-      
+
       const fileMetadataDTO = new FileMetadataDto()
       fileMetadataDTO.init({
         id: fileId,
@@ -145,7 +145,7 @@ const UploadPage: React.FC = () => {
       lessonDetailsDTO.init({
         id: uploadID,
         title: title,
-        description: "",
+        description: '',
         tags: [],
         thumbnailId: thumbnailId
       })
@@ -158,7 +158,7 @@ const UploadPage: React.FC = () => {
         ownerId,
         ownerName
       })
-      
+
       const lessonUploadRequest = new LessonUploadRequest()
       lessonUploadRequest.init({
         lesson: lessonDTO,

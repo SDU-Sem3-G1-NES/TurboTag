@@ -70,7 +70,11 @@ const LibraryPage: React.FC = () => {
           <Row gutter={[16, 16]} style={{ width: '75%' }}>
             {lessons.map((lesson) => (
               <Col key={lesson.mongoId} span={12}>
-                <LessonCard lesson={lesson} onStarToggled={reload} onClick={() => navigate(`/lesson/${lesson.uploadId}`)} />
+                <LessonCard
+                  lesson={lesson}
+                  onStarToggled={reload}
+                  onClick={() => navigate(`/lesson/${lesson.uploadId}`)}
+                />
               </Col>
             ))}
           </Row>
