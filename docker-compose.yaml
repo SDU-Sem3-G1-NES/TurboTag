@@ -76,12 +76,14 @@
       context: ./setup/fasterWhisper
       dockerfile: Dockerfile
     volumes:
-      - /tmp:/host-tmp
-
+      - /tmp:/host-tmp # Use this on linux, comment on Windows
+    # - ${LOCALAPPDATA}/Temp:/win-tmp   # Use on Windows, comment on Linux
     ports:
       - "8000:8000"
     networks:
       - turbotag
+    env_file:
+      - .env
 
   ollama:
     image: ollama/ollama
